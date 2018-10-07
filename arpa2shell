@@ -1,0 +1,66 @@
+#!/usr/bin/env python2.7
+#
+# arpa2shell -- invoke arpa2cmd.Cmd () and subshells
+#
+# Call this command with a series of module names that
+# contain a Cmd which subclasses arpa2cmd.Cmd -- they
+# will be mutually introduced and the meta-shell is
+# started so the user can switch to subshells.
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+import os
+import sys
+
+import arpa2cmd
+
+
+# Load shells as given on the commandline or, when none
+# is provided, search for shells to include automatically.
+#
+args = set (sys.argv [1:])
+if len (args) == 0:
+	for p in sys.path:
+		try:
+			for m in os.listdir (p):
+				if m [-3:] != '.py':
+					continue
+				if m == 'arpa2cmd.py':
+					continue
+				if m [:5] == 'arpa2':
+					args.add (m [:-3])
+		except OSError,oe:
+			if oe.errno != 2:
+				raise
+
+
+# The arpa2shell is invoked with packages to load and
+# whose Cmd to start, followed by mutual introductions.
+# Each of these Cmd instances are assumed to derive
+# from arpa2shell.Cmd.
+#
+if __name__ == '__main__':
+	arpa2shell = arpa2cmd.Cmd ()
+	for modname in args:
+		try:
+			if modname [-3:] == '.py':
+				modname = modname [:-3]
+			mod = __import__ (modname)
+			# cls = getattr (mod, 'Cmd')
+			# cmd = cls ()
+			if 'Cmd' not in dir (mod):
+				raise Exception ('Not a command shell')
+			cmd = mod.Cmd ()
+			if not isinstance (cmd, arpa2cmd.Cmd):
+				raise Exception ('This is not an ARPA2 shell')
+			arpa2shell.know_about (modname, cmd)
+			cmd.know_about ('arpa2shell', arpa2shell)
+		except Exception, e:
+			sys.stderr.write ('Failed to import ' + modname + ': ' + str (e) + '\n')
+	current_shell = arpa2shell
+	while current_shell is not None:
+		current_shell.next_shell = None
+		current_shell.cmdloop ()
+		current_shell = current_shell.next_shell
+

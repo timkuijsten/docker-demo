@@ -25,6 +25,12 @@ RUN apt-get install -y krb5-user openldap-utils python2.7 ldapvi nano lrzsz
 
 RUN ln -s /usr/bin/python2.7 /usr/bin/python
 
+ADD arpa2shell /usr/bin/arpa2shell
+ADD arpa2cmd.py /usr/lib/python2.7/arpa2cmd.py
+ADD readline.py /usr/lib/python2.7/readline.py
+
+#TODO# We might not have added gnureadline yet, check cmdline editing
+
 # Add files relative to this Dockerfile
 # ADD index.html /var/www/index.html
 
