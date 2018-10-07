@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 #
 # arpa2shell -- invoke arpa2cmd.Cmd () and subshells
 #
@@ -30,7 +30,7 @@ if len (args) == 0:
 					continue
 				if m [:5] == 'arpa2':
 					args.add (m [:-3])
-		except OSError,oe:
+		except OSError as oe:
 			if oe.errno != 2:
 				raise
 
@@ -56,7 +56,7 @@ if __name__ == '__main__':
 				raise Exception ('This is not an ARPA2 shell')
 			arpa2shell.know_about (modname, cmd)
 			cmd.know_about ('arpa2shell', arpa2shell)
-		except Exception, e:
+		except Exception as e:
 			sys.stderr.write ('Failed to import ' + modname + ': ' + str (e) + '\n')
 	current_shell = arpa2shell
 	while current_shell is not None:
