@@ -21,8 +21,9 @@ ADD krb5.conf /etc/krb5.conf
 # ADD selections.debconf /tmp/selections.debconf
 # RUN debconf-set-selections /tmp/selections.debconf
 
-RUN apt-get install -y krb5-user
-RUN apt-get install -y openldap-utils
+RUN apt-get install -y krb5-user openldap-utils python2.7 ldapvi nano lrzsz
+
+RUN ln -s /usr/bin/python2.7 /usr/bin/python
 
 # Add files relative to this Dockerfile
 # ADD index.html /var/www/index.html
