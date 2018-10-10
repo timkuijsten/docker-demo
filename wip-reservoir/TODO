@@ -1,0 +1,12 @@
++ (arpa2id) look into ldap.conf instead of ARPA2_DOMAIN and ARPA2_LDAPURI
++ (arpa2id) use GSSAPI login when the BINDDN matches
+- (arpa2id) inherit from cmd.Cmd instead of parsing "manually"
++ setup Kerberos5 server ticket ldap/reservoir.arpa2@ARPA2.NET
++ a2reservoir -> arpa2reservoir
++ yet another round of Python installation blues (BUT THIS TIME IT'S RESOLVED!!!!)
++ construct an image arpa2:buildphase-pip FROM debian:stable with "just" pip
++ use it to RUN pip install cmdparser python-ldap riak
++ COPY --from /usr/*/lib/python2.7/dist-utils/ /usr/*/lib/python2.7/dist-utils
+- Somehow get riak to create bucket types with or without crypto:md5 facility
++ Drop user_pasw.py from Dockerfile [also in the arpa2:identityhub target]
+

@@ -1,0 +1,16 @@
+digraph arpa2demos {
+   "debian:stable";
+   "arpa2:base";
+   "debian:stable" -> "arpa2:base" ;
+   "arpa2:build-bin";
+   "arpa2:base" -> "arpa2:build-bin" ;
+   "arpa2:build-pip";
+   "arpa2:build-bin" -> "arpa2:build-pip" ;
+   "arpa2:demo-identityhub";
+   "arpa2:build-pip" -> "arpa2:demo-identityhub" ;
+   "arpa2:base" -> "arpa2:demo-identityhub" ;
+   "arpa2:wip-reservoir";
+   "arpa2:build-pip" -> "arpa2:wip-reservoir" ;
+   "arpa2:base" -> "arpa2:wip-reservoir" ;
+   "arpa2:base" -> "arpa2:wip-reservoir" ;
+}

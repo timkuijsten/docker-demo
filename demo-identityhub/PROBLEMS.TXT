@@ -1,0 +1,35 @@
+
+3. Keytab for OpenLDAP.
+   This can be set in the default manner,
+   using something along the lines of
+   export KRB5_KTNAME=/etc/ldap/krb5-ldap.keytab
+   The alternative is the default keytab
+   /etc/krb5.keytab but made readable to slapd.
+   But can we set the envvar reliably and just
+   for OpenLDAP?
+
+   *DONE:** Add it to `/etc/default/slapd`
+
+6. Getting ports actually exported, so users
+   can access web2ldap (when it runs again)
+   and OpenLDAP (with GSSAPI from a desktop).
+
+   **DONE:** On Mac OS X, this is done via
+   `localhost` -- which leaves us with new a
+   problem due to Kerberos' DNS reverse lookups.
+
+
+This is how we gain access to LDAP with GSSAPI:
+
+```
+import ldap
+dap = ldap.initialize ('ldap://identityhub.arpa2:1389')
+sasl_auth = ldap.sasl.gssapi ()
+dap.sasl_interactive_bind_s ('', sasl_auth)
+```
+
+Or we can use
+
+```
+ldapsearch -Y GSSAPI ...
+```

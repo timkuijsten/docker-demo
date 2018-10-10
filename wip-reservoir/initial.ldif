@@ -1,0 +1,167 @@
+# DIT example for Service Directory.
+#
+# We use a Service Directory to collect configuration data in a
+# tree that first sorts out the service and only then splits into
+# domains hosted by services.  This file demonstrates by example
+# how the general top structure works, and how it breaks down into
+# description of individual service.
+#
+# Note the structural distinction relative to the Global Directory,
+# which first splits out domains (with separate domainComponenent
+# RDNs even) before turning to the various things underneath it.
+# The Global Directory is meant for sharing public data under a
+# domain (which holds SRV records pointing to an LDAP server) and
+# this is not true for the Service Directory.  The purpose of the
+# Service Directory is to offer information to service providers
+# on a need-to-know basis.  These can subscribe to the subtree
+# for their configuration data, without seeing the same from other
+# processes.  We consider it the "shared database" between the
+# hosting provider and a plugged-in service provider, though the
+# precise link between those parties has not materialised into
+# full specifications yet.
+#
+# The concrete service shown below is the IdentityHub, so the
+# component used in the InternetWide Infrastructure to manage
+# rights to access their LDAP root node
+#
+
+# The root of the Service Directory indicates clearly that it falls
+# under the structural reign of the InternetWide Organisation.  It
+# informatively references a few sites and domains, to service those
+# who poke around the DIT.
+#
+# It may seem a bit awkward to have an organizationalUnit as the
+# root component; still, it makes sense in that it is a unit that
+# we consider to span across many organisations.  It also helps
+# to have a distinct top-level that is unlikely to interfere with
+# already defined database roots in directory servers.
+#
+# Readable to all service providers.
+#
+dn: ou=InternetWide
+ou: InternetWide
+ou: Service Directory
+ou: InternetWide ServiceDIT
+ou: InternetWide Service Directory
+objectClass: organizationalUnit
+objectClass: labeledURIObject
+objectClass: domainRelatedObject
+description: Service Directory for InternetWide Architecture
+labeledURI: http://internetwide.org Blog and Project Description
+labeledURI: http://arpa2.net ARPA2 Umbrella for Partial Projects
+labeledURI: http://arpa2.org ARPA2 Umbrella for Project Infrastrucutre
+labeledURI: https://github.com/arpa2 ARPA2 Software Repositories
+associatedDomain: internetwide.org
+associatedDomain: arpa2.net
+associatedDomain: arpa2.org
+
+# The second level lists service providers, whose name we mandate to
+# take the form of a domain name, because that constitutes a unique
+# identifier.  The objectClass at this level is standardised, and it
+# is a good idea to incorporate contact information at this point, as
+# a way for an identity provider to get in touch with the service
+# provider.  Since these records are not published, it is not a direct
+# threat of workload to publish technical people here; this information
+# is not meant for consumption by the end user / domain owner.  It is
+# a good idea to include references to the website of the service
+# provider.  Service description links and contact details however,
+# are best placed one level down, as companies may start off with
+# just one service, but are likely to add more as they go.
+#
+# Readable only to the service provider who binds to this node.
+# Writeable to the same service provider.
+#
+# Created and Deleted as the user plugs in, or removes a service.
+# Initial details are provided by the plugin description handed over
+# by the prospective service provider.
+#
+# The example given below is made for internal use by InternetWide
+# components, such as the IdentityHub.  It is bound to be present
+# in each identity provider's Service Directory.
+#
+dn: o=arpa2.net,ou=InternetWide
+o: arpa2.net
+o: ARPA2 projects of the InternetWide Organisation
+o: ARPA2
+objectClass: organization
+objectClass: labeledURIObject
+objectClass: domainRelatedObject
+description: IdentityHub Component of the InternetWide Architecture
+description: Authorisation details: users, groups, memberships, ...
+telephoneNumber: +3123456789
+labeledURI: http://internetwide.org Blog and Project Description
+labeledURI: http://internetwide.org/tag/architecture.html InternetWide Architecture
+associatedDomain: arpa2.org
+
+# The third level holds the services provided by a service provider.
+# These can be named as they like, where the only need is to keep
+# them unique under their service provider (domain) name.  The form
+# of the object is always an organizationalUnit.  Contact details
+# are once again useful, in this case with specific contacts for the
+# described service.  It also helps to have website links to the
+# specific service.
+#
+# Readable only to the service provider who binds to the node above
+# this one.  Writeable to the same service provider.
+#
+# Created and Deleted as the user plugs in, or removes a service.
+# Initial details are provided by the plugin description handed over
+# by the prospective service provider.
+#
+# The example given below is made for internal use by InternetWide
+# components, such as the IdentityHub.  It is bound to be present
+# in each identity provider's Service Directory.
+#
+dn: ou=Reservoir,o=arpa2.net,ou=InternetWide
+ou: IdentityHub
+objectClass: organizationalUnit
+objectClass: labeledURIObject
+description: Reservoir metadata, notably Resource Collections
+labeledURI: https://github.com/arpa2/reservoir Reservoir Architecture
+labeledURI: https://github.com/arpa2/webdav-reservoir WebDAV interface to Reservoir
+labeledURI: http://reservoir.arpa2.net Project home page
+
+# The fourth level lists the domain names of the various users.
+# It is part of the protocol of plugging services into domains
+# that these services will collate such domains.  The result is
+# the it is easy for service providers to iterate over customer
+# domains and the accompanying configuration details.
+#
+# Domain owners are encouraged to provide contact details for
+# use by the service provider in case of problems.  These details
+# may be service-specific, leading to an expert contact in a
+# large organisation, or they may be the same for all services.
+#
+# It is possible to make this an index into the domain's
+# Reservoir.  In this case, named references are added to
+# point to the Resource Collections directly below it.  It is
+# also possible for other parts of the LDAP directory to
+# reference the associatedDomain's Reservoir underneath this
+# node.  A notably example are the IdentityHub objects for
+# uid=,associatedDomain=,ou=IdentityHub,o=arpa2.net,ou=InternetWide
+# identities; these form a starting point for a user's Reservoir.
+# In all cases, the references point to the resource collections
+# under associatedDomain=,ou=Reservoir,o=arpa2.net,ou=InternetWide
+# 
+# Readable only to the service provider who binds to this node.
+# Writeable by the reservoir service provider.
+#
+
+# The fifth level lists the Resource Collections, and the sixth
+# level holds the actual Resource metadata in individual LDAP
+# objects.
+#
+# The fifth level of Resource Collection can reference other
+# Resource Collections under the same associatedDomain.  This
+# mimics nesting.
+#
+# The fifth level is also a ResourceInstance and in fact the
+# RDN used mentions that, resins=(UUID), to simplify finding
+# ACL information based on the mere DN of a Resource.  The
+# individual Resources do not have individual access control;
+# move a Resource into another Resource Collection to change
+# access control.  This is probably easier to manage, as well
+# as easier on digital resources, than setting access control
+# on individual Resources.
+
+

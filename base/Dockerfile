@@ -21,7 +21,7 @@ ADD krb5.conf /etc/krb5.conf
 # ADD selections.debconf /tmp/selections.debconf
 # RUN debconf-set-selections /tmp/selections.debconf
 
-RUN apt-get install -y krb5-user openldap-utils ldapvi nano lrzsz net-tools netcat python2.7 # python3
+RUN apt-get install -y krb5-user openldap-utils ldapvi nano procps less lrzsz net-tools netcat python2.7 # python3
 
 RUN ln -s /bin/nano /usr/bin/vi
 
@@ -30,11 +30,9 @@ RUN ln -s /usr/bin/python2.7 /usr/bin/python
 
 ADD arpa2shell /usr/bin/arpa2shell
 ADD arpa2cmd.py /usr/lib/python2.7/dist-packages/arpa2cmd.py
-ADD readline.py /usr/lib/python2.7/dist-packages/readline.py
+# ADD readline.py /usr/lib/python2.7/dist-packages/readline.py
 # ADD arpa2cmd.py /usr/lib/python3/dist-packages/arpa2cmd.py
 # ADD readline.py /usr/lib/python3/dist-packages/readline.py
-
-#TODO# We might not have added gnureadline yet, check cmdline editing
 
 # Add files relative to this Dockerfile
 # ADD index.html /var/www/index.html

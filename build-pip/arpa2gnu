@@ -1,0 +1,45 @@
+#!/bin/bash
+#
+# arpa2gnu -- Install GNU readline
+#
+# GNU readline is a bit of a puzzle.  It's functionality is
+# great to have, but its license spreads like a virus.  When
+# developers hadn out software with GNU readline built in,
+# that software automatically must reside under GNU license.
+# Not be compatible with it, not just open source, but very
+# specifically, the GNU license.  This is not generally
+# workable, so we offer users a way out.  By running this
+# script, they install GNU readline themselves, which is
+# always a good choice, and has no impact on licensing
+# terms.
+#
+# Just run this program once and enjoy the benefits anytime
+# afterwards.  Just make sure not to include this program
+# into automatic image generators and so on.
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+echo
+echo You can install GNU readline if you like.
+echo This enhances your user experience with cmdling editing.
+echo
+echo -n 'Install GNU readline? '
+
+read YESNO
+
+case $YESNO in
+y|Y|yes|Yes|YES|aye|please)
+	echo
+	echo Installing GNU readline.  Enjoy your flight.
+	echo
+	;;
+*)
+	echo
+	echo Not installing.  You can always run arpa2gnu again later.
+	echo
+	exit 0
+	;;
+esac
+
+base64 -d > /usr/local/lib/python2.7/dist-packages/gnureadline.so <<EOF
