@@ -31,6 +31,11 @@ RUN apt-get install -y python2.7 build-essential \
 	libldap-dev libsasl2-dev libkrb5-dev
 	#TODO#libgnutls-dev
 
+# Install ARPA2CM
+ADD https://github.com/arpa2/arpa2cm/archive/version-0.5.tar.gz /root/arpa2cm-0.5.tar.gz
+RUN cd /usr/local/src && tar -xzvf /root/arpa2cm-0.5.tar.gz
+RUN cd /usr/local/src/arpa2cm-version-0.5 && mkdir build && cd build && cmake .. && make install
+
 # Define default command
 CMD ["/bin/bash"]
 

@@ -48,8 +48,9 @@ RUN DEBIAN_FRONTEND=noninteractive SLAPD_PASSWORD=sekreet \
 COPY identityhub.sh /usr/bin/identityhub.sh
 COPY initial.ldif /root/initial.ldif
 
-COPY arpa2id.py /usr/local/lib/python2.7/dist-packages/arpa2id.py
-RUN ln -s /usr/local/lib/python2.7/dist-packages/arpa2id.py /usr/bin/arpa2id
+COPY arpa2id.py /usr/local/lib/python2.7/dist-packages/arpa2identityhub.py
+RUN ln -s /usr/local/lib/python2.7/dist-packages/arpa2identityhub.py /usr/bin/arpa2identityhub
+COPY --from=pip /usr/bin/arpa2kerberos /usr/bin/arpa2kerberos
 COPY --from=pip /usr/bin/arpa2gnu /usr/bin/arpa2gnu
 
 COPY schema/*		/etc/ldap/schema/
@@ -66,7 +67,7 @@ RUN chmod go+r          /etc/krb5.keytab
 #RATHER #RUN chmod go-rwx          /etc/ldap/slapd.keytab
 #RATHER #ENV ... OpenLDAP only ...
 
-RUN chmod ugo+x /usr/bin/arpa2id
+RUN chmod ugo+x /usr/bin/arpa2identityhub
 
 EXPOSE 1389:1389 1760:1760
 

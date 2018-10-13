@@ -36,6 +36,9 @@ RUN base64 /usr/local/lib/python2.7/dist-packages/gnureadline.so >> /usr/bin/arp
 RUN echo EOF >> /usr/bin/arpa2gnu
 RUN rm /usr/local/lib/python2.7/dist-packages/gnureadline.so
 
+COPY arpa2kinit /usr/bin/arpa2kinit
+
+
 # Define default command
 CMD ["/bin/bash"]
 
