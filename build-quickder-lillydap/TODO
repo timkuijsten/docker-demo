@@ -1,0 +1,1 @@
+Python tests all fail.  The reason is that setuptools.py have evolved beyond what is said here.

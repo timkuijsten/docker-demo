@@ -74,6 +74,10 @@ FROM arpa2:base
 # Install Riak KV from .deb (moved from option 2 above)
 #
 
+# Install libssl1.0.0 old-school dependency from binary
+COPY libssl1.0.0_1.0.1t-1+deb7u4_amd64.deb /root
+RUN dpkg -i /root/libssl1.0.0_1.0.1t-1+deb7u4_amd64.deb
+
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get install --no-install-recommends -y \
 	openssl logrotate sudo
@@ -81,10 +85,10 @@ RUN apt-get install --no-install-recommends -y \
 COPY riak_*_amd64.deb /root
 RUN ( dpkg -i --force-depends /root/riak_*_amd64.deb || /bin/true )
 
-# Upgrade Riak KV dependency on libssl1.0.0 to Debian Stable libssl1.0.2l+
-RUN grep libssl1.0.0 /var/lib/dpkg/status
-RUN sed -i -e 's+libssl1\.0\.0 (>= 1\.0\.0)+libssl1.0.2 (>= 1.0.2l)+' /var/lib/dpkg/status
-#WILLNOWFAIL!# RUN grep libssl1.0.0 /var/lib/dpkg/status
+#SATISFIED-DEPENDENCY# # Upgrade Riak KV dependency on libssl1.0.0 to Debian Stable libssl1.0.2l+
+#SATISFIED-DEPENDENCY# RUN grep libssl1.0.0 /var/lib/dpkg/status
+#SATISFIED-DEPENDENCY# RUN sed -i -e 's+libssl1\.0\.0 (>= 1\.0\.0)+libssl1.0.2 (>= 1.0.2l)+' /var/lib/dpkg/status
+#SATISFIED-DEPENDENCY# #WILLNOWFAIL!# RUN grep libssl1.0.0 /var/lib/dpkg/status
 
 
 
@@ -111,11 +115,13 @@ RUN chmod go+r /etc/krb5.keytab
 # Install operator's shells to play around with the Reservoir
 #
 
-COPY webdav-reservoir/arpa2resv /usr/lib/python2.7/dist-packages/arpa2resv.py
-#PY3# COPY arpa2resv.py /usr/lib/python3/dist-packages/arpa2resv.py
-RUN ln -s /usr/lib/python2.7/dist-packages/arpa2resv.py /usr/bin/arpa2resv
-#PY3# RUN ln -s /usr/lib/python3/dist-packages/arpa2resv.py /usr/bin/arpa2resv
-RUN chmod ugo+x /usr/bin/arpa2resv
+COPY webdav-reservoir/arpa2resv /usr/local/lib/python2.7/dist-packages/arpa2resv.py
+#PY3# COPY arpa2resv.py /usr/local/lib/python3/dist-packages/arpa2resv.py
+RUN ln -s /usr/local/lib/python2.7/dist-packages/arpa2resv.py /usr/bin/arpa2resv
+#PY3# RUN ln -s /usr/local/lib/python3/dist-packages/arpa2resv.py /usr/bin/arpa2resv
+COPY arpa2acl.py /usr/local/lib/python2.7/dist-packages/arpa2acl.py
+RUN ln -s /usr/local/lib/python2.7/dist-packages/arpa2acl.py /usr/bin/arpa2acl
+RUN chmod ugo+x /usr/bin/arpa2resv /usr/bin/arpa2acl
 COPY --from=pip /usr/bin/arpa2gnu /usr/bin/arpa2gnu
 
 

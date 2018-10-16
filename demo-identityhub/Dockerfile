@@ -50,7 +50,7 @@ COPY initial.ldif /root/initial.ldif
 
 COPY arpa2id.py /usr/local/lib/python2.7/dist-packages/arpa2identityhub.py
 RUN ln -s /usr/local/lib/python2.7/dist-packages/arpa2identityhub.py /usr/bin/arpa2identityhub
-COPY --from=pip /usr/bin/arpa2kerberos /usr/bin/arpa2kerberos
+COPY --from=pip /usr/bin/arpa2kinit /usr/bin/arpa2kinit
 COPY --from=pip /usr/bin/arpa2gnu /usr/bin/arpa2gnu
 
 COPY schema/*		/etc/ldap/schema/

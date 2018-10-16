@@ -8,6 +8,11 @@ builddir base
 
 builddir build-bin
 builddir build-pip
+builddir build-tls
+
+builddir build-quickder-lillydap
+builddir build-steamworks
+builddir build-tlspool
 
 builddir demo-identityhub
 

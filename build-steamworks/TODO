@@ -1,0 +1,24 @@
+Running tests...
+Test project /usr/local/src/steamworks-version-0.92-beta3/build
+    Start 1: compile-tests/empty-lines.ply
+1/5 Test #1: compile-tests/empty-lines.ply ...........   Passed    0.00 sec
+    Start 2: compile-tests/empty-script.ply
+2/5 Test #2: compile-tests/empty-script.ply ..........   Passed    0.00 sec
+    Start 3: compile-tests/intuition-example.ply
+3/5 Test #3: compile-tests/intuition-example.ply .....***Exception: SegFault  0.05 sec
+    Start 4: compile-tests/syntactical-sandbox.ply
+4/5 Test #4: compile-tests/syntactical-sandbox.ply ...***Exception: SegFault  0.03 sec
+    Start 5: compile-tests/tlspool-issuers.ply
+5/5 Errors while running CTest
+Test #5: compile-tests/tlspool-issuers.ply .......***Exception: SegFault  0.03 sec
+
+40% tests passed, 3 tests failed out of 5
+
+Total Test time (real) =   0.14 sec
+
+The following tests FAILED:
+      3 - compile-tests/intuition-example.ply (SEGFAULT)
+      4 - compile-tests/syntactical-sandbox.ply (SEGFAULT)
+      5 - compile-tests/tlspool-issuers.ply (SEGFAULT)
+make: *** [test] Error 8
+Makefile:149: recipe for target 'test' failed

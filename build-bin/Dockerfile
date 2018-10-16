@@ -27,14 +27,16 @@ RUN \
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get install -y python2.7 build-essential \
-	cmake cmake-curses-gui git vim nano \
+	git vim nano \
+	flex bison \
+	cmake cmake-curses-gui pkg-config \
 	libldap-dev libsasl2-dev libkrb5-dev
 	#TODO#libgnutls-dev
 
 # Install ARPA2CM
-ADD https://github.com/arpa2/arpa2cm/archive/version-0.5.tar.gz /root/arpa2cm-0.5.tar.gz
-RUN cd /usr/local/src && tar -xzvf /root/arpa2cm-0.5.tar.gz
-RUN cd /usr/local/src/arpa2cm-version-0.5 && mkdir build && cd build && cmake .. && make install
+ADD https://github.com/arpa2/arpa2cm/archive/version-0.5.tar.gz /root/arpa2cm-version-0.5.tar.gz
+RUN cd /usr/local/src && tar -xzvf /root/arpa2cm-version-0.5.tar.gz
+RUN cd /usr/local/src/arpa2cm-version-0.5 && mkdir build && cd build && cmake .. && make all install
 
 # Define default command
 CMD ["/bin/bash"]
