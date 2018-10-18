@@ -138,18 +138,23 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.8
 	SINGLE-VALUE )
 
 # resourceInstance describes an instance key, always
-# within the scope of a given resourceClassUUID.
+# within the scope of a given resourceClassUUID.  It is
+# represented as a DirectoryString, to capture general
+# UTF-8 forms.
 #
 # When used extensively to distinguish within any given
 # resourceClassUUID, this attribute may be an interesting
-# candidate for equality indexing.
+# candidate for equality indexing.  When doing so, note
+# that this is a case-sensitive format so it can hold a
+# maximum of key forms (and because it is easy to map to
+# a certain form if so desired).
 #
 attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.9
         NAME 'resourceInstanceKey'
         DESC 'The binary key for a resource instance'
-	EQUALITY octetStringMatch
-	ORDERING octetStringOrderingMatch
-	SYNTAX 1.3.6.1.4.1.1466.115.121.1.40 )
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
 
 
 # identityHubUser is an object that describes users, as in, individuals.

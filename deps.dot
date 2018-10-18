@@ -20,8 +20,9 @@ digraph arpa2demos {
    "arpa2:demo-identityhub";
    "arpa2:build-pip" -> "arpa2:demo-identityhub" ;
    "arpa2:base" -> "arpa2:demo-identityhub" ;
-   "arpa2:wip-reservoir";
-   "arpa2:build-pip" -> "arpa2:wip-reservoir" ;
-   "arpa2:base" -> "arpa2:wip-reservoir" ;
-   "arpa2:base" -> "arpa2:wip-reservoir" ;
+   "arpa2:demo-reservoir";
+   "arpa2:build-pip" -> "arpa2:demo-reservoir" ;
+   "arpa2:base" -> "arpa2:demo-reservoir" ;
+   "arpa2:wip-6bed4";
+   "arpa2:build-bin" -> "arpa2:wip-6bed4" ;
 }

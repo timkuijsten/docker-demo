@@ -80,6 +80,27 @@ if use_gssapi:
 else:
 	dap.bind_s (ldapuser, ldappasw)
 
+whoami = dap.whoami_s ()
+if whoami [:3] == 'dn:':
+	whoami = whoami [3:]
+#DEBUG# print 'I seem to be', whoami, '::', type (whoami)
+
+whoami_uid = None
+whoami_dom = None
+whoami_a2id = None
+for rdn in map (string.strip, whoami.split (',')):
+	if rdn [:4] == 'uid=' and whoami_uid is None:
+		whoami_uid = rdn [4:].strip ().lower ()
+	if rdn [:17] == 'associatedDomain=' and whoami_dom is None:
+		whoami_dom = rdn [17:].strip ().lower ()
+		if whoami_dom [-1:] == '.':
+			whoami_dom = whoami_dom [:-1]
+if whoami_uid is None or whoami_dom is None:
+	sys.stderr.write ('Failed to construct uid@associatedDomain from ' + whoami)
+else:
+	whoami_nai = whoami_uid + '@' + whoami_dom
+
+
 base = 'ou=IdentityHub,o=arpa2.net,ou=InternetWide'
 
 
@@ -316,6 +337,11 @@ matchables = {
 }
 
 
+# The UUID for the resource class 'uid.domain.identityhub'
+# or uid@domain administrative access control
+uuid_uid_domain_idhub = '53281a7c-2c69-3d49-b12f-590e0a2f54bc'
+
+
 
 class Cmd (arpa2cmd.Cmd):
 
@@ -359,12 +385,23 @@ class Cmd (arpa2cmd.Cmd):
 		   Add DOMAIN.TLD named ORGNAME... to the managed portfolio of domain names.
 		"""
 		sys.stdout.write ("do_domain_add: " + line + "\n")
+		if whoami_nai is None:
+			sys.stderr.write ('Error: No uid@associatedDomain from whoami to assign rights\n')
+			return
+		else:
+			sys.stdout.write ('User identity management will be granted to ' + whoami_nai + '\n')
 		(domain,orgname) = string.split (line.strip (), maxsplit=1)
+		domain = domain.lower ()
+		if domain [-1:] == '.':
+			domain = domain [:-1]
 		dn1 = 'associatedDomain=' + domain + ',' + base
 		at1 = [
-			('objectClass', ['organization','domainRelatedObject']),
+			('objectClass', ['organization','domainRelatedObject', 'resourceInstance', 'accessControlledObject']),
 			('o', orgname or domain),
 			('associatedDomain', domain),
+			('resourceClassUUID', uuid_uid_domain_idhub),
+			('resourceInstanceKey', bytes (domain)),
+			('accessControlList', bytes ('%rwcd ' + whoami_nai + ' %o @' + whoami_dom)),
 		]
 		try:
 			meta = dap.add_s (dn1,at1)

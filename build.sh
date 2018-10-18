@@ -15,4 +15,5 @@ builddir build-steamworks
 builddir build-tlspool
 
 builddir demo-identityhub
+builddir demo-reservoir
 
