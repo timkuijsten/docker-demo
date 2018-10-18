@@ -46,12 +46,10 @@ docker build -t rv <THIS-DIRECTORY>
 ```
 
 The `slapd` is on the main terminal, outputing tons of debugging
-information:
+information; you can avoid seeing it with the `--detach` option:
 
 ```
 docker run --detach --network host --hostname reservoir.arpa2 -p 1388:1388 -p 1761:1761 --name rv0 rv
-docker cp py/lib/python2.7/site-packages/ rv0:/dist-packages/
-docker exec rv0 mv /dist-packages/* /usr/lib/python2.7/dist-packages/
 ```
 
 You can stop and start it at any time using
@@ -72,7 +70,6 @@ docker rm rv0
 Shells for poking around can be started as desired:
 
 ```
-# Alas, this complains about envvars that are not set
 docker exec -ti rv0 arpa2shell
 ```
 
@@ -82,8 +79,7 @@ ARPA2 sub-shells and allows switching between them.
 This is more powerful than just opening a single shell,
 
 ```
-# Alas, this complains about envvars that are not set
-docker exec -ti rv0 arpa2shell
+docker exec -ti rv0 arpa2reservoir
 ```
 
 You can get a normal shell with
@@ -92,11 +88,32 @@ You can get a normal shell with
 docker exec -ti rv0 bash
 ```
 
+If you would to setup GNU readline for more pleasant
+editing, you would run this on the shell:
+
+```
+arpa2gnu
+```
+
+And if you would like to switch to Kerberos authentication
+you could use `demo@ARPA2.NET` with password `sekreet`:
+
+```
+arpa2kinit
+```
+
+To drop Kerberos, instead run
+
+```
+arpa2kinit @
+```
+
+
 On the shell, you could also run the shells,
 
 ```
 arpa2reservoir
-arpa2shell arpa2reservoir # and later more sub-shells
+arpa2shell
 ```
 
 Note that the set of domains is independent from those
@@ -107,19 +124,76 @@ additional service, where customers take out only one
 but not both the services, and so on.
 
 Once on an `arpa2reservoir` shell, you can do things like
+adding domains, Resource Collections underneath domains,
+and since both the domain and each Resource Collection
+count as a Resource Index, you can use `index add` to
+link to a Resource Collection throug its UUID (shown
+symbolically below, as it is a random value).  You can
+start at a domain's Resource Index with `index domain`
+and the traverse locally added names with `index path`.
+There may be cycles, such as the `buurman` below that
+points from `Smid` to `Bakker` and back again.  The
+paths are always finite-sized so you can make any
+steps that seem good.
 
 ```
-domain_add orvelte.nep Orvelte, Incorporated
-#TODO# user_add orvelte.nep bakker Hij die bakt
-#TODO# user_add orvelte.nep smid Hij die hakt
-#TODO# user_del orvelte.nep bakker
-#TODO# user_del orvelte.nep smid
-domain_del orvelte.nep
+domain add orvelte.nep
+collection add orvelte.nep Ambachten
+collection add orvelte.nep Kunstenaars
+collection add orvelte.nep Bakker
+collection add orvelte.nep Brood
+collection add orvelte.nep Banket
+collection add orvelte.nep Smid
+collection add orvelte.nep Hoefijzers
+collection add orvelte.nep Schilden
+collection add orvelte.nep Zwaarden
+index domain orvelte.nep
+index add {UUID_Kunstenaars} kunst
+index add {UUID_Ambachten} ambacht
+index path kunst
+index add {UUID_Schilden} schilden
+index add {UUID_Zwaarden} zwaarden
+index add {UUID_Banket} banket
+index add {UUID_Bakker} bakker
+index add {UUID_Smid} smid
+inded domain orvelte.nep
+index path ambacht
+index add {UUID_Schilden} schilden
+index add {UUID_Zwaarden} zwaarden
+index add {UUID_Hoefijzers} hoefijzers
+index add {UUID_Brood} brood
+index add {UUID_Banket} banket
+index add {UUID_Bakker} bakker
+index add {UUID_Smid} smid
+index domain orvelte.nep
+index collection {UUID_Smid}
+index add {UUID_Schilden} schilden
+index add {UUID_Zwaarden} zwaarden
+index add {UUID_Hoefijzers} hoefijzers
+index add {UUID_Bakker} buurman
+index add {UUID_Kunstenaars} kunst
+index add {UUID_Ambachten} ambacht
+index path buurman
+index add {UUID_Brood} brood
+index add {UUID_Banket} banket
+index add {UUID_Smid} buurman
+index add {UUID_Kunstenaars} kunst
+index add {UUID_Ambachten} ambacht
+index domain orvelte.nep
+index path kunst bakker brood
+resource add file=/tmp/recept-krentemik.txt type=text/plain name=Recept_Krentemik
 ```
 
 Make sure to hit `<tab>` often, it should work really
 pleasantly.  Use `?command` or `help command` to inquire
 about a specific command's syntax.
+
+You can also use the `arpa2acl` shell to set the ACL for
+the two kinds of Reservoir Index objects: the client's
+domain as represented under the Reservoir root and the
+various Reservoir Collections underneath the domain.
+Resource are one step further down; these do not have
+individual ACL settings but follow Resource Collections.
 
 You can run `slapcat` from another shell to see the
 changes in the database.  This command is basically
@@ -144,7 +218,7 @@ that path separators are escaped to `%2f` to not mix them with URI syntax.
 A query that could be made would be
 
 ```
-ldapsearch -w sekreet -D uid=admin,ou=IdentityHub,o=arpa2.net,ou=InternetWide -b ou=InternetWide labeledURI
+ldapsearch -w sekreet -D uid=demo,ou=IdentityHub,o=arpa2.net,ou=InternetWide -b ou=InternetWide labeledURI
 ```
 
 You should get the `dn` and `labeledURI` for all objects underneath the

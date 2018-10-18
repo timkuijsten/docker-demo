@@ -132,7 +132,7 @@ def random_uuid ():
 def cmd_domain_add (domain, orgname=None):
 	dn1 = 'associatedDomain=' + domain + ',' + base
 	at1 = [
-		('objectClass', ['organization','domainRelatedObject','reservoirIndex']),
+		('objectClass', ['organization','domainRelatedObject','reservoirIndex', 'aclObject']),
 		('o', orgname or domain),
 		('associatedDomain', domain),
 	]
