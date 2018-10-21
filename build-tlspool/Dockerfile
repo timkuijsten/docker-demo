@@ -64,7 +64,7 @@ RUN cd /usr/local/src/tlspool-0.20-beta2/testdata && ( TOOLDIR=../build/tool mak
 # RUN  cd /usr/local/src/tlspool-0.20-beta2/testdata \
 # 	&& sed -i -e 's+^pkcs11_path .*$+pkcs11_path /usr/lib/softhsm/libsofthsm2.so+' ../etc/tlspool.conf \
 # 	&& make install
-RUN sed < /usr/local/src/tlspool-0.20-beta2/etc/tlspool.conf > /etc/tlspool.conf -e 's+ \.\./+/usr/local/src/tlspool-0.20-beta2/+'
+RUN sed < /usr/local/src/tlspool-0.20-beta2/etc/tlspool.conf > /etc/tlspool.conf -e 's+ \.\./+ /usr/local/src/tlspool-0.20-beta2/+'
 COPY tlspool.sh /tlspool.sh
 
 # Make sure all libraries can be found (including libquickder which was copied)

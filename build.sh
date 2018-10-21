@@ -9,12 +9,11 @@ builddir base
 
 builddir build-bin
 builddir build-pip
-builddir build-tls
+builddir build-libtls
 
 builddir build-quickder-lillydap
 builddir build-steamworks
 builddir build-tlspool
-builddir build-tls
 
 builddir demo-identityhub
 builddir demo-reservoir
