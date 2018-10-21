@@ -54,6 +54,9 @@ ADD https://github.com/vanrein/lillydap/archive/version-0.9-1.tar.gz /root/lilly
 RUN cd /usr/local/src && tar -xzvf /root/lillydap-version-0.9-1.tar.gz
 RUN cd /usr/local/src/lillydap-version-0.9-1 && mkdir build && cd build && cmake .. && make all test install
 
+# Trigger library updates
+RUN ldconfig
+
 # Define default command
 CMD ["/bin/bash"]
 

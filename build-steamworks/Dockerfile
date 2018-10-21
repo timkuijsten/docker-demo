@@ -25,10 +25,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get install -y liblog4cpp5-dev libsqlite3-dev
 
 # Install SteamWorks
-ADD https://github.com/arpa2/steamworks/archive/version-0.92-beta3.tar.gz /root/steamworks-version-0.92-beta3.tar.gz
-RUN cd /usr/local/src && tar -xzvf /root/steamworks-version-0.92-beta3.tar.gz
-#TODO#CRASH#ON#THREE#TESTS# RUN cd /usr/local/src/steamworks-version-0.92-beta3 && mkdir build && cd build && cmake .. && make all test install
-RUN cd /usr/local/src/steamworks-version-0.92-beta3 && mkdir build && cd build && cmake .. && make all install
+ADD https://github.com/arpa2/steamworks/archive/version-0.93-beta4.tar.gz /root/steamworks-version-0.93-beta4.tar.gz
+RUN cd /usr/local/src && tar -xzvf /root/steamworks-version-0.93-beta4.tar.gz
+RUN cd /usr/local/src/steamworks-version-0.93-beta4 && mkdir build && cd build && cmake .. && make all test install
+
+# Add a few Pulley Scripts
+ADD pulley/ /root/pulley
 
 # Define default command
 CMD ["/bin/bash"]

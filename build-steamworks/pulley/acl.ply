@@ -1,0 +1,92 @@
+# Access Control List management with SteamWorks Pulley.
+#
+# This script retrieves ACL entries for the generic formats
+# that are stored in LDAP under the InternetWide Architecture:
+#
+#   - Communication between two users
+#   - Resources access by users
+#   - Resource Instance access by users
+#
+# These are all described in accessControlledObjects in their
+# accessControlLine attributes.  The objects holding these
+# auxiliary enhancements can be of various kinds:
+#
+#   - uidObject or person for Communication
+#   - resourceClass for Resource access
+#   - resourceInstance for Resource Instance access
+#
+# Applications decide when to ask for access control, but we
+# can retrieve this scattered information and combine it in
+# a format that allows efficient implementation with a few
+# key/value database lookups, as described in
+# http://donai.arpa2.net/acl-impl.html
+#
+# This script accesses LDAP under variable internetwide.
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+
+# Subscribe to user objects to list their ACL lines.  Since this
+# concerns strictly identities, the information is taken from
+# the IdentityHub.  Group Members and Role Occupants have no
+# separate ACL rights.
+#
+# Requires: idhub.
+# Provides: user,domain,acl,userobject.
+#
+Uid:user+Acl:acl+ObjectClass:"aclObject",@userobject,associatedDomain=domain,ou="IdentityHub",o="arpa2.net",ou="InternetWide" <- idhub
+
+
+# Keep an output driver informed about additions and removals
+# to ACL lines for user@domain.  This includes groups and roles
+# but not their members and occupants.
+#
+# A proper backend needs to do some amount of work.  Multiple
+# ARPA2 Selectors to match against remote users may be included,
+# and these are stored under different database keys.  So the
+# backend should split the ACL description and add/remove it in
+# the various key/value pairs.
+#
+# Requires: user,domain,acl.
+#
+user,domain,acl -> null (title="user/group/role",vars="user,domain,acl")
+
+
+# Subscribe to Resource Class objects and find their ACL lines.
+# This addresses any application, not just the IdentityHub.
+# Indeed are Resource Class objects self-descriptive, as they
+# hold a dedicated resourceClassUUID attribute.  Note that this
+# does not mean that it does not occur elsewhere; anything is
+# grouped per resourceClassUUID and furthermore works additive.
+#
+ResourceClassUUID:rescls+Acl:acl+ObjectClass:"resourceClass"+ObjectClass:"aclObject",@resclsobj,...,ou="InternetWide" <- internetwide
+
+
+# Keep an output driver informed about additions and removals
+# to ACL lines for Resource Classes.  This is independent of
+# domains and users, and even from the various applications
+# that can be hosted in LDAP.  (Note: abuse possible...)
+#
+rescls,acl -> null (title="resource class",vars="resourceclass,acl")
+
+
+# Subscribe to Resource Instance objects and find ACL lines.
+# This addresses any application, not just the IdentityHub.
+# Indeed are Resource Instances self-descriptive, as they
+# hold a dedicated resourceClassUUID attribut.  Note that this
+# does not mean that it does not occur elsewhere; anything is
+# grouped per resourceClassUUID and refined on the basis of a
+# resourceInstanceKey and furthermore works additive.
+#
+ResourceClassUUID:rescls+ResourceInstanceKey:resins+Acl:acl+ObjectClass:"resourceInstance"+ObjectClass:"aclObject",@resinsobj,...,ou="InternetWide" <- internetwide
+
+
+# Keep an output driver informed about additions and removals
+# to ACL lines for Resource Instances.  This is independent
+# of domains and users, and even from the various applications
+# that can be hosted in LDAP.  (Note: abuse possible...)
+#
+rescls,resins,acl -> null (title="resource instance",vars="resourceclass,resourceinstance,acl")
+
+

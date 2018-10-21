@@ -27,8 +27,9 @@ RUN \
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get install -y python2.7 build-essential \
-	git vim nano \
+	git vim nano man \
 	flex bison \
+	rsyslog strace gdb \
 	cmake cmake-curses-gui pkg-config \
 	libldap-dev libsasl2-dev libkrb5-dev
 	#TODO#libgnutls-dev
