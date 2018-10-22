@@ -6,7 +6,7 @@
 # From: Rick van Rein <rick@openfortress.nl>
 
 cd /usr/local/src/tlspool*/src
-tlspool -kc ../etc/tlspool.conf
+tlspool -kc /etc/tlspool.conf
 
 sleep 10
 echo Enter the keepalive shell
