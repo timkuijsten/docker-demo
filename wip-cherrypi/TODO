@@ -1,0 +1,23 @@
+Preliminary:
+ X note that build-tlspool needs some work first, to welcome Python
+
+Docker:
+ - base CherryPy on build-tlspool, so as to have libraries and includes
+ - later copy the relative parts from build-tlspool and make a demo-cherrypy
+ - install SASL for Python, including library
+
+Cheroot/TLS:
+ - follow lib/python/webdemo.py but in server2client mode
+ - setup server name first, don't request client names (yet)
+ - deliver server name in LOCAL_USER
+ - deliver client name in REMOTE_USER -- if available
+
+CherryPy/SASL:
+ - bypass HTTP SASL EXTERNAL to the TLS Pool to ask a client name?
+ - add authentication via HTTP SASL
+ - possibly with HTTP SASL if REMOTE_USER unknown (CherryPy, wsgidav)
+
+TLS Pool/webdemo.py:
+ - include support for HTTP SASL authentication
+ - install libsasl, libkrb5 and Python wrappers
+
