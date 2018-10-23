@@ -18,17 +18,17 @@ FROM arpa2:build-quickder-lillydap AS quickder
 #
 FROM arpa2:build-bin
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Install required packages (already done in arpa2:base)
 # RUN \
 #     apt-get update && \
 #     apt-get -y upgrade
 
-ENV DEBIAN_FRONTEND=noninteractive
-
 # Install dependencies
 # libgnutls30 is present without a -dev for it?
-RUN apt-get install -y libdb5.3-dev softhsm2 libgnutls28-dev gnutls-bin libldns-dev libunbound-dev
-#DROPHSM# RUN apt-get install -y libdb5.3-dev libgnutls28-dev gnutls-bin libldns-dev libunbound-dev
+RUN apt-get install -y libdb5.3-dev softhsm2 libgnutls28-dev gnutls-bin libldns-dev libunbound-dev libpython-dev
+#DROPHSM# RUN apt-get install -y libdb5.3-dev libgnutls28-dev gnutls-bin libldns-dev libunbound-dev libpython-dev
 
 # Install Quick DER
 COPY --from=quickder /usr/local/include/quick-der /usr/local/include/quick-der
@@ -47,11 +47,11 @@ COPY --from=quickder /usr/local/share/doc/quick-der/ /usr/local/share/doc/quick-
 #WONTBERUN# RUN update-rc.d rsyslog enable
 
 # Install TLS Pool
-ADD https://github.com/arpa2/tlspool/archive/0.20-beta4.tar.gz /root/tlspool-0.20-beta4.tar.gz
+ADD https://github.com/arpa2/tlspool/archive/0.20-beta5.tar.gz /root/tlspool-0.20-beta5.tar.gz
 RUN useradd tlspool
-RUN cd /usr/local/src && tar -xzvf /root/tlspool-0.20-beta4.tar.gz
-RUN cd /usr/local/src/tlspool-0.20-beta4 && mkdir build && cd build && cmake .. && make all test install
-RUN cp /usr/local/src/tlspool-0.20-beta4/etc/tlspool.conf /etc/tlspool.conf
+RUN cd /usr/local/src && tar -xzvf /root/tlspool-0.20-beta5.tar.gz
+RUN cd /usr/local/src/tlspool-0.20-beta5 && mkdir build && cd build && cmake .. && make all test install
+RUN cp /usr/local/src/tlspool-0.20-beta5/etc/tlspool.conf /etc/tlspool.conf
 
 # Setup SoftHSM2 (includes creating missing directory)
 RUN chmod ugo+rx /etc/softhsm && chmod ugo+r /etc/softhsm/softhsm2.conf
@@ -61,16 +61,16 @@ RUN su -c 'softhsm2-util --init-token --free --label TLS_Pool_dev_data --so-pin=
 #FROMDEB# RUN softhsm2-util --init-token --free --label 'TLS_Pool_dev_data' --so-pin=sekreet --pin=1234
 
 # Setup TLS Pool testdata
-#GITDIDIT# RUN cd /usr/local/src/tlspool-0.20-beta4/testdata && sed -i -e 's+^pkcs11_path .*$+pkcs11_path /usr/lib/softhsm/libsofthsm2.so+' ../etc/tlspool.conf
-#SU-NOW-IN-INIT# RUN cd /usr/local/src/tlspool-0.20-beta4/testdata && chown tlspool . && ( su -c 'TOOLDIR=../build/tool make all' tlspool || su -c 'TOOLDIR=../build/tool make all' tlspool )
-#NOTNEEDED# RUN sed -i -e 's/^RSABITS=2048/RSABITS=4096/g' /usr/local/src/tlspool-0.20-beta4/testdata/Makefile
-RUN cd /usr/local/src/tlspool-0.20-beta4/testdata && chown -R tlspool . && ( su -c 'TOOLDIR=../build/tool make all' tlspool || su -c 'TOOLDIR=../build/tool make all' tlspool )
+#GITDIDIT# RUN cd /usr/local/src/tlspool-0.20-beta5/testdata && sed -i -e 's+^pkcs11_path .*$+pkcs11_path /usr/lib/softhsm/libsofthsm2.so+' ../etc/tlspool.conf
+#SU-NOW-IN-INIT# RUN cd /usr/local/src/tlspool-0.20-beta5/testdata && chown tlspool . && ( su -c 'TOOLDIR=../build/tool make all' tlspool || su -c 'TOOLDIR=../build/tool make all' tlspool )
+#NOTNEEDED# RUN sed -i -e 's/^RSABITS=2048/RSABITS=4096/g' /usr/local/src/tlspool-0.20-beta5/testdata/Makefile
+RUN cd /usr/local/src/tlspool-0.20-beta5/testdata && chown -R tlspool . && ( su -c 'TOOLDIR=../build/tool make all' tlspool || su -c 'TOOLDIR=../build/tool make all' tlspool )
 #NOMORE# RUN chown -R tlspool /var/lib/softhsm/tokens/*
-# RUN  cd /usr/local/src/tlspool-0.20-beta4/testdata \
+# RUN  cd /usr/local/src/tlspool-0.20-beta5/testdata \
 # 	&& sed -i -e 's+^pkcs11_path .*$+pkcs11_path /usr/lib/softhsm/libsofthsm2.so+' ../etc/tlspool.conf \
 # 	&& make install
-RUN sed < /usr/local/src/tlspool-0.20-beta4/etc/tlspool.conf > /etc/tlspool.conf -E -e '/^db_/p' -e '/^db_/d' -e 's+ (file:)?\.\./+ \1/usr/local/src/tlspool-0.20-beta4/+'
-#NAH# COPY tlspool.sh /tlspool.sh
+RUN sed < /usr/local/src/tlspool-0.20-beta5/etc/tlspool.conf > /etc/tlspool.conf -E -e '/^db_/p' -e '/^db_/d' -e 's+ (file:)?\.\./+ \1/usr/local/src/tlspool-0.20-beta5/+'
+COPY tlspool.sh /tlspool.sh
 COPY README.MD /TLS_Pool.MD
 
 # Make sure all libraries can be found (including libquickder which was copied)

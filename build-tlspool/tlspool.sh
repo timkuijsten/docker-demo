@@ -8,7 +8,11 @@
 cd /usr/local/src/tlspool*/src
 tlspool -kc /etc/tlspool.conf
 
-sleep 10
-echo Enter the keepalive shell
-bash
-echo Left the keepalive shell
+# Sleep forever, allowing the TLS Pool to spill its beans
+while true
+do
+	sleep 10
+done
+# echo Enter the keepalive shell
+# bash
+# echo Left the keepalive shell

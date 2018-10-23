@@ -162,6 +162,12 @@ If you screw up, you can always reset Docker to factory defaults, but
 you won't be able to save your settings first `:-S`  and oh, it will
 also free all your containers and images...
 
+Note that if you don't have routeable IPv6, you may run into problems
+with the Web Demo.  The Test Client and Test Server use IPv6 locally,
+so they should not experience routing difficulties.  But to be honest,
+it is a bit embarrassing to still have to explain backward compatibility
+to IPv6 `:'-(`
+
 
 ## Starting the TLS Pool
 
@@ -169,7 +175,7 @@ The TLS Pool logs plenty of information.
 You have to first start logging through
 
 ```
-/etc/init.d/rsyslogd start
+/etc/init.d/rsyslog start
 ```
 
 You can now start the TLS Pool with
@@ -177,6 +183,14 @@ You can now start the TLS Pool with
 ```
 tlspool -kc /etc/tlspool.conf
 ```
+
+For your convenience, we provide a script
+`/tlspool.sh` that will do both but not
+return to the prompt.  It is quite useful
+as a command to `docker run` too, as it
+will continue to run independent of being
+run interactively, but it will continue
+to output the TLS Pool messages.
 
 
 ## Test Client and Server
@@ -205,4 +219,39 @@ The identities setup by these utilities are
 testcli@tlspool.arpa2.lab
 testsrv@tlspool.arpa2.lab
 ```
+
+## Web Demo in Python
+
+There is a Python support library, and it
+comes with a web demonstration.  It downloads
+a page from a website, going through the
+TLS Pool.  The same concept of wrapping a
+socket into TLS is also what the built-in
+SSL library does!
+
+You would run this demo with
+
+```
+webdemo.py nlnet.nl [/var/run/tlspool.sock]
+```
+
+If your IPv6 network is local to your
+Docker container, then please accept that
+we need you to do some backward compatibility
+work.  You need to change the `AF_INET6` in the
+script into `AF_INET` to continue to use IPv4.
+While doing so, please ask yourself if it is
+fair that you should have to do this.  Why
+didn't you make a point out of upgrading the
+core protocol of the planet's most vital
+infrastructure?  The upgrade that will get
+you to peer-to-peer technology and away from
+constant prying into your activities through
+intermediate servers that are now needed to
+bounce traffic between end users because
+NAT traversal is not a generally solvable
+problem?  The impact of not being IPv6
+compliant is rather dire, but it is an
+individual choice whether you are part of
+that problem.
 

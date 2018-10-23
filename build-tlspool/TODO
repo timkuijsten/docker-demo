@@ -1,0 +1,23 @@
+For a web demo based on Python:
+ + apt-get install libpython2.7-dev
+
+CMake:
+ + install <tlspool/*.h> -- CMakeLists.txt wants to but it is not done?
+ X export CFLAGS=-I../../include before building _quickder.so
+ + install the Python plugin -- setup.py builds and installs tlspool.py and _tlspool.so
+ X install the Python demos
+ - prefix all installed binaries with "tlspool-"
+
+README:
+ + careful with IPv6, it blocks the webdemo if non-routeable
+
+Docker:
+ + install libpython-dev before building Python's _quickder.so
+
+TLS Pool:
+ X many type-based warnings when building _quickder.so (seemingly harmless)
+ + support a variable website in webdemo, please
+ X consider automatic fallback to IPv4, with a delay
+ - try again with the HTTPS_PROXY, using Twisted Python
+ - wonder why the webclientdemo.py and webserverdemo.py fail
+
