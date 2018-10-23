@@ -1,9 +1,20 @@
 """Implementation of the SSL Adapter for the TLS Pool."""
 
 
-from cheroot.ssl import Adapter
+from . import Adapter
+
+from ..makefile import StreamReader, StreamWriter
 
 import tlspool
+
+
+try:
+    from _pyio import DEFAULT_BUFFER_SIZE
+except ImportError:
+    try:
+        from io import DEFAULT_BUFFER_SIZE
+    except ImportError:
+        DEFAULT_BUFFER_SIZE = -1
 
 
 class TLSPoolAdapter (Adapter):
@@ -17,12 +28,12 @@ class TLSPoolAdapter (Adapter):
        problems resulting from an application breach.
     """
 
-    def __init__ (self, *ignored):
+    def __init__ (self, server_name):
         """Initialise this object and ignore the customary
            things: cert, key, chain, ciphers are all handled
            by the TLS Pool, so we can be blissfully ignorant.
         """
-        pass
+        self.server_name = server_name
 
     def bind (self, sock):
         """Wrap and return the socket.
@@ -38,7 +49,7 @@ class TLSPoolAdapter (Adapter):
 	       tlspool.PIOF_STARTTLS_REMOTEROLE_CLIENT |
                tlspool.PIOF_STARTTLS_IGNORE_REMOTEID )
 	hdl = tlspool.Connection (extsock, service='http', flags=fl)
-	hdl.tlsdata.localid = 'tlspool.arpa2.lab'
+	hdl.tlsdata.localid = self.server_name
 	intsock = hdl.starttls ()
         env = {
                 'wsgi.url_scheme': 'https',
@@ -48,10 +59,10 @@ class TLSPoolAdapter (Adapter):
         }
         return intsock, env
 
-    def makefile (self, sock, mode='r', bufsize=-1):
-        """Turn the socket into a file object.
-        """
-        return sock.makefile (mode=mode, bufsize=bufsize)
+    def makefile(self, sock, mode='r', bufsize=DEFAULT_BUFFER_SIZE):
+        """Return socket file object."""
+        cls = StreamReader if 'r' in mode else StreamWriter
+        return cls(sock, mode, bufsize)
 
     def get_environ (self, sock):
         """Return WSGI variables to be merged into each request.

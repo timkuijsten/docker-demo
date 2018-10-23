@@ -1,4 +1,4 @@
-# CherryPi demo, ARPA2 styled
+# CherryPy demo, ARPA2 styled
 
 This demonstrates a few ideas that we would like to see
 in web services:
@@ -46,4 +46,17 @@ openssl s_client -servername tlspool.arpa2.lab -connect 127.0.0.1:8070
 It will connect, print a certificate -- but that's all for now.
 There is no content in the test server yet.
 
-**TODO:** There is also a problem, trying to close an integer.  Our socket?
+It is worth noting that CherryPy is picky on correct line
+termination, so you will have to send carriage returns before
+line feeds.  You can type this on the shell by pressing `^V` `^M`
+just before hitting enter.
+
+After the handshake comes through, you can enter your query,
+with `^M` denoting the extra carriage return, for instance:
+
+```
+GET / HTTP/1.0^M
+Host: tlspool.arpa2.lab^M
+^M
+```
+
