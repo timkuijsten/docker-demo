@@ -4,6 +4,9 @@ digraph arpa2demos {
    "debian:stable" -> "arpa2:base" ;
    "arpa2:build-bin";
    "arpa2:base" -> "arpa2:build-bin" ;
+   "arpa2:build-libtls";
+   "arpa2:build-pip" -> "arpa2:build-libtls" ;
+   "arpa2:build-bin" -> "arpa2:build-libtls" ;
    "arpa2:build-pip";
    "arpa2:build-bin" -> "arpa2:build-pip" ;
    "arpa2:build-quickder-lillydap";
@@ -11,9 +14,6 @@ digraph arpa2demos {
    "arpa2:build-bin" -> "arpa2:build-quickder-lillydap" ;
    "arpa2:build-steamworks";
    "arpa2:build-bin" -> "arpa2:build-steamworks" ;
-   "arpa2:build-tls";
-   "arpa2:build-pip" -> "arpa2:build-tls" ;
-   "arpa2:build-bin" -> "arpa2:build-tls" ;
    "arpa2:build-tlspool";
    "arpa2:build-quickder-lillydap" -> "arpa2:build-tlspool" ;
    "arpa2:build-bin" -> "arpa2:build-tlspool" ;
@@ -25,4 +25,7 @@ digraph arpa2demos {
    "arpa2:base" -> "arpa2:demo-reservoir" ;
    "arpa2:wip-6bed4";
    "arpa2:build-bin" -> "arpa2:wip-6bed4" ;
+   "arpa2:wip-cherrypy";
+   "arpa2:build-pip" -> "arpa2:wip-cherrypy" ;
+   "arpa2:build-tlspool" -> "arpa2:wip-cherrypy" ;
 }
