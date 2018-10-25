@@ -9,6 +9,8 @@ digraph arpa2demos {
    "arpa2:build-bin" -> "arpa2:build-libtls" ;
    "arpa2:build-pip";
    "arpa2:build-bin" -> "arpa2:build-pip" ;
+   "arpa2:build-qpid";
+   "arpa2:build-pip" -> "arpa2:build-qpid" ;
    "arpa2:build-quickder-lillydap";
    "arpa2:build-pip" -> "arpa2:build-quickder-lillydap" ;
    "arpa2:build-bin" -> "arpa2:build-quickder-lillydap" ;

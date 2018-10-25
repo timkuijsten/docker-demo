@@ -35,6 +35,14 @@ Please commit a new demo as `wip-*` until it can
 actually be tried, at which time it moves to
 `demo-*` -- this may save some disappointments.
 
+A good approach is probably to start off with
+`FROM arpa2:build-xxx` and when it all works, strip away
+the unnecessary build environment by switching to
+`FROM arpa2:base` or another runtime base, and
+using `COPY --from=xxx` to copy necessary elements
+from the original `arpa2:build-xxx` that is now
+a preliminary phase `FROM arpa2:build-xxx AS xxx`
+
 You can create a typescript console "video" with
 
 ```shell
@@ -51,3 +59,24 @@ dot -T png deps.dot > deps.png
 
 Perhaps it is helpful to do even this work in
 CMake.
+
+## Using on Windows
+
+Docker images can be built on Windows without
+problem.  What is a concern however, is that
+files are being copied into containers, and those
+files should not get LF translated to CR-LF, as is
+the default when cloning a Git repository.
+
+The solution is to setup your repository with
+
+```
+git clone https://github.com/arpa2/docker-demo --config core.autocrlf=input
+```
+
+[[credit]](https://willi.am/blog/2016/08/11/docker-for-windows-dealing-with-windows-line-endings/)
+
+If your Docker does not work well and you get
+complaints about VT-D bios settings, you should
+instead [read this](http://www.tinkeringwithtechnology.com/2017/05/11/docker-problems-with-vt-d/).
+

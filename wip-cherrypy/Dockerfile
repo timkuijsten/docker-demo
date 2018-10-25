@@ -45,7 +45,9 @@ COPY cheroot-tlspool.py /usr/local/bin/
 COPY tlspooladapter.py /usr/local/src/cheroot.git/cheroot/ssl/
 
 RUN apt-get install -y python-pip
-RUN cd /usr/local/src/cheroot.git ; python setup.py install
+RUN cd /usr/local/src/cheroot.git  ; python setup.py install
+# There is an attempt to import urllib.parse (which is not present in Python 2.7)
+#TROUBLED# RUN cd /usr/local/src/cherrypy.git ; python setup.py install
 
 ### Final stage: Actually construct the image
 #

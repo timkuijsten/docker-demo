@@ -11,7 +11,7 @@ Cheroot/TLS:
  + setup server name first, don't request client names (yet)
  + deliver server name in LOCAL_USER
  + deliver client name in REMOTE_USER -- if available
- - get a TLS client connected to the demo application
+ + get a TLS client connected to the demo application
 
 CherryPy/SASL:
  - bypass HTTP SASL EXTERNAL to the TLS Pool to ask a client name?
