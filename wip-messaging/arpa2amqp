@@ -1,0 +1,101 @@
+#!/usr/bin/env python
+#
+# arpa2amqp -- AMQP 1.0 remote shell inquiries.
+#
+# This command runs batches of shell commands on a
+# remote machine, sending it over AMQP.  Sets reply_to
+# so the responses from the shell can be reported.
+#
+#TODO# This incarnation is based on stdin/stdout/stderr,
+#TODO# future versions may present a connectable daemon.
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+import sys
+
+
+from proton import Message
+from proton.handlers import MessagingHandler
+from proton.reactor import Container
+
+
+bad = False
+
+
+class ARPA2ShellClient (MessagingHandler):
+
+	def __init__ (self, broker, queue, batch):
+		super (ARPA2ShellClient,self).__init__ ()
+		self.broker = broker
+		self.queue = queue
+		self.batch = batch
+
+	def on_start (self, event):
+		#DEBUG# print 'started'
+		ctr = event.container
+		cnx = ctr.connect (self.broker)
+		self.sender = ctr.create_sender (cnx, self.queue)
+		self.recver = ctr.create_receiver (cnx, None, dynamic=True)
+		#DEBUG# print 'sender, receiver created'
+
+	def on_link_opened (self, event):
+		#DEBUG# print 'link opened for', self.batch
+		msg = Message (
+				reply_to=self.recver.remote_source.address,
+				body=self.batch)
+		self.batch = None
+		self.sender.send (msg)
+		#DEBUG# print 'message sent:', msg
+
+	def on_message (self, event):
+		#DEBUG# print 'message received'
+		reply = event.message.body
+		if reply is None:
+			return
+		global bad
+		while reply != '':
+			endmsg = reply.find ('\narpa2')
+			if endmsg != -1:
+				endmsg = endmsg + 1
+			submsg = reply [:endmsg]
+			#DEBUG# print 'processing submessage', submsg
+			if endmsg != -1:
+				reply = reply [endmsg:]
+			else:
+				reply = ''
+			endline = reply.find ('\n')
+			line0 = reply [:endline]
+			sys.stdout.write (line0 + '\n')
+			while endline != -1:
+				reply = reply [endline+1:]
+				endline = reply.find ('\n')
+				#DEBUG# print 'processing line', reply [:endline]
+				if endline [:2] == '> ':
+					sys.stdout.write (reply [:endline] + '\n')
+				elif endline [:3] == '>> ':
+					sys.stderr.write (reply [:endline] + '\n')
+					bad = True
+				else:
+					bad = True
+					sys.stderr.write ('Ill-formatted line: ' + reply [:endline] + '\n')
+		#DEBUG# print 'closing down'
+		event.connection.close ()
+		event.container.stop ()
+		#DEBUG# print 'closed down'
+
+
+# Read the input file
+#
+cmdbatch = sys.stdin.read ()
+
+
+
+# The main program creates on ARPA2ShellDaemon and runs it indefinately.
+#
+handler = ARPA2ShellClient ('amqp://localhost:5672', '/internetwide/arpa2.net/reservoir', cmdbatch)
+contain = Container (handler)
+contain.run ()
+
+exit (1 if bad else 0)
+

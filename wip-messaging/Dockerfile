@@ -26,7 +26,7 @@ FROM arpa2:base
 #TODO# Weird to have to install qpid-python on top of all the source-based build (but it doesn't work there either)
 #
 RUN apt-get install -y \
-	libboost-program-options1.62 libboost-system1.62 libuuid1 python-qpid
+	libboost-program-options1.62 libboost-system1.62 libuuid1 python-qpid python-qpid-proton
 
 
 ### Copy the Qpid Broker to this image
@@ -44,11 +44,23 @@ COPY --from=qpid /usr/local/sbin /usr/local/sbin/
 #TOO_FEW# COPY --from=qpid /usr/local/sbin/qpid*       /usr/local/sbin/
 #
 RUN ldconfig
+#
+COPY services /etc/services
+
+
+### Add local commands
+#
+#TODO# arpa2amqpshell.d should be run on other hosts!
+#TODO# arpa2amqpshell   should be run on other hosts!
+#
+COPY arpa2amqp.d /usr/local/bin/
+COPY arpa2amqp   /usr/local/bin/
 
 
 ### Add explanation files
 #
 COPY README.MD            /Messaging.md
+COPY PROTOCOL.MD          /ShellCommands.md
 COPY --from=qpid /Qpid.md /Qpid.md
 
 

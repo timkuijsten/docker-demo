@@ -35,7 +35,9 @@ FROM arpa2:build-bin
 # Install the source code, patch and compile.
 
 ADD https://github.com/vanrein/6bed4/archive/new-stable.tar.gz /root/6bed4-new-stable.tar.gz
-RUN cd /usr/local/src ; tar -zxvf /root/6bed4-new-stable.tar.gz ; cd 6bed4-new-stable ; ./configure ; sed -i nonstd.h -e 's/^#error\>/#warning/' ; make all install
+RUN cd /usr/local/src ; tar -zxvf /root/6bed4-new-stable.tar.gz ; cd 6bed4-new-stable ; ./configure ; sed -i nonstd.h -e 's/^#error\>/#warning/' ; make all #NOTADDED:install
+
+RUN mkdir /dev/net ; mknod /dev/net/tun c 10 200
 
 #TODO# Setup script to run
 

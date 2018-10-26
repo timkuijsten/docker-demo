@@ -64,7 +64,7 @@ translates to a multi-level name, where the structure is removed because
 it is static:
 
 ```
-internetwide/arpa2.net/reservoir/orvelte.nep
+/internetwide/arpa2.net/reservoir/orvelte.nep
 ```
 
 this can be matched with patterns, and that is helpful for flexible
@@ -73,7 +73,7 @@ need to route to a customer's own component.  The customer is also
 assigned their own exchange, for instance:
 
 ```
-customer/downlink01.orvelte.nep/reservoir/orvelte.nep
+/customer/downlink01.orvelte.nep/reservoir/orvelte.nep
 ```
 
 The second component is a service provider on behalf of the domain
@@ -87,13 +87,13 @@ will also be routed from these exchanges.
 
 The following names are used:
 
-  * `internetwide/arpa2.net/identityhub` is an interface over which
+  * `/internetwide/arpa2.net/identityhub` is an interface over which
     command batches for the `arpa2identityhub` and `arpa2acl`
     demonstration shells can be sent.
-  * `internetwide/arpa2.net/reservoir` is an interface over which
+  * `/internetwide/arpa2.net/reservoir` is an interface over which
     command batches for the `arpa2reservoir` and `arpa2acl`
     demonstration shells can be sent.
-  * `internetwide/arpa2.net/acme` for ACME-style challenges
+  * `/internetwide/arpa2.net/acme` for ACME-style challenges
     and responses that must be added to DNS.
 
 
@@ -125,6 +125,36 @@ various queues, exchanges and bindings.  And you can use
 `qpid-route` to configure links and link routing rules.
 And you can use `qpid-tool` for some general snooping
 around.
+
+You can create a queue, such as
+
+```
+qpid-config add queue /internetwide/arpa2.net/identityhub
+qpid-config add queue /internetwide/arpa2.net/reservoir
+```
+
+Based on this, you can now run a command shell handler,
+though you should do it on another host to actually
+get something realistic done:
+
+```
+arpa2amqp.d
+```
+
+Once you have that running, you can start sending
+commands to remote shells, in this case for the
+(hard-wired) queue that mimics Reservoir.
+
+```
+( echo 'arpa2identity> domain_add orvelte.nep' ; \
+  echo 'arpa2acl> help' ; \
+) | arpa2amqp
+```
+
+**To be improved:**
+These shells naturally run on other machines.  Once we
+interconnect our Docker containers with a simple network
+we should be able to do so.
 
 Bindings for topic exchanges are most interesting to our
 use case; we should employ keys that hold information that
@@ -243,6 +273,10 @@ A few mechanisms exist that we might use to distinguish users.
 
 
 ## Programming Notes
+
+There is a nice little
+[tutorial for Python Qpid Proton](https://qpid.apache.org/releases/qpid-proton-0.26.0/proton/python/book/tutorial.html)
+that explains how to send and receive messages in an event-driven manner, using the `Reactor` approach.
 
 We can use Python to talk to
 `qpidtoollibs.broker.BrokerAgent()`
