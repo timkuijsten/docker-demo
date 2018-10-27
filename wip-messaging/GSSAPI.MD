@@ -5,11 +5,21 @@
 > as part of GSSAPI.  It can even give end-to-end protection,
 > and use AMQP as a mere communication path.*
 
-The proposal made here is that communicating peers use GSSAPI
-with Kerberos5, and more specifically requiring encryption and
+The proposal made here is that communicating peers use
+[GSSAPI with Kerberos5](https://github.com/pythongssapi/python-gssapi/blob/master/docs/source/basic-tutorial.md),
+and more specifically requiring encryption and
 message integrity.  These messages can then be routed over
 AMQP, effectively reaching end-to-end protection.  On the receiving
 end, ACL tests and such can now be made.
+
+The annotations offered by AMQP are of use for routing; they
+might contain (well-known) exchange and queue names as well
+as tag services, domains and users.  This "outer layer" may
+lead to message loss or redirection, but it cannot break the
+protection of the message content.  This is a normal "power"
+of carrier protocols, and should not worry us.  In fact, the
+flexible routing of AMQP is perfect counter-balance for our
+content-based protection as specified herein.
 
 This is useful for internal communication of the IdentityHub,
 but will also facilitate plugin components such as customer's
@@ -28,34 +38,49 @@ point just to receive replies to messages sent upstream.  This
 is not builtin functionality; the primitives to construct this
 are simply available with a `reply_to` address pointing to a
 newly created end-point address, and a `correlation_id` to see
-that two messages are related.
+that two messages are related.  It is usually more efficient
+to setup just one `reply_to` address and use the `correlation_id`
+to find the proper security context.  The only reason to have
+more `reply_to` addresses could be to separate remote peers,
+so they would not be able to easily hijack sessions from other
+peers.
 
 GSSAPI initiates an exchange between contexts on both ends and
-continues using throughout the session.  The initiation is
-best sent directly to a target queue, with a `reply_to` address
+continues using throughout the session.  The initiation can be
+sent directly to a static remote peer, with a `reply_to` address
 set to a response channel.  There is no reason why the response
-could not also set a `reply_to` address for a new response channel.
-The communication could continue to reference the original
+could not also set a `reply_to` address for a response channel.
+The communication could continue to reference the initiating
 message through the `correlation_id`.  After one back-and-forth
 exchange, the communication is side-tracked to these temporary
-addresses, and anything passing through them is part of one
-GSSAPI session.
+addresses, and anything passing through them is part of the
+GSSAPI sessions that were selected to go through it (such as
+all GSSAPI traffic between a pair of peers).
 
-GSSAPI itself is a filter through which you push your data,
-only to retain literal bytes to send (for which AMQP is perfect)
+GSSAPI itself is like a filter through which data is pushed,
+leading to literal bytes to send (for which AMQP is perfect)
 and upon arrival a reversing filter is applied, leading to the
 original data.  The same is done in the opposite direction.
+It may be possible to use AMQP to reject a problematic GSSAPI
+exchange, which would mimic a GSSAPI shutdown -- as closing
+of connections is a meaningless concept to AMQP.  Note that
+under normal operations, GSSAPI itself deletion of security
+context, which effectively ends the GSSAPI exchange without
+dependency on the carrier protocol.
 
-It is up to us if the temporary end points are durable or not;
+It is up to us if the `reply_to` end points are durable or not;
 if not, they might not survive a restart of the software and
 so messages could be lost.  This is a choice to make with the
-expectations of a protocol in mind.  The end points must be
+expectations of an application in mind.  The end points must be
 cleaned up at some point, at least when they are persistently
-created.
+created; the GSSAPI exchange gives timing hints for that.
 
-Note that there are actually two ways of doing this; one
-is to use a `corellation_id` that repeats the `id` from the
-initiator message; another is to create temporary addresses.
+Interestingly, we end up having a system with potentially
+long-lasting connections between peers.  There is no need
+to authenticate over and over again, but instead we can
+have a connection standing by to service bulk traffic or
+sparsely scattered traffic, both handled as messages pop
+up and hardly any effort in keeping connections open.
 
 
 ## Problem Solved
@@ -79,7 +104,14 @@ be known in a nook or cranny; but it can be centrally
 managed alongside the KDC when it travels in this
 format.  The AuthorizationData can be setup
 specifically for the targeted service, provided it is
-one in the local realm.
+one in the local realm.  An extension call is implemented
+in MIT krb5 as well as Heimdal, named
+`gsskrb5_extract_authz_data_from_sec_context()`
+and effectively taking an `ad_type` to release the
+`ad_data` for it.  In addition,
+[GSS can supply attributes](https://tools.ietf.org/html/rfc6680)
+for security purposes.  (References credited to
+Greg Hudson of MIT krb5.)
 
 
 ## Problem Created
@@ -148,7 +180,6 @@ mistakes that an automatic process would not easily make.
 Having said all that, GSSAPI defines a flag for delegation
 of credentials.  When specified, actions can actually be
 handled at the request of an individual.  Note that this
-can also support remote operator intervention.  (Indeed,
-this is presumably what an SSH connection with ticket
-forwarding does too.)
+can also support remote operator intervention.  (This is
+probably what OpenSSH ticket forwarding uses too.)
 
