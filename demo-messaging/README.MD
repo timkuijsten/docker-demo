@@ -155,6 +155,7 @@ single sign-on principle) but we can use a slightly
 different approach and initialise from a keytab:
 
 ```
+export KRB5_CLIENT_KTNAME=/etc/krb5.keytab
 kinit -k amqp/testcli.qpid.arpa2@ARPA2.NET
 ```
 
@@ -178,6 +179,23 @@ send commands to remote shells, in this case for the
 ( echo 'arpa2identityhub> domain_add orvelte.nep' ; \
   echo 'arpa2acl> help' ; \
 ) | arpa2amqp
+```
+
+This may not work yet, but the following shell
+commands are actually available in the messaging
+image itself (the first prints on `stderr` and
+will make a remote call over AMQP `exit(1)`):
+
+```
+arpa2cmd> ping
+EPROTONOSUPPORT: Please upgrade to ping6
+arpa2cmd> ping6
+pong6
+arpa2cmd> date
+Sun Oct 28 21:41:19 2018
+arpa2cmd> whoami
+You are:    amqp/testcli.qpid.arpa2@ARPA2.NET
+Expiration: Mon Oct 29 07:23:20 2018
 ```
 
 Note that the end-to-end security with GSSAPI for
