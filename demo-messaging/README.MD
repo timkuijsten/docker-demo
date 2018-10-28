@@ -64,7 +64,7 @@ translates to a multi-level name, where the structure is removed because
 it is static:
 
 ```
-internetwide/arpa2.net/reservoir/orvelte.nep
+/internetwide/arpa2.net/reservoir/orvelte.nep
 ```
 
 this can be matched with patterns, and that is helpful for flexible
@@ -73,7 +73,7 @@ need to route to a customer's own component.  The customer is also
 assigned their own exchange, for instance:
 
 ```
-customer/downlink01.orvelte.nep/reservoir/orvelte.nep
+/customer/downlink01.orvelte.nep/reservoir/orvelte.nep
 ```
 
 The second component is a service provider on behalf of the domain
@@ -87,13 +87,13 @@ will also be routed from these exchanges.
 
 The following names are used:
 
-  * `internetwide/arpa2.net/identityhub` is an interface over which
+  * `/internetwide/arpa2.net/identityhub` is an interface over which
     command batches for the `arpa2identityhub` and `arpa2acl`
     demonstration shells can be sent.
-  * `internetwide/arpa2.net/reservoir` is an interface over which
+  * `/internetwide/arpa2.net/reservoir` is an interface over which
     command batches for the `arpa2reservoir` and `arpa2acl`
     demonstration shells can be sent.
-  * `internetwide/arpa2.net/acme` for ACME-style challenges
+  * `/internetwide/arpa2.net/acme` for ACME-style challenges
     and responses that must be added to DNS.
 
 
@@ -125,6 +125,94 @@ various queues, exchanges and bindings.  And you can use
 `qpid-route` to configure links and link routing rules.
 And you can use `qpid-tool` for some general snooping
 around.
+
+You can create a queue, such as
+
+```
+qpid-config add queue /internetwide/arpa2.net/identityhub
+qpid-config add queue /internetwide/arpa2.net/reservoir
+```
+
+Based on this, you can now run a command shell handler,
+though you should do it on another host to actually
+get something realistic done:
+
+```
+arpa2amqp.d &
+```
+
+This runs a daemon process that executes shell scripts
+sent to it over AMQP.  It already employs
+[GSSAPI](GSSAPI.MD) for protection, but will not
+use the authenticated identity for access control yet.
+The daemon identifies itself as a (currently fixed)
+service `amqp/testsrv.qpid.arpa2@ARPA2.NET` and gets
+it automatically from the keytab.
+
+Once you have that running, you can get a credential.
+The client needs to prepare this (as part of the
+single sign-on principle) but we can use a slightly
+different approach and initialise from a keytab:
+
+```
+export KRB5_CLIENT_KTNAME=/etc/krb5.keytab
+kinit -k amqp/testcli.qpid.arpa2@ARPA2.NET
+```
+
+When you check with `klist` you should see something
+like
+
+```
+Ticket cache: FILE:/tmp/krb5cc_0
+Default principal: amqp/testcli.qpid.arpa2@ARPA2.NET
+
+Valid starting     Expires            Service principal
+10/27/18 17:23:57  10/28/18 03:23:57  krbtgt/ARPA2.NET@ARPA2.NET
+	renew until 10/28/18 17:23:47
+```
+
+After this, you have reached the point where we can
+send commands to remote shells, in this case for the
+(hard-wired) queue that mimics Reservoir.
+
+```
+( echo 'arpa2identityhub> domain_add orvelte.nep' ; \
+  echo 'arpa2acl> help' ; \
+) | arpa2amqp
+```
+
+This may not work yet, but the following shell
+commands are actually available in the messaging
+image itself (the first prints on `stderr` and
+will make a remote call over AMQP `exit(1)`):
+
+```
+arpa2cmd> ping
+EPROTONOSUPPORT: Please upgrade to ping6
+arpa2cmd> ping6
+pong6
+arpa2cmd> date
+Sun Oct 28 21:41:19 2018
+arpa2cmd> whoami
+You are:    amqp/testcli.qpid.arpa2@ARPA2.NET
+Expiration: Mon Oct 29 07:23:20 2018
+```
+
+Note that the end-to-end security with GSSAPI for
+the AMQP transport allows us to open up the entire
+transport, with some concern for being swamped with
+nonsense, but no concerns for security!  This means
+that our intention of being pluggable for external
+components is doable.  Or having users dial into an
+OpenSSH session and enter shell commands in them,
+being themselves thanks to Kerberos login with
+ticket forwarding.
+
+
+**To be improved:**
+These shells naturally run on other machines.  Once we
+interconnect our Docker containers with a simple network
+we should be able to do so.
 
 Bindings for topic exchanges are most interesting to our
 use case; we should employ keys that hold information that
@@ -243,6 +331,10 @@ A few mechanisms exist that we might use to distinguish users.
 
 
 ## Programming Notes
+
+There is a nice little
+[tutorial for Python Qpid Proton](https://qpid.apache.org/releases/qpid-proton-0.26.0/proton/python/book/tutorial.html)
+that explains how to send and receive messages in an event-driven manner, using the `Reactor` approach.
 
 We can use Python to talk to
 `qpidtoollibs.broker.BrokerAgent()`

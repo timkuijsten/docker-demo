@@ -5,6 +5,8 @@
 #
 # From: Rick van Rein <rick@openfortress.nl>
 
+/etc/init.d/rsyslog start
+
 cd /usr/local/src/tlspool*/src
 tlspool -kc /etc/tlspool.conf
 

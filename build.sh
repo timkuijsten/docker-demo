@@ -24,7 +24,8 @@ builddir build-libtls
 builddir build-quickder-lillydap
 builddir build-steamworks
 builddir build-tlspool
-#HEAVY_UNUSED_IMAGE_2.31GB# builddir build-qpid
+#HEAVY_IMAGE_2.31GB# builddir build-qpid
+#HEAVY_DEMO__2.31GB# builddir wip-messaging
 
 builddir demo-identityhub
 builddir demo-reservoir

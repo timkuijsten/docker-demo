@@ -411,6 +411,7 @@ def token_factory (token):
 @cmdparser.CmdClassDecorator()
 class Cmd (arpa2cmd.Cmd):
 
+	version = (0,0)
 	prompt = "arpa2reservoir> "
 	intro = "Edit Reservoir: Resource Collections and Resources.\nAnd Resource Indexes per Domain and per Resource Collection."
 

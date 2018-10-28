@@ -1,0 +1,4 @@
+amqps		5671/tcp    # AMQP over TLS
+amqps           5671/udp    # AMQP over TLS
+amqp            5672/tcp    # AMQP
+amqp            5672/udp    # AMQP

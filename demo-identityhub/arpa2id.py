@@ -345,6 +345,7 @@ uuid_uid_domain_idhub = '53281a7c-2c69-3d49-b12f-590e0a2f54bc'
 
 class Cmd (arpa2cmd.Cmd):
 
+	version = (0,0)
 	prompt = 'arpa2id> '
 	intro = 'Shell to the ARPA2 IdentityHub.\nYou can add, del, mov identities for users, groups, roles and so on.'
 

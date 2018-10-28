@@ -194,7 +194,7 @@ class ACL ():
 
 class Cmd (arpa2cmd.Cmd):
 
-
+	version = (0,0)
 	prompt = "arpa2acl> "
 	intro = "Edit Access Control Lists as saved in LDAP."
 
