@@ -26,6 +26,8 @@ import sys
 
 import arpa2cmd
 
+import gssapi
+from gssapi.raw.misc import GSSError
 
 # Note: cStringIO is faster, but ASCII-only
 from StringIO import StringIO
@@ -44,8 +46,18 @@ class ARPA2ShellDaemon (MessagingHandler):
 	   sent back if a reply_to address is provided
 	   in the shell request batch message.
 	   
-	   TODO: AUTHENTICATION AND AUTHORISATION
-	         ...or can we leave that to Qpid Broker?
+	   Messages are protected with GSSAPI/Kerberos5,
+	   and the exchange is initiated as GSSAPI is.
+	   After initial setup, any number of messages
+	   may follow.
+
+	   Although messages can be processed one at a
+	   time, the GSSAPI contexts require some more
+	   maintenance.  The correlation_id in a message
+	   (defaulting to the initiating message's id)
+	   is used to keep messages related.
+
+	   TODO: Expire contexts when credentials do.
 	"""
 
 
@@ -56,6 +68,55 @@ class ARPA2ShellDaemon (MessagingHandler):
 		self.shell = { }
 		self.broker  = broker
 		self.address = address
+		self.name = gssapi.Name (
+			#TODO#FIXED#
+			'amqp/testsrv.qpid.arpa2@ARPA2.NET')
+		self.side = 'accept' # initiate, accept, both
+		self.cred = None
+		self.gctx = { }
+
+	def _have_gssapi_ctx_corlid (self, msg):
+		assert (self.name is not None)
+		corlid = msg.correlation_id or msg.id
+		#TODO# assert (corlid is not None)
+		if self.cred is None:
+			self.gctx = { }
+			self.cred = gssapi.Credentials (
+				name = self.name,
+				mechs = set ([gssapi.MechType.kerberos]),
+				usage = self.side)
+			print 'server has self.cred setup as', self.cred.inquire ()
+		print 'checking for match with corlid', corlid
+		if self.gctx.has_key (corlid):
+			ctx = self.gctx [corlid]
+		else:
+			ctx = gssapi.SecurityContext (
+				creds = self.cred,
+				usage = 'accept')
+			self.gctx [corlid] = ctx
+			print 'new security context for server:', ctx
+		assert (ctx is not None)
+		ctx.__DEFER_STEP_ERRORS__ = False
+		return (ctx,corlid)
+
+	# Consume a GSSAPI token and update the context accordingly.
+	# Once GSSAPI is complete, trigger on_link_opened_securely()
+	#
+	def on_message_gssapi (self, event, (ctx,corlid)):
+		assert (not ctx.complete)
+		gsstoken = event.message.body
+		print 'received gssapi token size:', len (gsstoken)
+		gsstoken = ctx.step (gsstoken)
+		if gsstoken is not None or not ctx.complete:
+			print 'sending gssapi token size:', len (gsstoken), 'namely', gsstoken.encode ('hex')
+			msg = Message (
+				body=gsstoken,
+				address=event.message.reply_to,
+				reply_to=self.recver.remote_source.address,
+				correlation_id=corlid)
+			self.sender.send (msg)
+			print 'sent with corlid', corlid
+		print 'done receiving and processing gssapi token'
 
 
 	# Load the shell as a plugin module to this daemon.
@@ -94,7 +155,7 @@ class ARPA2ShellDaemon (MessagingHandler):
 	# Return the string to be inserted in the reply message.
 	#
 	def run_command (self, shellname, command):
-		#DEBUG# print 'running shell', shellname, 'for', command
+		print 'running shell', shellname, 'for', command
 		savedio = (sys.stdin, sys.stdout, sys.stderr)
 		if '\n' in command:
 			(command,input) = command.split ('\n', 1)
@@ -115,7 +176,7 @@ class ARPA2ShellDaemon (MessagingHandler):
 		reply  = shellname + '>> ' + command + '\n'
 		reply += self._prefix_lines ('>> ', cmderr)
 		reply += self._prefix_lines ('> ',  cmdout)
-		#DEBUG# print 'returning reply', reply
+		print 'returning reply', reply
 		return reply
 
 
@@ -126,12 +187,12 @@ class ARPA2ShellDaemon (MessagingHandler):
 	def run_message (self, message):
 		reply = ''
 		while message != '':
-			#DEBUG# print 'splitting message', message
+			print 'splitting message', message
 			endcmd = message.find ('\narpa2')
 			if endcmd != -1:
 				endcmd += 1
 			assert (endcmd != 0)
-			#DEBUG# print 'Splitting prompt off of', message, '[:' + str (endcmd) + ']'
+			print 'Splitting prompt off of', message, '[:' + str (endcmd) + ']'
 			try:
 				(shell,cmd) = message [:endcmd].split ('> ', 1)
 				reply += self.run_command (shell, cmd)
@@ -141,40 +202,74 @@ class ARPA2ShellDaemon (MessagingHandler):
 				message = message [endcmd:]
 			else:
 				message = ''
-		#DEBUG# print 'message run complete'
+		print 'message run complete'
 		return reply
 
 
 	# Setup the current Container for incoming and reply traffic
 	#
 	def on_start (self, event):
-		#DEBUG# print 'starting'
+		print 'starting'
 		ctr = event.container
 		cnx = ctr.connect (self.broker)
 		self.recver = ctr.create_receiver (cnx, self.address)
 		self.sender = ctr.create_sender   (cnx, None        )
-		#DEBUG# print 'started'
+		print 'started'
 
+
+	def _decrypted_message (self, body, (ctx,corlid)):
+		body2 = ctx.decrypt (body)
+		return body2
+
+	def _encrypted_message (self, body, (ctx,corlid), **kwargs):
+		try:
+			body2 = ctx.encrypt (body)
+		except GSSError as ge:
+			body2 = 'GSSAPI Error: ' + str (ge) + '\n'
+		return Message (body=body2, **kwargs)
 
 	# Receive an AMQP message.  Run its batch of commands,
 	# collect the reply and pass it back if so desired.
 	#
 	def on_message (self, event):
-		#DEBUG# print 'message received'
 		msg = event.message
+		print 'message received size:', len (msg.body), 'namely', msg.body.encode ('hex')
+		(ctx,corlid) = self._have_gssapi_ctx_corlid (msg)
+		try:
+			if not ctx.complete:
+				print 'handling message as gssapi'
+				self.on_message_gssapi (event, (ctx,corlid))
+				print 'handled  message as gssapi'
+				return
+		except GSSError as ge:
+			print 'ran into a problem:', str (ge)
+			return #TODO# Not ideal, but can we send a reply?
+		print 'treating as plain message'
 		if msg.body is None:
+			print 'body is none'
 			return
-		ans = self.run_message (msg.body)
+		print 'treating as non-empty plain message'
+		try:
+			body2 = self._decrypted_message (msg.body, (ctx,corlid))
+			print 'decrypted to', body2
+			ans = self.run_message (body2)
+		except GSSError as ge:
+			print 'responding with gssapi error', ge
+			ans = '>> GSSAPI error: ' + str (ge) + '\n'
+		except Exception as e:
+			print 'responding with exception', e
+			ans = '>> Exception: ' + str (e) + '\n'
+		print 'answer will be', ans
 		if msg.reply_to is not None:
-			#DEBUG# print 'composing reply'
-			rto = Message (
+			print 'composing reply'
+			rto = self._encrypted_message (ans, (ctx,corlid),
 				address=msg.reply_to,
-				correlation_id=msg.correlation_id,
-				body=ans)
+				reply_to=self.recver.remote_source.address,
+				correlation_id=corlid)
 			self.sender.send (rto)
-			#DEBUG# print 'sent reply'
+			print 'sent reply size:', len (rto.body), 'namely:', rto.body.encode ('hex')
 		else:
-			#DEBUG# print 'no reply requested'
+			print 'no reply requested by client'
 			pass
 
 

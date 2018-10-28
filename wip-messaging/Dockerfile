@@ -63,6 +63,9 @@ COPY --from=qpid /usr/local/sbin /usr/local/sbin/
 RUN ldconfig
 #
 COPY services /etc/services
+#
+COPY qpid.keytab /etc/krb5.keytab
+RUN chmod go-rwx /etc/krb5.keytab
 
 
 ### Add local commands

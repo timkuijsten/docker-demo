@@ -138,18 +138,58 @@ though you should do it on another host to actually
 get something realistic done:
 
 ```
-arpa2amqp.d
+arpa2amqp.d &
 ```
 
-Once you have that running, you can start sending
-commands to remote shells, in this case for the
+This runs a daemon process that executes shell scripts
+sent to it over AMQP.  It already employs
+[GSSAPI](GSSAPI.MD) for protection, but will not
+use the authenticated identity for access control yet.
+The daemon identifies itself as a (currently fixed)
+service `amqp/testsrv.qpid.arpa2@ARPA2.NET` and gets
+it automatically from the keytab.
+
+Once you have that running, you can get a credential.
+The client needs to prepare this (as part of the
+single sign-on principle) but we can use a slightly
+different approach and initialise from a keytab:
+
+```
+kinit -k amqp/testcli.qpid.arpa2@ARPA2.NET
+```
+
+When you check with `klist` you should see something
+like
+
+```
+Ticket cache: FILE:/tmp/krb5cc_0
+Default principal: amqp/testcli.qpid.arpa2@ARPA2.NET
+
+Valid starting     Expires            Service principal
+10/27/18 17:23:57  10/28/18 03:23:57  krbtgt/ARPA2.NET@ARPA2.NET
+	renew until 10/28/18 17:23:47
+```
+
+After this, you have reached the point where we can
+send commands to remote shells, in this case for the
 (hard-wired) queue that mimics Reservoir.
 
 ```
-( echo 'arpa2identity> domain_add orvelte.nep' ; \
+( echo 'arpa2identityhub> domain_add orvelte.nep' ; \
   echo 'arpa2acl> help' ; \
 ) | arpa2amqp
 ```
+
+Note that the end-to-end security with GSSAPI for
+the AMQP transport allows us to open up the entire
+transport, with some concern for being swamped with
+nonsense, but no concerns for security!  This means
+that our intention of being pluggable for external
+components is doable.  Or having users dial into an
+OpenSSH session and enter shell commands in them,
+being themselves thanks to Kerberos login with
+ticket forwarding.
+
 
 **To be improved:**
 These shells naturally run on other machines.  Once we

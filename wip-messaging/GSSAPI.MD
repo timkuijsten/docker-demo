@@ -183,3 +183,81 @@ handled at the request of an individual.  Note that this
 can also support remote operator intervention.  (This is
 probably what OpenSSH ticket forwarding uses too.)
 
+
+## Design Alternatives: GGSAPI over SCTP of AMQP
+
+The idea of secure messaging through GSSAPI clearly has
+merit in the InternetWide Architecture.  There are in
+fact two mechanisms that could be used to carry GSSAPI,
+namely SCTP or AMQP.  In both cases, there is one
+GSSAPI context for every end-to-end connection.
+
+**SCTP** is useful for point-to-point connections, where
+the endpoints are known and the addition of a switch point
+is... pointless.  Each SCTP stream carries its own
+GSSAPI context, independently handled at the receiving
+end, inasfar as that has any meaning.
+
+**AMQP** is useful for one-off communication, especially
+when there are many such messages but each may be routed
+in different directions.  In addition, it mixes traffic
+from a variety of sources, so it takes the need for
+managing sessions away from a service, making it highly
+suited for stateless requests.  Example uses include
+submission of commands to ARPA shells and web requests.
+
+The two can be used interchangingly; traffic might hop
+from SCTP onto AMQP, and back on SCTP, for instance.
+Generic connectors can be created to do that.  The only
+point of care would be that SCTP must be dedicated to
+one security context per stream, so an SCTP connection
+with multiple streams would also host multiple GSSAPI
+contexts, and AMQP may be used to redirect each in
+another direction.
+
+This allows us to have just the infrastructure that we
+have been longing for.
+
+
+## Design Alternatives: Commands or Diameter over GSSAPI
+
+There are two kinds of thing that should be easily
+carried over GSSAPI, and those are textual commands and
+binary content.  For the latter, we choose to standardise
+on Diameter, with a few exceptions such as, perhaps,
+LDAPMessage or dynamic DNS updates, as determined by
+the Kerberos identity of the receiving endpoint.
+
+**Commands** are lines of text, encoded with `stdin` on
+input and `stdout` and `stderr` on output as detailed in
+[PROTOCOL.MD](the protocol).  Command batches will
+usually request a response by way of a `reply_to` header,
+but the same format may be used to send event
+notifications and these are just another name for
+command batches without a `reply_to` header.
+
+Commands are usually run in ARPA2 Shells; that is,
+dedicated environments for simple tasks, such as
+adding a domain or a user to the IdentityHub and
+causing any spin-off actions that may lead to more
+command batches to be sent around.
+
+**Diameter** is an easily parsed form of
+tag/length/value messages.  It is normally run on
+SCTP with DTLS, or TCP with TLS, but this drops the
+end-to-end responsibilities that we would like to use.
+Even TLS-KDH seems to be at a loss to help with that,
+because it is not full-blown GSSAPI; it could only work
+if we take on a request and don't have to pass it on
+to a backend with end-to-end security in place.
+
+Binary commands are sent as Diameter messages, and as
+per the base specification, this involves a negotiation
+of capabilities; this can be seen as sub-protocol
+negotiation.  Indeed, it is possible to create our own
+protocols within Diameter if we need to, but it is
+likely that we can use the existing ones, with the
+acces control being the most obvious one.  Even those
+can be embellished with our own fields, if we need.
+
+
