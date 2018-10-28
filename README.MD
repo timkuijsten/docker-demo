@@ -63,7 +63,10 @@ CMake.
 ## Using on Windows
 
 Docker images can be built on Windows without
-problem.  What is a concern however, is that
+problem. You can use Docker for Windows, as described below, but it is easier to create a Linux VM (eg. using VirtualBox) and use Docker for Linux instead, because then Hyper-V is not required and one can use IPv6.
+
+### Using Docker for Windows
+When using Docker for Windows remember that Hyper-V should be enabled and running, and that
 files are being copied into containers, and those
 files should not get LF translated to CR-LF, as is
 the default when cloning a Git repository.
@@ -75,8 +78,3 @@ git clone https://github.com/arpa2/docker-demo --config core.autocrlf=input
 ```
 
 [[credit]](https://willi.am/blog/2016/08/11/docker-for-windows-dealing-with-windows-line-endings/)
-
-If your Docker does not work well and you get
-complaints about VT-D bios settings, you should
-instead [read this](http://www.tinkeringwithtechnology.com/2017/05/11/docker-problems-with-vt-d/).
-
