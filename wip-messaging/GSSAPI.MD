@@ -196,7 +196,9 @@ GSSAPI context for every end-to-end connection.
 the endpoints are known and the addition of a switch point
 is... pointless.  Each SCTP stream carries its own
 GSSAPI context, independently handled at the receiving
-end, inasfar as that has any meaning.
+end, inasfar as that has any meaning.  An advantage,
+especially over longer links, is the ability to overcome
+head-of-line problems.
 
 **AMQP** is useful for one-off communication, especially
 when there are many such messages but each may be routed
@@ -260,4 +262,23 @@ likely that we can use the existing ones, with the
 acces control being the most obvious one.  Even those
 can be embellished with our own fields, if we need.
 
+
+## Fallback Option: OpenSSH with GSSAPI and Ticket Forwarding
+
+It would be possible, though not advised, to connect to
+an SSH server that enters this same kind of shell
+interaction.  To pass Kerberos credentials all the
+way through to the remote shell, we would require
+GSSAPI authentication with Ticket Forwarding to
+SSH.  This is sub-optimal, as the user now needs to
+trust our OpenSSH host.  It is easier to them, so some
+may prefer this option.
+
+Note that public-key based authentication will not
+be added.  We'd have to retract it as soon as the
+first Quantum Computer comes alive, and we'd risk
+that the traffic up to then has been tapped.  Also,
+we'd need cruel hacks to get the ACLs working on the
+receiving shells.  That's probably wasted energy,
+given how easy it is to use Kerberos as a client.
 

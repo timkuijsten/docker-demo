@@ -12,8 +12,27 @@
 
 import os
 import sys
+import time
+
+import gssapi
 
 import arpa2cmd
+
+
+# Determine our own identity, according to GSSAPI
+#
+try:
+	creds = gssapi.creds.Credentials ()
+	descr = creds.inquire ()
+	gss_name = str (descr.name)
+	gss_life = descr.lifetime + time.time ()
+
+	if descr.lifetime <= 0:
+		sys.stderr.write ('WARNING: You have expired\n')
+except:
+	gss_name = 'nobody'
+	gss_life = 0
+	sys.stderr.write ('WARNING: You are nobody\n')
 
 
 # Load shells as given on the commandline or, when none
@@ -61,6 +80,10 @@ if __name__ == '__main__':
 	current_shell = arpa2shell
 	while current_shell is not None:
 		current_shell.next_shell = None
+		current_shell.gss_name = gss_name
+		current_shell.gss_life = gss_life
 		current_shell.cmdloop ()
+		current_shell.gss_name = None
+		current_shell.gss_life = None
 		current_shell = current_shell.next_shell
 

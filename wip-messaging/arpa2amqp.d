@@ -23,6 +23,7 @@
 
 
 import sys
+import time
 
 import arpa2cmd
 
@@ -78,15 +79,15 @@ class ARPA2ShellDaemon (MessagingHandler):
 	def _have_gssapi_ctx_corlid (self, msg):
 		assert (self.name is not None)
 		corlid = msg.correlation_id or msg.id
-		#TODO# assert (corlid is not None)
+		assert (corlid is not None)
 		if self.cred is None:
 			self.gctx = { }
 			self.cred = gssapi.Credentials (
 				name = self.name,
 				mechs = set ([gssapi.MechType.kerberos]),
 				usage = self.side)
-			print 'server has self.cred setup as', self.cred.inquire ()
-		print 'checking for match with corlid', corlid
+			#DEBUG# print 'server has self.cred setup as', self.cred.inquire ()
+		#DEBUG# print 'checking for match with corlid', corlid
 		if self.gctx.has_key (corlid):
 			ctx = self.gctx [corlid]
 		else:
@@ -94,7 +95,7 @@ class ARPA2ShellDaemon (MessagingHandler):
 				creds = self.cred,
 				usage = 'accept')
 			self.gctx [corlid] = ctx
-			print 'new security context for server:', ctx
+			#DEBUG# print 'new security context for server:', ctx
 		assert (ctx is not None)
 		ctx.__DEFER_STEP_ERRORS__ = False
 		return (ctx,corlid)
@@ -105,18 +106,18 @@ class ARPA2ShellDaemon (MessagingHandler):
 	def on_message_gssapi (self, event, (ctx,corlid)):
 		assert (not ctx.complete)
 		gsstoken = event.message.body
-		print 'received gssapi token size:', len (gsstoken)
+		#DEBUG# print 'received gssapi token size:', len (gsstoken)
 		gsstoken = ctx.step (gsstoken)
 		if gsstoken is not None or not ctx.complete:
-			print 'sending gssapi token size:', len (gsstoken), 'namely', gsstoken.encode ('hex')
+			#DEBUG# print 'sending gssapi token size:', len (gsstoken), 'namely', gsstoken.encode ('hex')
 			msg = Message (
 				body=gsstoken,
 				address=event.message.reply_to,
 				reply_to=self.recver.remote_source.address,
 				correlation_id=corlid)
 			self.sender.send (msg)
-			print 'sent with corlid', corlid
-		print 'done receiving and processing gssapi token'
+			#DEBUG# print 'sent with corlid', corlid
+		#DEBUG# print 'done receiving and processing gssapi token'
 
 
 	# Load the shell as a plugin module to this daemon.
@@ -146,7 +147,10 @@ class ARPA2ShellDaemon (MessagingHandler):
 	# Prefix lines with the given prompt and return the text.
 	#
 	def _prefix_lines (self, prompt, text):
-		text = prompt + text.replace ('\n', '\n' + prompt)
+		if text [-1:] == '\n':
+			text = text [:-1]
+		if text != '':
+			text = prompt + text.replace ('\n', '\n' + prompt)
 		return text
 
 
@@ -154,8 +158,8 @@ class ARPA2ShellDaemon (MessagingHandler):
 	# The command may span multiple lines, adding to stdin.
 	# Return the string to be inserted in the reply message.
 	#
-	def run_command (self, shellname, command):
-		print 'running shell', shellname, 'for', command
+	def run_command (self, shellname, command, name, life):
+		#DEBUG# print 'running shell', shellname, 'for', command
 		savedio = (sys.stdin, sys.stdout, sys.stderr)
 		if '\n' in command:
 			(command,input) = command.split ('\n', 1)
@@ -166,17 +170,21 @@ class ARPA2ShellDaemon (MessagingHandler):
 		sys.stderr = StringIO ()
 		try:
 			shell = self.get_shell (shellname)
+			shell.gss_name = name
+			shell.gss_life = life + time.time ()
 			shell.onecmd (command)
 		except Exception as e:
 			sys.stderr.write (str (e) + '\n')
 		finally:
+			shell.gss_name = None
+			shell.gss_life = None
 			cmdout = sys.stdout.getvalue ()
-			cmderr = sys.stdout.getvalue ()
+			cmderr = sys.stderr.getvalue ()
 			(sys.stdin, sys.stdout, sys.stderr) = savedio
 		reply  = shellname + '>> ' + command + '\n'
 		reply += self._prefix_lines ('>> ', cmderr)
 		reply += self._prefix_lines ('> ',  cmdout)
-		print 'returning reply', reply
+		#DEBUG# print 'returning reply', reply
 		return reply
 
 
@@ -184,37 +192,43 @@ class ARPA2ShellDaemon (MessagingHandler):
 	# in their respective shells.  Return the collective
 	# reply to the batch job in the message.
 	#
-	def run_message (self, message):
+	def run_message (self, message, ctx):
+		name = ctx.initiator_name
+		life = ctx.lifetime
 		reply = ''
 		while message != '':
-			print 'splitting message', message
+			#DEBUG# print 'splitting message', message
 			endcmd = message.find ('\narpa2')
 			if endcmd != -1:
 				endcmd += 1
 			assert (endcmd != 0)
-			print 'Splitting prompt off of', message, '[:' + str (endcmd) + ']'
+			#DEBUG# print 'Splitting prompt off of', message, '[:' + str (endcmd) + ']'
 			try:
 				(shell,cmd) = message [:endcmd].split ('> ', 1)
-				reply += self.run_command (shell, cmd)
+				if life > 0:
+					reply += self.run_command (shell, cmd, name, life)
+				else:
+					reply += shell + '>> ' + cmd.split ('\n') [0] + ('\n>> You expired %.3f seconds ago' % life)
 			except Exception as e:
 				reply += 'Exception when running: ' + str (e) + '\n'
 			if endcmd != -1:
 				message = message [endcmd:]
 			else:
 				message = ''
-		print 'message run complete'
+			reply += '\n'
+		#DEBUG# print 'message run complete'
 		return reply
 
 
 	# Setup the current Container for incoming and reply traffic
 	#
 	def on_start (self, event):
-		print 'starting'
+		#DEBUG# print 'starting'
 		ctr = event.container
 		cnx = ctr.connect (self.broker)
 		self.recver = ctr.create_receiver (cnx, self.address)
 		self.sender = ctr.create_sender   (cnx, None        )
-		print 'started'
+		#DEBUG# print 'started'
 
 
 	def _decrypted_message (self, body, (ctx,corlid)):
@@ -233,43 +247,43 @@ class ARPA2ShellDaemon (MessagingHandler):
 	#
 	def on_message (self, event):
 		msg = event.message
-		print 'message received size:', len (msg.body), 'namely', msg.body.encode ('hex')
+		#DEBUG# print 'message received size:', len (msg.body), 'namely', msg.body.encode ('hex')
 		(ctx,corlid) = self._have_gssapi_ctx_corlid (msg)
 		try:
 			if not ctx.complete:
-				print 'handling message as gssapi'
+				#DEBUG# print 'handling message as gssapi'
 				self.on_message_gssapi (event, (ctx,corlid))
-				print 'handled  message as gssapi'
+				#DEBUG# print 'handled  message as gssapi'
 				return
 		except GSSError as ge:
-			print 'ran into a problem:', str (ge)
+			#DEBUG# print 'ran into a problem:', str (ge)
 			return #TODO# Not ideal, but can we send a reply?
-		print 'treating as plain message'
+		#DEBUG# print 'treating as plain message'
 		if msg.body is None:
-			print 'body is none'
+			#DEBUG# print 'body is none'
 			return
-		print 'treating as non-empty plain message'
+		#DEBUG# print 'treating as non-empty plain message'
 		try:
 			body2 = self._decrypted_message (msg.body, (ctx,corlid))
-			print 'decrypted to', body2
-			ans = self.run_message (body2)
+			#DEBUG# print 'decrypted to', body2
+			ans = self.run_message (body2,ctx)
 		except GSSError as ge:
-			print 'responding with gssapi error', ge
+			#DEBUG# print 'responding with gssapi error', ge
 			ans = '>> GSSAPI error: ' + str (ge) + '\n'
 		except Exception as e:
-			print 'responding with exception', e
+			#DEBUG# print 'responding with exception', e
 			ans = '>> Exception: ' + str (e) + '\n'
-		print 'answer will be', ans
+		#DEBUG# print 'answer will be\n', ans,
 		if msg.reply_to is not None:
-			print 'composing reply'
+			#DEBUG# print 'composing reply'
 			rto = self._encrypted_message (ans, (ctx,corlid),
 				address=msg.reply_to,
 				reply_to=self.recver.remote_source.address,
 				correlation_id=corlid)
 			self.sender.send (rto)
-			print 'sent reply size:', len (rto.body), 'namely:', rto.body.encode ('hex')
+			#DEBUG# print 'sent reply size:', len (rto.body), 'namely:', rto.body.encode ('hex')
 		else:
-			print 'no reply requested by client'
+			#DEBUG# print 'no reply requested by client'
 			pass
 
 

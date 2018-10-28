@@ -1,0 +1,18 @@
++ server cannot handle consecutive clients yet (fixed corlid?)
++ client should be more temporary (address, random corlid)
++ client should use proper corlid for actual traffic
++ remove debugging messages (some day)
+- add queue/exchange names to connect to (argv, env, cfgfile?)
++ try to automatically login the client? creds from other process?
+- find a form to send back GSSAPI errors (unencrypted ASCII)
+- prefixes OPEN(ing), DATA, COMM(unicating), NYET(noty_ready), TIME(out)
++ add ping, ping6, whoami, echo, date to arpa2cmd
++ actually make the shells work with the utility ;-)
++ avoid ">> > " in output lines
++ properly concatenate answers in batch scripts
+- program wrapper classes for secure remoting client/server
+- work on non-shell, binary alternatives; at least, Diameter
+- construct a arpa2shells package with shells and secure remoting
+- consider linkage with SCTP streams connecting to the broker
+- documentation is all over the place: howto, explanation, design
+- gently handle ticket expiration (shell error, not crash)

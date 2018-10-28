@@ -13,6 +13,7 @@
 
 
 import sys
+import uuid
 
 import gssapi
 
@@ -38,6 +39,7 @@ class ARPA2ShellClient (MessagingHandler):
 		self.side = 'initiate' # initiate, accept, both
 		self.gctx = None
 		self.gsta = 'lazy'
+		self.corlid = str (uuid.uuid4 ())
 
 	def _have_gssapi_ctx (self):
 		assert (self.name is not None)
@@ -55,31 +57,31 @@ class ARPA2ShellClient (MessagingHandler):
 	# Start GSSAPI as soon as the first link is open (the sender)
 	#
 	def on_link_opened_gssapi (self, event):
-		print 'gssapi link opened'
+		#DEBUG# print 'gssapi link opened'
 		if self.gsta == 'lazy':
-			print 'gssapi is first (sender)'
+			#DEBUG# print 'gssapi is first (sender)'
 			ctx = self._have_gssapi_ctx ()
-			print 'using (new) client context', ctx
+			#DEBUG# print 'using (new) client context', ctx
 			gsstoken = ctx.step ()
 			assert (gsstoken is not None)
-			print 'initial token of size:', len (gsstoken), 'namely', gsstoken.encode ('hex'), '::', type (gsstoken)
+			#DEBUG# print 'initial token of size:', len (gsstoken), 'namely', gsstoken.encode ('hex'), '::', type (gsstoken)
 			msg = Message (
 					body=gsstoken,
-					id=123,  #TODO#FIXED#
+					id=self.corlid,
 					reply_to=self.recver.remote_source.address)
 			self.sender.send (msg)
-			print 'sent initial message sized:', len (gsstoken)
+			#DEBUG# print 'sent initial message sized:', len (gsstoken)
 			self.gsta = 'boot'
 
 	# Consume a GSSAPI token and update the context accordingly.
 	# Once GSSAPI is complete, trigger on_link_opened_securely()
 	#
 	def on_message_gssapi (self, event):
-		print 'got gssapi reply'
-		try:
-			print 'correlation id is', event.message.correlation_id
-		except:
-			pass
+		#DEBUG# print 'got gssapi reply'
+		#DEBUG# try:
+		#DEBUG# 	print 'correlation id is', event.message.correlation_id, 'should equal', self.corlid
+		#DEBUG# except:
+		#DEBUG# 	pass
 		assert (self.gsta != 'comm')
 		if self.gsta == 'lazy':
 			# We are receiving a message before sending one.
@@ -87,21 +89,21 @@ class ARPA2ShellClient (MessagingHandler):
 			raise NotImplementedError ('GSSAPI accept mode')
 		elif self.gsta == 'boot':
 			ctx = self._have_gssapi_ctx ()
-			print 'using client context', ctx
+			#DEBUG# print 'using client context', ctx
 			gsstoken = event.message.body
-			print 'stepping client with size:', len (gsstoken), 'namely', gsstoken.encode ('hex'), '::', type (gsstoken)
+			#DEBUG# print 'stepping client with size:', len (gsstoken), 'namely', gsstoken.encode ('hex'), '::', type (gsstoken)
 			assert (not ctx.complete)
 			gsstoken = ctx.step (gsstoken)
 			if gsstoken is not None:
-				print 'produced new token size:', len (gsstoken), 'namely', gsstoken.encode ('hex')
+				#DEBUG# print 'produced new token size:', len (gsstoken), 'namely', gsstoken.encode ('hex')
 				msg = Message (
 					body=gsstoken,
 					reply_to=self.recver.remote_source.address,
-					correlation_id=event.message.correlation_id)
+					correlation_id=self.corlid)
 				self.sender.send (msg)
 			if ctx.complete:
 				self.gsta = 'comm'
-				print 'client opened link securely'
+				#DEBUG# print 'client opened link securely'
 				self.on_link_opened_securely (event)
 		elif self.gsta == 'comm':
 			raise RuntimeError ('GSSAPI already communicates')
@@ -121,20 +123,20 @@ class ARPA2ShellClient (MessagingHandler):
 		return Message (body=body2, **kwargs)
 
 	def on_start (self, event):
-		print 'started'
+		#DEBUG# print 'started'
 		ctr = event.container
 		cnx = ctr.connect (self.broker)
 		# The sender triggers the first on_link_opened() event
 		self.sender = ctr.create_sender (cnx, self.queue)
 		self.recver = ctr.create_receiver (cnx, None, dynamic=True)
-		print 'sender, receiver created'
+		#DEBUG# print 'sender, receiver created'
 		self.on_start_gssapi (event)
-		print 'gssapi also started'
+		#DEBUG# print 'gssapi also started'
 
 	# First pass the link over to GSSAPI; later return to on_link_opened_securely()
 	#
 	def on_link_opened (self, event):
-		print 'link opened'
+		#DEBUG# print 'link opened'
 		self.on_link_opened_gssapi (event)
 
 	# After GSSAPI has run, it triggers this handler to open the application.
@@ -142,27 +144,26 @@ class ARPA2ShellClient (MessagingHandler):
 	# We will only call this operation once, sorry :-S
 	#
 	def on_link_opened_securely (self, event):
-		print 'link was opened securely on client (will we be sending twice?)'
+		#DEBUG# print 'link was opened securely on client (will we be sending twice?)'
 		msg = self._encrypted_message (
 				self.batch,
 				reply_to=self.recver.remote_source.address,
-				#TODO# DIG UP corlid!
-				correlation_id=123)
+				correlation_id=self.corlid)
 		self.batch = None
 		self.sender.send (msg)
-		print 'message sent sized:', len (msg.body)
+		#DEBUG# print 'message sent sized:', len (msg.body)
 
 	# Initial messages arrive, for GSSAPI, but in 'comm' mode it is a reply
 	#
 	def on_message (self, event):
-		print 'message from', self.recver.remote_source.address, 'to ?'
+		#DEBUG# print 'message from', self.recver.remote_source.address, 'to ?'
 		if self.gsta != 'comm':
 			self.on_message_gssapi (event)
 			return
 		reply0 = event.message.body
 		if reply0 is None:
 			return
-		print 'message received on client sized:', len (reply0), 'namely', reply0.encode ('hex')
+		#DEBUG# print 'message received on client sized:', len (reply0), 'namely', reply0.encode ('hex')
 		reply = self._decrypted_message (reply0)
 		global bad
 		while reply != '':
@@ -170,30 +171,35 @@ class ARPA2ShellClient (MessagingHandler):
 			if endmsg != -1:
 				endmsg = endmsg + 1
 			submsg = reply [:endmsg]
-			print 'processing submessage', submsg
+			#DEBUG# print 'processing submessage', submsg
 			if endmsg != -1:
 				reply = reply [endmsg:]
 			else:
 				reply = ''
-			endline = reply.find ('\n')
-			line0 = reply [:endline]
-			sys.stdout.write (line0 + '\n')
+			endline = submsg.find ('\n')
+			line0 = submsg [:endline]
+			sys.stdout.write (line0.replace ('>>', '>', 1) + '\n')
 			while endline != -1:
-				reply = reply [endline+1:]
-				endline = reply.find ('\n')
-				print 'processing line', reply [:endline]
-				if endline [:2] == '> ':
-					sys.stdout.write (reply [:endline] + '\n')
-				elif endline [:3] == '>> ':
-					sys.stderr.write (reply [:endline] + '\n')
-					bad = True
+				submsg = submsg [endline+1:]
+				#DEBUG# print 'submessage', submsg
+				endline = submsg.find ('\n')
+				if endline != -1:
+					subsubmsg = submsg [:endline]
 				else:
+					subsubmsg = submsg
+				#DEBUG# print 'processing line', subsubmsg
+				if subsubmsg [:2] == '> ':
+					sys.stdout.write (subsubmsg [2:] + '\n')
+				elif subsubmsg [:3] == '>> ':
+					sys.stderr.write (subsubmsg [3:] + '\n')
 					bad = True
-					sys.stderr.write ('Ill-formatted line: ' + reply [:endline] + '\n')
-		print 'closing down'
+				elif subsubmsg != '':
+					bad = True
+					sys.stderr.write ('Ill-formed line: ' + subsubmsg + '\n')
+		#DEBUG# print 'closing down'
 		event.connection.close ()
 		event.container.stop ()
-		print 'closed down'
+		#DEBUG# print 'closed down'
 
 
 # Read the input file
