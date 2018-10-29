@@ -41,6 +41,16 @@ RUN cd /usr/local/src && tar -xzvf /root/mbedtls-2.13.1.tar.gz
 RUN cd /usr/local/src/mbedtls-mbedtls-2.13.1 && mkdir build && cd build && cmake .. && make all test install
 
 # TODO: Install GnuTLS (with TLS-KDH)
+#RUN apt-get install -y dash git-core autoconf libtool gettext autopoint \
+#automake autogen nettle-dev libp11-kit-dev libtspi-dev libunistring-dev \
+#guile-2.0-dev libtasn1-6-dev libidn2-0-dev gawk gperf \
+#libunbound-dev dns-root-data bison help2man gtk-doc-tools \
+#texinfo texlive texlive-generic-recommended texlive-extra-utils
+#ADD https://ftp.gnu.org/gnu/nettle/nettle-3.4.tar.gz /usr/local/src
+#RUN cd /usr/local/src && tar -xzvf nettle-3.4.tar.gz && cd nettle-3.4 && ./configure && make && make install
+#ADD https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.4.tar.xz /usr/local/src
+#RUN cd /usr/local/src && tar -xJvf gnutls-3.6.4.tar.xz && cd gnutls-3.6.4 && ./configure && make && make install
+# README: the above code work until the make command. Make fails on some guile modules. No clue why.
 
 # TODO: Install TLS Pool
 
