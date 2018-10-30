@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+# export DOCKER=sudo docker
+
+
 # The following bash macro accepts numerous forms, and even defaults to
 # the current directory.  It will use the build directory name to tag the
 # image, and also tag it under arpa2.
@@ -12,7 +16,7 @@
 builddir () {
 	DIR=$( cd ${1:-.} ; pwd )
 	TAG=$(basename ${DIR:-.})
-	docker build -t "$TAG" "$DIR" && docker tag "$TAG" arpa2:"$TAG" && touch "$DIR"/.built
+	${DOCKER:-docker} build -t "$TAG" "$DIR" && ${DOCKER:-docker} tag "$TAG" arpa2:"$TAG" && touch "$DIR"/.built
 }
 
 builddir base
@@ -24,8 +28,9 @@ builddir build-libtls
 builddir build-quickder-lillydap
 builddir build-steamworks
 builddir build-tlspool
-#HEAVY_IMAGE_2.31GB# builddir build-qpid
-#HEAVY_DEMO__2.31GB# builddir wip-messaging
+#HEAVY_IMAGE_2.3GB# builddir build-qpid
+#HEAVY_DEMO__2.3GB# builddir wip-messaging
+#HEAVY_IMAGE_1.3GB# builddir build-apachemod
 
 builddir demo-identityhub
 builddir demo-reservoir
