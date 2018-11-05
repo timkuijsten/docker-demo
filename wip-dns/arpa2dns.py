@@ -136,7 +136,14 @@ class Cmd (arpa2cmd.Cmd):
 			return False
 		self.knot.have_zones (zone)
 		ns1 = args [3]
-		rp = args [4].replace ('@', '.')
+		if not '@' in args [4]:
+			sys.stderr.write ('Missing \'@\' in email address for responsible person')
+			return False
+		(rp0,rp1) = args [4].resplit ('@', 1)
+		if '@' in rp0:
+			sys.stderr.write ('Multiple \'@\' in email address for responsible person')
+			return False
+		rp = rp0.replace ('.', '\\.') + '.' + rp1
 		self.knot.rr (zone, '@', '3600', 'SOA',
 			'%s %s 0 10800 3600 1814400 3600' % (ns1,rp))
 		if not self.knot.try_commit ():
@@ -144,24 +151,25 @@ class Cmd (arpa2cmd.Cmd):
 		return False
 
 	@cmdparser.CmdMethodDecorator(token_factory=token_factory)
-	def do_tlsa (self, args, fields):
+	def do_dane (self, args, fields):
 		"""
-		tlsa ( ( add | del ) <zone> <_proto> <port> <fqdn> <to-be-matched> |
+		dane ( ( add | del ) <zone> <_proto> <port> <fqdn> <to-be-matched> |
 		       config (ca-root|pkix-end|trust-root|any-end) (cert|pubkey) (full|sha256|sha512) )
 
-		Adds or removes TLSA records for a certificatie supplied in the
-		<to-be-matched> parameter.  Any computations on the certificate
-		are assumed to be dealt with by the client, as this is most likely
-		the certificate generating party, with knowledge about how to do
-		this.
+		Adds or removes TLSA records for DANE to match certificates against
+		the <to-be-matched> parameter.  The location and matched value are
+		determined by the "dane add" command.  The method of comparison used
+		is determined by the "dane config" command.
 
-		The particulars of the published TLSA records are independently set
-		with the config command form.  The parameters are in symbolic forms
-		to make the result more readable.  This time, knowledge is best on
-		the side of the DNS shell.
+		The parameters setup with "dane config" are in symbolic forms to
+		make the result more readable.  Knowledge of these labels is known
+		at the side of the DNS shell.
 
 		The setup is not fool-proof; one must provide the suitable kind of
-		data in <to-be-matched> for it to work.
+		data in <to-be-matched> for it to work.  All crypto computations
+		are assumed to be dealt with by the caller, as this is most likely
+		the certificate-generating party, with knowledge about how to do
+		this.
 		"""
 		subcmd = args [1]
 		if subcmd == 'config':
@@ -211,9 +219,9 @@ class Cmd (arpa2cmd.Cmd):
 			sys.stderr.write ('The <fqdn> parameter is not properly formatted')
 			return False
 		name = '_acme-challenge.' + fqdn [:-2]
-		self.knot.have_zone (zone)
-		zone_cmd = 'zone-set' if subcmd == 'add' else 'zone-unet'
-		self.knot.knot (cmd=zone_cmd, section=zone, item=name, data='3600 TXT "' + txtfield + '"')
+		self.knot.have_zones (zone)
+		zone_cmd = self.knot.add_rr if subcmd == 'add' else self.knot.del_rr
+		zone_cmd (zone, name, '3600', 'TXT', '"' + txtfield + '"')
 		if not self.knot.try_commit ():
 			sys.stderr.write ('Publication failed')
 		return False
@@ -230,7 +238,7 @@ class Cmd (arpa2cmd.Cmd):
 		rdata = fields ['<rdata>']
 		ttl = fields ['<ttl>'] or '3600'
 		rec_cmd = 'zone-set' if subcmd == 'add' else 'zone-unset'
-		self.knot.have_zone (zone)
+		self.knot.have_zones (zone)
 		self.knot.knot (cmd=rec_cmd, section=zone, item=fqdn, data=('%s %s %s' % (ttl,rtype,rdata)))
 		if not self.knot.try_commit ():
 			sys.stderr.write ('Failed to %s %s in zone %s' % (subcmd,rtype,zone))

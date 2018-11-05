@@ -22,8 +22,9 @@ In the shell, you can do things like (more to come)
 
 ```
 zone add orvelte.nep ns1.orvelte.nep. admin.orvelte.nep.
-tlsa config pkix-end pubkey sha512
-tlsa add orvelte.nep _443 tcp web 666999aaabbbcccdddeeefff
+dane config pkix-end pubkey sha512
+dane add orvelte.nep _443 tcp web 666999aaabbbcccdddeeefff
+acme add orvelte.nep www 1122334455
 zone del orvelte.nep
 exit
 ```
