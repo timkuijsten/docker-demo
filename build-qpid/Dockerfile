@@ -24,7 +24,8 @@ RUN apt-get install -y ruby-dev libboost-program-options1.62 libboost-system1.62
 #
 #TODO# Is the Python support installed?
 #
-RUN cd /usr/local/src ; git clone https://git-wip-us.apache.org/repos/asf/qpid-proton.git qpid-proton.git
+RUN cd /usr/local/src ; git clone -b master --single-branch \
+		https://git-wip-us.apache.org/repos/asf/qpid-proton.git qpid-proton.git
 #FAILING TEST# RUN cd /usr/local/src/qpid-proton.git ; mkdir build ; cd build ; cmake .. ; make all test install
 RUN cd /usr/local/src/qpid-proton.git ; mkdir build ; cd build ; cmake .. ; make all install
 
@@ -32,7 +33,8 @@ RUN cd /usr/local/src/qpid-proton.git ; mkdir build ; cd build ; cmake .. ; make
 #
 # Old INSTALL: https://raw.githubusercontent.com/apache/qpid-cpp/master/INSTALL.txt
 #
-RUN cd /usr/local/src ; git clone https://git-wip-us.apache.org/repos/asf/qpid-cpp.git qpid-cpp-broker.git
+RUN cd /usr/local/src ; git clone -b master --single-branch \
+		https://git-wip-us.apache.org/repos/asf/qpid-cpp.git qpid-cpp-broker.git
 #FAILING TEST# RUN cd /usr/local/src/qpid-cpp-broker.git ; mkdir build ; cd build ; cmake .. ; make all test install
 RUN cd /usr/local/src/qpid-cpp-broker.git ; mkdir build ; cd build ; cmake .. ; make all install
 
@@ -41,7 +43,8 @@ RUN cd /usr/local/src/qpid-cpp-broker.git ; mkdir build ; cd build ; cmake .. ; 
 # Misses LIBWEBSOCKETS but continues without it
 # Misses asciidoc but continues -- it would install a truck load to replicate online documentation
 #
-RUN cd /usr/local/src ; git clone https://git-wip-us.apache.org/repos/asf/qpid-dispatch.git qpid-dispatch.git
+RUN cd /usr/local/src ; git clone -b master --single-branch \
+		https://git-wip-us.apache.org/repos/asf/qpid-dispatch.git qpid-dispatch.git
 #FAILING TESTS# RUN cd /usr/local/src/qpid-dispatch.git ; mkdir build ; cd build ; cmake .. ; make all test install
 RUN cd /usr/local/src/qpid-dispatch.git ; mkdir build ; cd build ; cmake .. ; make all install
 

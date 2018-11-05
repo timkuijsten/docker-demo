@@ -1,0 +1,2 @@
+# deb https://deb.knot-dns.cz/knot-latest/ stable main
+deb https://deb.knot-dns.cz/knot-latest/ stretch main

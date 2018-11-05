@@ -16,3 +16,5 @@
 - consider linkage with SCTP streams connecting to the broker
 - documentation is all over the place: howto, explanation, design
 - gently handle ticket expiration (shell error, not crash)
+- remove hacky flag for immediate errors and exceptions
+- deal with timeouts due to queues for crashed microservices

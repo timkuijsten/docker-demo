@@ -1,0 +1,13 @@
+
+
+Knot is not always reliable.  About one out of ten times, it may
+miss out on a lock that it just obtained, maybe because we just
+deleted it before reinstating the zone?  The following are dumps
+of command blocks as sent/received by the Python library:
+
+KnotControl send {'cmd': 'zone-begin', 'data': 'orvelte.nep'}
+KnotControl recv {}
+KnotControl send {'zone': 'orvelte.nep', 'rtype': 'SOA', 'cmd': 'zone-set', 'ttl': '3600', 'owner': '@', 'data': 'ns1.orvelte.nep. admin.orvelte.nep. 0 10800 3600 1814400 3600'}
+KnotControl exception: no active transaction (data: COMMAND = zone-set, ERROR = no active transaction, ZONE = orvelte.nep, OWNER = @, TTL = 3600, TYPE = SOA, DATA = ns1.orvelte.nep. admin.orvelte.nep. 0 10800 3600 1814400 3600)
+KnotControl send {'cmd': 'zone-abort', 'data': 'orvelte.nep'}
+KnotControl recv {}
