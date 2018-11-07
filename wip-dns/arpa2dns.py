@@ -335,6 +335,7 @@ class Cmd (arpa2cmd.Cmd):
 		if '!' in uri:
 			sys.stderr.write ('Please use no ! in your uri')
 			return False
+		uri = uri.replace ('\\', '\\\\')
 		if '\\\\2' in uri and not wildcard:
 			sys.stdout.write ('You might use \\\\2 to capture the wildcarded trailer\n')
 			return False
