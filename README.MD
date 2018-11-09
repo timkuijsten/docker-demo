@@ -8,7 +8,7 @@ Dependencies are shown in the graphic below.
 
 ![Build dependencies](deps.png)
 
-## Quick start
+## Quick start (Video)
 
 To see a usage video in your console, run
 
@@ -16,13 +16,17 @@ To see a usage video in your console, run
 script -p demo-identityhub.script
 ```
 
-To build the images, run
+To build the images, run CMake to setup and
+then make the respective demonstration:
 
 ```shell
-build.sh
+cmake .
+make demo-identityhub
 ```
 
 The directories contain individual README files.
+They are installed in the root dir of the images.
+
 Generally, the `demo-*` directories are targets
 and `wip-*` is work in progress.  The `build-*`
 are helpful temporary images during building;
@@ -49,16 +53,12 @@ You can create a typescript console "video" with
 script -r <imagename>.script
 ```
 
-To recreate the dependency graphs, there is a simple
-scripted procedure,
-
-```shell
-./deps.sh > deps.dot
-dot -T png deps.dot > deps.png
-```
-
-Perhaps it is helpful to do even this work in
-CMake.
+The dependency graph is re-created any time you run
+CMake in/on the root dir of this repository.  This
+is a good place and time, because it overviews what
+you may just have updated.  A new image is only
+created when you have `dot` installed though.  If
+not, it will quietly fail.
 
 ## Using on Windows
 

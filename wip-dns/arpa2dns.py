@@ -298,7 +298,7 @@ class Cmd (arpa2cmd.Cmd):
 		"""
 		enum ( add | del ) <zone> [wildcard] <skip> <service-field> <uri>
 
-		Add or remove a NAPTR record for the ENUM <zone> (which may be in +ddddd form).
+		Add or remove an NAPTR record for the ENUM <zone> (which may be in +ddddd form).
 		The wildcard flag indicates that sub-numbers are added instead of the actual number.
 		The <skip> is a number of leading digits to not return from the regexp.
 		The <service-field> must follow RFC 6116 grammar, for instance E2U+voice:tel+sms:tel
