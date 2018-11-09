@@ -80,6 +80,12 @@ knot.add_rr ('orvelte.nep', '_443._tcp.www',
 # knot.knotc_shell ('zone-set orvelte.nep _443._tcp.www.orvelte.nep 3600 TLSA 0 1 2 666', expect_ok=True)
 knot.try_commit ()
 
+knot.have_zones ('orvelte.nep')
+knot.del_rr ('orvelte.nep', '_443._tcp.www',
+		'3600', 'TLSA',
+		('%d %d %d %s' % (0,1,2,'6660')))
+knot.try_commit ()
+
 knot.have_conf ()
 # knot.knot (cmd='conf-unset', section='zone', item='domain', data='orvelte.nep')
 knot.del_zone ('orvelte.nep')

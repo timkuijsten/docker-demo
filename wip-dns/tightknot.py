@@ -237,15 +237,45 @@ class TightKnot:
 		self.knot (cmd=cmd, zone=zone, owner=owner, ttl=ttl, rtype=rtype, data=rdata)
 		return False
 
+	def patience (self, zone, owner, rtype):
+		"""Measure how long our patience should be when
+		   posting the given resource record.  The return
+		   value is a number of seconds.
+
+		   When resource records already exist at the
+		   given coordinates, the patience returned is
+		   the current TTL.  Otherwise, it is the lowest
+		   of the SOA TTL and the SOA minimum timeout.
+		"""
+		if rtype.upper () == 'SOA':
+			return 0
+		old_success = self.txn_success
+		oldrdata = self.knot (cmd='zone-get', zone=zone, owner=owner, rtype=rtype)
+		if oldrdata is None:
+			self.txn_success = old_success
+			oldrdata = self.knot (cmd='zone-get', zone=zone, owner='@', rtype='SOA')
+			soadata = oldrdata.values()[0].values()[0] ['SOA']
+			retval = min (int (soadata ['data'][0].split()[-1]), int (soadata ['ttl']))
+		else:
+			rrdata = oldrdata.values()[0].values()[0] [rtype]
+			retval = int (rrdata ['ttl'])
+		self.txn_success = old_success
+		return retval
+
 	def add_rr (self, zone, owner, ttl, rtype, rdata):
 		"""Add the given resource record.
 		"""
+		done_after = self.patience (zone, owner, rtype)
+		self.patience (zone, owner, rtype)
 		self._rr ('zone-set', zone, owner, ttl, rtype, rdata)
+		print 'Done-After:', done_after
 
 	def del_rr (self, zone, owner, ttl, rtype, rdata):
 		"""Delete the given resource record.
 		"""
+		done_after = self.patience (zone, owner, rtype)
 		self._rr ('zone-unset', zone, owner, ttl, rtype, rdata)
+		print 'Done-After:', done_after
 
 	def _knotc_shell (self, knotc_subcommand, expect_ok=True):
 		"""Send a command to knotc, using the commandline.
