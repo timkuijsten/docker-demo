@@ -204,6 +204,10 @@ class Cmd (arpa2cmd.Cmd):
 	"""All DNs of accessControlledObjects."""
 	acl_dns = None
 
+	def reset (self):
+		self.cur_acl = None
+		self.acl_dns = None
+
 	"""Add a space after a complete name."""
 	def completenames (self, text, *ignored):
 		return [ w + ' '

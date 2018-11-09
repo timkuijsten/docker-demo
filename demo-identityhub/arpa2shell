@@ -62,5 +62,6 @@ if __name__ == '__main__':
 	while current_shell is not None:
 		current_shell.next_shell = None
 		current_shell.cmdloop ()
+		current_shell.reset ()
 		current_shell = current_shell.next_shell
 

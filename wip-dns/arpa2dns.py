@@ -184,6 +184,9 @@ class Cmd (arpa2cmd.Cmd):
 		self.knot = tightknot.TightKnot ()
 		self.tlsa_config = (0,0,0)
 
+	def reset (self):
+		selt.tlsa_config = (0,0,0)
+
 	@cmdparser.CmdMethodDecorator(token_factory=token_factory)
 	def do_zone (self, args, fields):
 		"""

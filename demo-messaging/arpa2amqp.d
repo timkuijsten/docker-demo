@@ -193,6 +193,7 @@ class ARPA2ShellDaemon (MessagingHandler):
 	# reply to the batch job in the message.
 	#
 	def run_message (self, message, ctx):
+		shellnames = set ()
 		name = ctx.initiator_name
 		life = ctx.lifetime
 		reply = ''
@@ -205,6 +206,7 @@ class ARPA2ShellDaemon (MessagingHandler):
 			#DEBUG# print 'Splitting prompt off of', message, '[:' + str (endcmd) + ']'
 			try:
 				(shell,cmd) = message [:endcmd].split ('> ', 1)
+				shellnames.add (shell)
 				if life > 0:
 					reply += self.run_command (shell, cmd, name, life)
 				else:
@@ -216,6 +218,9 @@ class ARPA2ShellDaemon (MessagingHandler):
 			else:
 				message = ''
 			reply += '\n'
+		for shellname in shellnames:
+			#DEBUG# print 'resetting shell', shellname
+			self.get_shell (shellname).reset ()
 		#DEBUG# print 'message run complete'
 		return reply
 

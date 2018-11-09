@@ -41,6 +41,15 @@ class Cmd (cmd.Cmd):
 		self.known = [ ]
 		self.next_shell = None
 
+	def reset (self):
+		"""Actual shells should override the reset
+		   method such that they remove traces of
+		   command history.  This is an abstract
+		   method, so don't bother calling it from
+		   the subclass.
+		"""
+		raise NotImplementedError ('No reset method for this shell')
+
 	def do_version (self, *ignored):
 		"""Print the name and current version of this shell.
 		"""

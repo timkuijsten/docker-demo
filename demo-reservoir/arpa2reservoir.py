@@ -421,6 +421,10 @@ class Cmd (arpa2cmd.Cmd):
 		self.cur_dn = None
 		#UNUSED# self.cur_colluuid = None
 
+	def reset (self):
+		self.cur_domain = None
+		self.cur_dn = None
+
 	@cmdparser.CmdMethodDecorator(token_factory=token_factory)
 	def do_domain (self, args, fields):
 		"""

@@ -356,6 +356,11 @@ class Cmd (arpa2cmd.Cmd):
 
 	do_quit = do_EOF
 
+	def reset (self):
+		"""There is no state to clear for arpa2identityhub.
+		"""
+		pass
+
 	def completenames (self, text, *ignored):
 		return [ w + ' '
 			for w in cmd.Cmd.completenames (self, text, *ignored) ]
