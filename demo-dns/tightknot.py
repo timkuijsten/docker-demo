@@ -268,14 +268,20 @@ class TightKnot:
 		done_after = self.patience (zone, owner, rtype)
 		self.patience (zone, owner, rtype)
 		self._rr ('zone-set', zone, owner, ttl, rtype, rdata)
-		print 'Cache-Update-Delay:', done_after
+		if done_after is not None:
+			print 'Cache-Update-Delay:', done_after
+		else:
+			print 'DEBUG: No done_after available'
 
 	def del_rr (self, zone, owner, ttl, rtype, rdata):
 		"""Delete the given resource record.
 		"""
 		done_after = self.patience (zone, owner, rtype)
 		self._rr ('zone-unset', zone, owner, ttl, rtype, rdata)
-		print 'Cache-Update-Delay:', done_after
+		if done_after is not None:
+			print 'Cache-Update-Delay:', done_after
+		else:
+			print 'DEBUG: No done_after available'
 
 	def _knotc_shell (self, knotc_subcommand, expect_ok=True):
 		"""Send a command to knotc, using the commandline.

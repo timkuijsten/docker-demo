@@ -375,14 +375,20 @@ class Cmd (arpa2cmd.Cmd):
 		subcmd = args [1]
 		zone = map_enum (args [2])
 		fqdn = args [3]
-		rtype = fields ['<rtype>']
-		rdata = fields ['<rdata>']
-		ttl = fields ['<ttl>'] or '3600'
+		rtype = fields ['<rtype>'] [0]
+		rdata = fields ['<rdata>'] [0]
+		ttl = fields ['<ttl>'] [0] or '3600'
 		rec_cmd = 'zone-set' if subcmd == 'add' else 'zone-unset'
 		self.knot.have_zones (zone)
-		self.knot.knot (cmd=rec_cmd, section=zone, item=fqdn, data=('%s %s %s' % (ttl,rtype,rdata)))
+		#OLD#BAD# done_after = self.knot.patience (zone=zone, owner=fqdn, rtype=rtype)
+		#OLD#BAD# self.knot.knot (cmd=rec_cmd, section=zone, item=fqdn, data=('%s %s %s' % (ttl,rtype,rdata)))
+		self.knot.add_rr (zone, fqdn, ttl, rtype, rdata)
 		if not self.knot.try_commit ():
 			sys.stderr.write ('Failed to %s %s in zone %s' % (subcmd,rtype,zone))
+		#OLD#BAD# if done_after is not None:
+		#OLD#BAD# 	print 'Cache-Update-Delay:', done_after
+		#OLD#BAD# else:
+		#OLD#BAD# 	print 'DEBUG: No done_after available'
 		return False
 
 

@@ -70,6 +70,64 @@ kdig @localhost         5.4.3.2.1.e164.arpa naptr
 kdig @localhost 9.8.7.6.5.4.3.2.1.e164.arpa naptr
 ```
 
+
+## Learning about DNS Cache Timing
+
+When publishing security-bound information, such as the
+records `DNSKEY`, `DS`, `TLSA`, `SSHFP` it can be important
+to not make such claims too early or too late.  Having to
+figure out how long to wait can be rather tedious, but a
+general structure might be
+[min(DNS) and max(DNS)](https://github.com/arpa2/DNS-mixer/blob/master/doc/min-max-DNS.MD)
+as we intend to build it into the anticipated
+[DNS mixer](https://github.com/arpa2/DNS-mixer/blob/master/doc/dns-mixer-from-partial-masters.md)
+component.
+
+Until we have a DNS mixer, we can at least satisfy ourselves
+by returning cache delays from knowledge central, which is
+the DNS shell.  So, even simple update returns cache delay
+times:
+
+```
+shell$ docker run -it demo-dns
+# /etc/init.d/knot start
+# arpa2dns
+arpa2dns> ?
+arpa2dns> ?record
+arpa2dns> record add orvelte.nep www 7200 AAAA 2001:db8:1::80
+Cache-Update-Delay: 3600
+arpa2dns> record add orvelte.nep www 7200 AAAA 2001:db8:2::80
+Cache-Update-Delay: 7200
+arpa2dns> quit
+# kdig +short @::1 www.orvelte.nep aaaa
+2001:db8:1::80
+2001:db8:2::80
+# exit
+shell$ 
+```
+
+Note the two responses, and how they are different.  The
+first record is a freshly added `AAAA` record that will
+take the negative caching time to come through.  This is
+the lowest of the SOA minimum and the SOA TTL, in this
+case 3600 seconds from now.  The second addition is made
+to an existing record that has a cache time of 7200, and
+since that may already be loaded somewhere it may take
+that long for the second record added to come through.
+(I am aware that the shell could try to combine these,
+and we probably will, at some point.)
+
+For security-related operations, this is a great asset.
+When you post something that ends up as a security
+instruction, you always risk breaking things if the
+instruction is expected but not yet found.  The same
+holds when you remove things.  In those cases, it is
+really helpful to have a timer for the records added
+or removed, to know when they are globally available,
+or globally retracted.  This facility takes away a
+lot of complexity related to caching in DNS.
+
+
 ## Current and Future Work
 
 This DNS demonstration takes in zone changes and publishes

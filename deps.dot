@@ -11,6 +11,9 @@ digraph arpa2demo{
    "arpa2:build-bin" -> "arpa2:build-steamworks"
    "arpa2:build-quickder-lillydap" -> "arpa2:build-tlspool"
    "arpa2:build-bin" -> "arpa2:build-tlspool"
+   "arpa2:build-bin" -> "arpa2:demo-dns"
+   "arpa2:build-pip" -> "arpa2:demo-dns"
+   "arpa2:base" -> "arpa2:demo-dns"
    "arpa2:build-pip" -> "arpa2:demo-identityhub"
    "arpa2:base" -> "arpa2:demo-identityhub"
    "arpa2:build-qpid" -> "arpa2:demo-messaging"
@@ -21,8 +24,5 @@ digraph arpa2demo{
    "arpa2:build-bin" -> "arpa2:wip-6bed4"
    "arpa2:build-pip" -> "arpa2:wip-cherrypy"
    "arpa2:build-tlspool" -> "arpa2:wip-cherrypy"
-   "arpa2:build-bin" -> "arpa2:wip-dns"
-   "arpa2:build-pip" -> "arpa2:wip-dns"
-   "arpa2:base" -> "arpa2:wip-dns"
    "arpa2:base" -> "arpa2:wip-rfcmarkup"
 }
