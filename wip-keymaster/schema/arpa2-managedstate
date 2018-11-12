@@ -1,0 +1,64 @@
+#
+# The lifecycleState attribute allows LDAP subscribers to follow state
+# changes, and trigger events in processing software.  Causes for
+# triggering are expiration of a timer, or the occurrence of an event
+# in another lifecycleState attribute in the same object.
+#
+# Past and future are separated by a dot.  As a result, a lifecycleState
+# that ends in a dot is finished, and needs no further attention.
+#
+# It is possible for future values to be partial; for instance, a
+# variable assignment without a value yet, or a timer that has not
+# been set.  This is not possible for the next one up, though.
+#
+# This syntax is not enforced by LDAP, but may well be by applications
+# that have to process events when they occur.
+#
+# 
+# lifecycleState ::= lifecycle 0*( SP done ) "." SP next 0*( SP todo )
+# lifecycleState  /= lifecycle 1*( SP done ) "."
+# 
+# next ::= event     "@" timestamp
+# next  /= lifecycle "?" event
+# 
+# done ::= next
+# done  /= var EQUALS value
+# 
+# todo ::= done
+# todo  /= event    "@"
+# todo  /= variable "="
+# 
+# lifecycle ::= identifier
+# event     ::= identifier
+# variable  ::= identifier
+# 
+# identifier ::= [a-z-_]+[0-9]*
+# timestamp  ::= [0-9]+
+# value      ::= [^ .]*
+#
+#
+# lifecycles must be uniquely named within an object, and tend to refer
+# to event handler software.  In the interest of LDAP filters (lcname*)
+# every lifecycle SHALL NOT be the beginning of another life cycle, so
+# "some" and "something" must not both be used, but "something" and
+# "someone" can be used together.
+#
+# timestamps refer to a number of seconds since the Epoch, in decimal
+# notation.  Note that no integer size limitation occurs in this format.
+#
+# events are uniquely named within a lifecycleState attribute.
+#
+# variables are uniquely named within a lifecycleState attribute.
+# 
+
+
+attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.22
+	NAME 'lifecycleState'
+	DESC 'Incremental progress of a life cycle, triggering events from a process'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.28
+	NAME 'lifecycleObject'
+	DESC 'Objects managed with zero or more lifecycleState attributes'
+	MAY lifecycleState )
+

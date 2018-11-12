@@ -118,3 +118,20 @@ behind in work-done administration is the safe
 choice.
 
 
+## Finally Done
+
+When a process is finished, it is not marked with
+an end marker like a dot.  That would work, but at
+restart of the system the entire state would need
+to flush through the event system, potentially
+leading to quadratic delays on large data sets.
+
+Instead, we can remove the `managedState` attribute.
+However, for historic purposes, we might call it
+the `managedHistory` attribute instead.  The
+event-drive structures ignore those attributes
+completely, even for `ID?EV` they are gone.  At
+any time at the administrator's convenience, the
+`managedHistory` logs may be removed.  In most
+cases however, it would be expected of some use.
+

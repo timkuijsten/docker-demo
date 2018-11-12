@@ -1,0 +1,337 @@
+# Definitions of OBJECT CLASS and ATTRIBUTE TYPE for the Service Directory
+# in the InternetWide Architecture, or more specifically, the IdentityHub.
+#
+# Currently allocated as
+# ARPA2-Experimental-LDAP-SteamWorks-ServiceHub 
+# 1.3.6.1.4.1.44469.666.389.1.3
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+##
+## IDENTITYHUB USERID MANAGEMENT: ALIASES, PSEUDONYMS, GROUPS, ROLES, ...
+##
+
+
+#
+# We set out to define our own attributes for uidPseudonym and so on.
+# Arrogance?  Not quite.  It's internal, so doesn't matter, but it also
+# avoids our need to deal with the variability of 0+ roleOccupants,
+# 1+ members, sometimes owners and sometimes not, references as RDNs
+# (or actually DNs) that always use uid= but are unmatchable to current
+# PulleyScript, lack of reverse relations, and so on.  Enter simplicity.
+#
+
+
+
+
+##
+## RESOURCE LABELLING AND ACCESS CONTROL
+##
+
+# uidAlias holds the uid value of a user that is aliased by this object.
+# We generally use uid=xxx+yyy as an alias of uid=xxx, but we shall not
+# locate it underneath the uid=xxx object anymore.  The uidAlias is
+# used in spite of it being superfluous; so the object with RDN uid=xxx+yyy
+# will contain the uidAlias=xxx attribute to accommodate search tools.
+#
+# It is an error to specify a uidAlias if not both are identityHubUser
+# or both are identityHubGroup or both are identityHubRole.
+#
+# uidAlias is not usually bidirectional; it is considered valid only when
+# the owner of the two objects is the same party (which software may
+# choose to check or ignore, but formally that's how it works).
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.1
+        NAME 'uidAlias'
+        DESC 'Reference to a uid of which we acknowledge being an alias'
+	SUP uid )
+
+# uidPseudonym holds the uid value of a user that is pseudonymised by this
+# object.  We use uid=zzz as a pseudonym of uid=xxx, so this attribute
+# cannot be inferred from anything formal.
+#
+# uidPseudonym is not usually bidirectional; it is considered valid only
+# when the owner of the two objects is the same party (which software may
+# choose to check or ignore, but formally that's how it works).
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.2
+        NAME 'uidPseudonym'
+        DESC 'Reference to a user of which we acknowledge being a pseudonym'
+	SUP uid )
+
+# uidGroup acknowledges that we are a member of a group whose uid value is
+# stored in this attribute.  From the group with that uid there should be a
+# uidMember reference back to us before it is formally acknowledged.  When
+# these relations are unbalanced, they may show up as "invitations" or
+# "sollicitations", depending on the side.
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.3
+        NAME 'uidGroup'
+        DESC 'Reference to a group of which we acknowledge membership'
+	SUP uid )
+
+# uidRole acknowledges that we are an occupant of a role whose uid value is
+# stored in this attribute.  From the role with the uid there should be a
+# uidOccupant reference back to us before it is formally acknowledged.
+# When these relations are unbalanced, they may show up as "invitations" or
+# "sollicitations", depending on the side.
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.4
+        NAME 'uidRole'
+        DESC 'Reference to a role of which we acknowledge being an occupant'
+	SUP uid )
+
+# uidMember acknowledges that this group welcomes a member whose uid value is
+# stored in this attribute.  From the member with that uid there should be a
+# uidGroup reference back to us before it is formally acknowledged.  When
+# these relations are unbalanced, they may show up as "invitations" or
+# "sollicitations", depending on the side.
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.5
+        NAME 'uidMember'
+        DESC 'Reference to a member that we acknowledge in this group'
+	SUP uid )
+
+# uidOccupant acknowledges that this role is filled by a user whose uid value
+# is stored in this attribute.  From the user with that uid there should be a
+# uidRole reference back to us before it is formally acknowledged.  When
+# these relations are unbalanced, they may show up as "invitations" or
+# "sollicitations", depending on the side.
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.6
+        NAME 'uidOccupant'
+        DESC 'Reference to a member that we acknowledge in this group'
+	SUP uid )
+
+# uidDecline is the opposite of acknowledgement of a relation between groups
+# and members, or between roles and occupants.  The reasons for declining
+# these relations may vary.  In general it is advisable to remove an attempt
+# to link with uidGroup, uidRole, uidMmeber or uidOccupant when the other
+# half of the link opposes it with uidDecline.  It is up to the policy of the
+# declining party whether this explicit choice is kept to avoid repeated
+# sollicitations, or perhaps turned into an ACL.
+#
+# Note that the co-existence of a uidDecline with a positive statement with
+# the same attribute value is silly.  It may be expected that some software
+# ignores the uidDecline in such cases, and simply works on the positive
+# statement.  Such forms should generally be avoided as their semantics are
+# unclear, and no formal definition for the situation is given here.
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.7
+        NAME 'uidDecline'
+        DESC 'Reference to a member that we explicitly do not acknowledge in this group'
+	SUP uid )
+
+# resourceClassUUID describes what a resource looks like in
+# terms of a unique code.  Instances of resources may have
+# further identifiers in terms of a DoNAI.
+#
+# This attribute is a good candidate for equality indexing.
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.8
+        NAME 'resourceClassUUID'
+        DESC 'The UUID value for a resource class'
+	EQUALITY uuidMatch
+	ORDERING uuidOrderingMatch
+	SYNTAX 1.3.6.1.1.16.1
+	SINGLE-VALUE )
+
+# resourceInstance describes an instance key, always
+# within the scope of a given resourceClassUUID.  It is
+# represented as a DirectoryString, to capture general
+# UTF-8 forms.
+#
+# When used extensively to distinguish within any given
+# resourceClassUUID, this attribute may be an interesting
+# candidate for equality indexing.  When doing so, note
+# that this is a case-sensitive format so it can hold a
+# maximum of key forms (and because it is easy to map to
+# a certain form if so desired).
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.9
+        NAME 'resourceInstanceKey'
+        DESC 'The binary key for a resource instance'
+	EQUALITY caseExactMatch
+	SUBSTR caseExactSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+
+# identityHubUser is an object that describes users, as in, individuals.
+# The general idea is to describe authorisation relations, which is why
+# there may often be ACLs attached to regulate editing, reading and so on.
+#
+objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.10
+        NAME 'identityHubUser'
+        DESC 'An individual identity under the IdentityHub Component of the InternetWide Architecture'
+	SUP top STRUCTURAL
+        MUST ( uid )
+	MAY ( uidAlias $ uidPseudonym $ uidGroup $ uidRole $ uidDecline $
+	      cn $ description $ labeledURI $ seeAlso ) )
+
+# identityHubGroup is an object that describes groups of users and groups.
+# The general idea is to describe authorisation relations, which is why
+# there may often be ACLs attached to regulate editing, reading and so on.
+#
+objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.11
+        NAME 'identityHubGroup'
+        DESC 'A group identity under the IdentityHub Component of the InternetWide Architecture'
+	SUP top STRUCTURAL
+        MUST ( uid )
+	MAY ( uidAlias $ uidPseudonym $ uidGroup $ uidRole $ uidMember $ uidDecline $
+	      cn $ description $ labeledURI $seeAlso ) )
+
+# identityHubRole is an object that describes roles, usually granted permissions.
+# The general idea is to describe authorisation relations, which is why
+# there may often be ACLs attached to regulate editing, reading and so on.
+#
+objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.12
+        NAME 'identityHubRole'
+        DESC 'A role identity under the IdentityHub Component of the InternetWide Architecture'
+	SUP top STRUCTURAL
+        MUST ( uid )
+	MAY ( uidAlias $ uidPseudonym $ uidGroup $ uidRole $ uidOccupant $ uidDecline $
+	      cn $ description $ labeledURI $ seeAlso ) )
+
+# resourceClass is attached to an object that describes a
+# resource class.  The additional attributes resourceClassUUID
+# holds an UUID that identifies an application statically.
+#
+# Very often, a resourceClass is an accessControlledObject,
+# but this is not required and certainly not enforced.
+#
+objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.15
+        NAME 'resourceClass'
+        DESC 'A description of a resource class'
+	AUXILIARY
+	MUST ( resourceClassUUID )
+        MAY ( cn $ description $ labeledURI $ seeAlso ) )
+
+# resourceInstance is attached to an object that describes a
+# resource instance.  The additional attribute resourceClassUUID
+# holds an UUID that identifies an application statically, and
+# resourceInstanceKey holds an binary key that identifies a
+# possibly dynamic instance of the resource class.
+#
+# Very often, a resourceInstance is an accessControlledObject,
+# but this is not required and certainly not enforced.
+#
+objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.16
+        NAME 'resourceInstance'
+        DESC 'A description of a resource instance'
+	AUXILIARY
+	MUST ( resourceClassUUID $ resourceInstanceKey )
+        MAY ( cn $ description $ labeledURI $ seeAlso ) )
+
+# resourceRequirement is a reference from an object to a
+# resourceObject that it requires.  The reference is made
+# by UUID, rather than by DN, so as to allow for data
+# that spans across scopes of visibility.
+#
+# When combined with an accessControlList, it is up to the
+# application to decide whether these should be setup on the
+# referencing or referred object(s), or both.
+#
+objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.17
+        NAME 'resourceRequirement'
+        DESC 'A link to a required resourceObject'
+	AUXILIARY
+	MUST ( resourceClassUUID )
+        MAY ( resourceInstanceKey ) )
+
+
+# accessControlList describes a number of properties in a
+# whitspace-separated (space, tab, newline) string with each
+# word in one of these forms:
+#
+#	%level    -> to specify a level for following selectors
+#	selector  -> to define a selector under the last %level
+#	%%elector -> is an escaped selector %elector
+# 
+# Not all forms are meaningful; the first word needs to set a
+# level and it is useless when the last word does.  It is also
+# meaningless to have more than one %level in direct succession.
+# Use of this attribute must be limited to meaningful forms.
+#
+# The level is a sequence of characters, each of which has a
+# meaning depending on the kind of accessControlList that is
+# expected where it is defined.
+#
+# The selector is a (possibly abstracted) form for the format
+# user@domain.name.
+#
+# We shall be laid-back and describe the syntax below as a simple
+# DirectoryString which is just a string of UTF-8 characters,
+# though we limit it here to the meaningful forms above.
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.20
+	NAME 'accessControlList'
+	DESC 'ACL description in "( %level | selector )..." format'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+
+# accessControlInheritance references a more general node in
+# the directory from which fallback settings are inherited.
+# This could be used to reference an overarching definition
+# such as a class of usages, or it could be used to share an
+# access control profile.
+#
+# When using this, be very careful about the potential of
+# transitive inheritance.  This may or may not be desired in
+# any concrete application.
+#
+#RESERVED# attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.21 ...)
+
+# accessToken contains an octet string that clients can use
+# to access a resource.  This will often combine with
+# accessControl settings, which would then determine the
+# parties to which the token may be released.
+#
+# It is generally a Bad Idea(tm) to supply end users with
+# static accessTokens, which work like bearer tokens (grant
+# access to bearer) and is thus dangerous when stolen.
+# The Internet does not need new words for the same old
+# password mechanisms!  It is much more secure to derive a
+# short-lived access token, or to encrypt the accessToken
+# in a form with a limited usage time.
+#
+# The format of an accessToken is unspecified.  It may well
+# be a combination of a username and password (or identifier
+# and access token) for an application demanding that.
+#
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.22
+	NAME 'accessToken'
+	DESC 'Opaque bearer token that can be used to grant access'
+	EQUALITY octetStringMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.40
+	SINGLE-VALUE )
+
+
+# 1.3.6.1.4.1.44469.666.389.1.3.23 -- lifecycleState attributeclass
+
+# 1.3.6.1.4.1.44469.666.389.1.3.28 -- lifecycleObject attributeclass
+
+
+# accessControlledObject is any object that employs
+# accessControlList attributes to indicate its intended access.
+#
+# There is no requirement of actually specifying an
+# accessControlList, not even when an object carries this
+# objectClass.  When none is specified, access is restricted
+# to the lowest possible level, meaning either no access at
+# all, or just a form of guest-mode access, depending on the
+# ACL patterns in use.
+#
+# Multiple accessControlList attributes on one LDAP object
+# may be concatenated provided that they all have meaningful
+# forms.  When not, the composite meaning is undefined.
+#
+objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.29
+        NAME 'accessControlledObject'
+        DESC 'An object that may or resides under access control'
+	AUXILIARY
+	MAY ( accessControlList $ accessToken ) )
+
