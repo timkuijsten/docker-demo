@@ -30,5 +30,11 @@ For wrapping a Diameter SASL backend into applications like an
 Apache module, it also seems helpful that this is a toolkit built
 in C, not C++ or Erlang.
 
-**See also:** [ARPA2 AVP Registry](http://avp.arpa2.org)
+**See also:**
+
+  * [ARPA2 AVP Registry](http://avp.arpa2.org)
+  * [freeDiameter test app](http://www.freediameter.net/trac/wiki/test_app.fdx)
+    with [client source](http://www.freediameter.net/trac/browser/freeDiameter/extensions/test_app/ta_cli.c)
+    and [server soruce](http://www.freediameter.net/trac/browser/freeDiameter/extensions/test_app/ta_serv.c)
+    and [app context](http://www.freediameter.net/trac/browser/freeDiameter/extensions/test_app).  Looks doable to make a SASL variation.
 
