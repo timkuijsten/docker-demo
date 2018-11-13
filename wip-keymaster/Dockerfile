@@ -47,6 +47,8 @@ RUN rm -rf /etc/ldap/slapd.d
 COPY slapd.conf /etc/ldap/slapd.conf
 COPY ldap.conf /etc/ldap/ldap.conf
 # COPY slapd.keytab /etc/krb5.keytab
+RUN chmod go+w /var/run /run
+RUN chmod o+t  /var/run /run
 
 COPY arpa2keys.py /usr/local/lib/python2.7/dist-packages/arpa2keys.py
 RUN ln -s /usr/local/lib/python2.7/dist-packages/arpa2keys.py /usr/bin/arpa2keys

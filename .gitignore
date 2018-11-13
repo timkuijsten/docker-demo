@@ -1,2 +1,6 @@
 *.pyc
 .built
+.DS_Store
+CMakeCache.txt
+CMakeFiles
+Makefile

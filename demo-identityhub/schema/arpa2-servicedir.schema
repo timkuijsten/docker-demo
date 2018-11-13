@@ -310,6 +310,11 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.22
 	SINGLE-VALUE )
 
 
+# 1.3.6.1.4.1.44469.666.389.1.3.23 -- lifecycleState attributeclass
+
+# 1.3.6.1.4.1.44469.666.389.1.3.28 -- lifecycleObject attributeclass
+
+
 # accessControlledObject is any object that employs
 # accessControlList attributes to indicate its intended access.
 #

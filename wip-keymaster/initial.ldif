@@ -1,0 +1,156 @@
+# DIT example for KeyMaster
+#
+# The KeyMaster manages private/secret keys and public credentials.
+# As part of this, it handles complex processes through LDAP
+# attributes, "lifecycleState", of which any number can be combined.
+#
+# Each life cycle describes a part of the object's life cycle, with
+# a dot separating its past from its future.  The intention is to
+# move the dot forward, while taking the hurdles interfering that.
+#
+# Hurdles include awaiting an event in another life cycle (if it exists)
+# and awaiting a timeout, after which an action is tried until it
+# succeeds (with exponential fallback).
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+# The root of the Service Directory indicates clearly that it falls
+# under the structural reign of the InternetWide Organisation.  It
+# informatively references a few sites and domains, to service those
+# who poke around the DIT.
+#
+# It may seem a bit awkward to have an organizationalUnit as the
+# root component; still, it makes sense in that it is a unit that
+# we consider to span across many organisations.  It also helps
+# to have a distinct top-level that is unlikely to interfere with
+# already defined database roots in directory servers.
+#
+# Readable to all service providers.
+#
+dn: ou=InternetWide
+ou: InternetWide
+ou: Service Directory
+ou: InternetWide ServiceDIT
+ou: InternetWide Service Directory
+objectClass: organizationalUnit
+objectClass: labeledURIObject
+objectClass: domainRelatedObject
+description: Service Directory for InternetWide Architecture
+labeledURI: http://internetwide.org Blog and Project Description
+labeledURI: http://arpa2.net ARPA2 Umbrella for Partial Projects
+labeledURI: http://arpa2.org ARPA2 Umbrella for Project Infrastrucutre
+labeledURI: https://github.com/arpa2 ARPA2 Software Repositories
+associatedDomain: internetwide.org
+associatedDomain: arpa2.net
+associatedDomain: arpa2.org
+
+# The second level lists service providers, whose name we mandate to
+# take the form of a domain name, because that constitutes a unique
+# identifier.  The objectClass at this level is standardised, and it
+# is a good idea to incorporate contact information at this point, as
+# a way for an identity provider to get in touch with the service
+# provider.  Since these records are not published, it is not a direct
+# threat of workload to publish technical people here; this information
+# is not meant for consumption by the end user / domain owner.  It is
+# a good idea to include references to the website of the service
+# provider.  Service description links and contact details however,
+# are best placed one level down, as companies may start off with
+# just one service, but are likely to add more as they go.
+#
+# Readable only to the service provider who binds to this node.
+# Writeable to the same service provider.
+#
+# Created and Deleted as the user plugs in, or removes a service.
+# Initial details are provided by the plugin description handed over
+# by the prospective service provider.
+#
+# The example given below is made for internal use by InternetWide
+# components, such as the KeyMaster.  It is bound to be present
+# in each identity provider's Service Directory.
+#
+dn: o=arpa2.net,ou=InternetWide
+o: arpa2.net
+o: ARPA2 projects of the InternetWide Organisation
+o: ARPA2
+objectClass: organization
+objectClass: labeledURIObject
+objectClass: domainRelatedObject
+description: KeyMaster Component of the InternetWide Architecture
+description: Authorisation details: users, groups, memberships, ...
+telephoneNumber: +3123456789
+labeledURI: http://internetwide.org Blog and Project Description
+labeledURI: http://internetwide.org/tag/architecture.html InternetWide Architecture
+associatedDomain: arpa2.org
+
+# The third level holds the services provided by a service provider.
+# These can be named as they like, where the only need is to keep
+# them unique under their service provider (domain) name.  The form
+# of the object is always an organizationalUnit.  Contact details
+# are once again useful, in this case with specific contacts for the
+# described service.  It also helps to have website links to the
+# specific service.
+#
+# Readable only to the service provider who binds to the node above
+# this one.  Writeable to the same service provider.
+#
+# Created and Deleted as the user plugs in, or removes a service.
+# Initial details are provided by the plugin description handed over
+# by the prospective service provider.
+#
+# The example given below is made for internal use by InternetWide
+# components, such as the KeyMaster.  It is bound to be present
+# in each identity provider's Service Directory.
+#
+dn: ou=KeyMaster,o=arpa2.net,ou=InternetWide
+ou: KeyMaster
+objectClass: organizationalUnit
+objectClass: labeledURIObject
+description: Key and Credential management, Service Directory
+
+# The fourth level lists the domain names of the various users.
+# It is part of the protocol of plugging services into domains
+# that these services will collate such domains.  The result is
+# the it is easy for service providers to iterate over customer
+# domains and the accompanying configuration details.
+#
+# Domain owners are encouraged to provide contact details for
+# use by the service provider in case of problems.  These details
+# may be service-specific, leading to an expert contact in a
+# large organisation, or they may be the same for all services.
+# 
+# Readable only to the service provider who binds to this node.
+# Writeable by the identity provider.
+#
+dn: associatedDomain=orvelte.nep,ou=KeyMaster,o=arpa2.net,ou=InternetWide
+associatedDomain: orvelte.nep
+objectClass: domainRelatedObject
+
+# The fifth level is specific to KeyMaster.  It holds RDNs of the
+# forms uid= and dc= RDN to represent users/groups/aliases and
+# hosts/domains, respectively.  Furthermore, TODO:cn= for each
+# pkcs11PrivateKeyObject.
+#
+# This fifth level holds lifecycleObjects whose state is managed
+# specifically by the KeyMaster.  When they are created, each
+# credential is given the representing life cycles.  These can
+# be made inter-dependent with lcname?evname notation.  This
+# allows, for example, the use of one certificate in multiple
+# servers, with a separate server for each.  In general, you are
+# given a very simple language to control processes of arbitrary
+# complexity.  Have fun :-)
+#
+# This is close to Communicating Sequential Processes.  We don't
+# have explicit channels, that's a difference, and so we don't
+# send explicitly but observe state changes elsewhere.
+#
+dn: dc=dorpshuis,associatedDomain=orvelte.nep,ou=KeyMaster,o=arpa2.net,ou=InternetWide
+dc: dorpshuis
+objectClass: dcObject
+objectClass: lifecycleObject
+lifecycleState: cert . pubkey@ request@ acme?signed certified@ dane?dnsdel deprecated@ expired@
+lifecycleState: acme . cert?request uploaded@ indns@ signed@ serve?removed deldns@
+lifecycleState: dane . cert?certified dnsadd@ omnipresent@ dnsdel@
+lifecycleState: serve . cert?certified created@ dane?omnipresent trusted@ configured@ removed@
+
+

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- This project file has been saved by the New GreatSPN Editor, v.100 --><project name="ServerCert" version="121">
+  <gspn name="PT" show-color-cmd="false" show-fluid-cmd="false" show-timed-cmd="false" view-rates="false">
+    <nodes>
+      <transition label-y="-2.0" name="add_pubkey" nservers-x="0.5" type="EXP" x="6.55" y="3.0"/>
+      <transition label-y="-2.0" name="certified" nservers-x="0.5" type="EXP" x="18.55" y="3.0"/>
+      <place name="request_gen" x="12.0" y="3.0"/>
+      <transition label-x="-3.5" label-y="0.0" name="requested" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="12.55" y="9.0"/>
+      <place name="acme_upload" x="12.0" y="14.0"/>
+      <transition label-x="-3.5" label-y="0.0" name="challenged" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="12.55" y="20.0"/>
+      <place name="dnsclaim" x="12.0" y="25.0"/>
+      <transition label-x="-3.5" label-y="0.0" name="responded" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="12.55" y="31.0"/>
+      <place name="dnsunclaim" x="12.0" y="36.0"/>
+      <transition label-x="-3.5" label-y="0.0" name="acme_clean" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="12.55" y="42.0"/>
+      <place name="acme_verify" x="18.0" y="14.0"/>
+      <place name="dane_add" x="24.0" y="3.0"/>
+      <transition label-x="-3.5" label-y="0.0" name="omnipresent" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="24.55" y="9.0"/>
+      <place name="serviced" x="24.0" y="14.0"/>
+      <transition label-x="-3.5" label-y="0.0" name="outdated" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="24.55" y="20.0"/>
+      <place name="dane_del" x="24.0" y="25.0"/>
+      <transition label-x="-3.5" label-y="0.0" name="dane_clean" nservers-x="0.5" rotation="1.5707963267948966" type="EXP" x="24.55" y="31.0"/>
+      <place name="dane_done" x="24.0" y="36.0"/>
+      <place name="acme_done" x="24.0" y="42.0"/>
+      <transition name="del_pubkey" nservers-x="0.5" type="EXP" x="31.55" y="42.0"/>
+    </nodes>
+    <edges>
+      <arc head="request_gen" kind="OUTPUT" tail="add_pubkey"/>
+      <arc head="requested" kind="INPUT" tail="request_gen"/>
+      <arc head="acme_upload" kind="OUTPUT" tail="requested"/>
+      <arc head="challenged" kind="INPUT" tail="acme_upload"/>
+      <arc head="dnsclaim" kind="OUTPUT" tail="challenged"/>
+      <arc head="responded" kind="INPUT" tail="dnsclaim"/>
+      <arc head="dnsunclaim" kind="OUTPUT" tail="responded"/>
+      <arc head="acme_clean" kind="INPUT" tail="dnsunclaim"/>
+      <arc head="acme_verify" kind="OUTPUT" tail="responded">
+        <point x="19.0" y="32.0"/>
+      </arc>
+      <arc head="certified" kind="INPUT" tail="acme_verify"/>
+      <arc head="dane_add" kind="OUTPUT" tail="certified"/>
+      <arc head="omnipresent" kind="INPUT" tail="dane_add"/>
+      <arc head="serviced" kind="OUTPUT" tail="omnipresent"/>
+      <arc head="outdated" kind="INPUT" tail="serviced"/>
+      <arc head="dane_del" kind="OUTPUT" tail="outdated"/>
+      <arc head="dane_clean" kind="INPUT" tail="dane_del"/>
+      <arc head="dane_done" kind="OUTPUT" tail="dane_clean"/>
+      <arc head="acme_done" kind="OUTPUT" tail="acme_clean"/>
+      <arc head="del_pubkey" kind="INPUT" tail="dane_done">
+        <point x="28.5" y="37.0"/>
+        <point x="28.5" y="43.0"/>
+      </arc>
+      <arc head="del_pubkey" kind="INPUT" tail="acme_done"/>
+    </edges>
+  </gspn>
+</project>
