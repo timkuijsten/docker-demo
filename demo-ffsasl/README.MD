@@ -62,7 +62,9 @@ You will see a button `[Load Temporary Add-On]` -- click it.  Then, browse to
 under Temporary Extensions.
 
 Go back to the tab that produced the 401 error, and reload.  You should now
-get a popup in which you enter
+get a popup.
+**This popup is an external program, communicating with the browser extension that side-tracks HTTP SASL traffic to the program.**
+Type the following into the two fields:
 
 ```
 Username: henri
