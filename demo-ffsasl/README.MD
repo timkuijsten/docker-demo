@@ -18,9 +18,11 @@ Before making the demo, please set your SSH public key in the `authorized_keys` 
 be installed in the `root` account of the image.  Then build.
 
 ```
-cd demo-ffsasl
-ssh-add -L > authorized_keys
-docker build .
+git clone https://github.com/arpa2/docker-demo
+cd docker-demo
+cmake .
+ssh-add -L > demo-ffsasl/authorized_keys
+make demo-ffsasl
 ```
 
 Then, deploy it in the background with
