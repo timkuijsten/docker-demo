@@ -15,8 +15,8 @@
 # that have to process events when they occur.
 #
 # 
-# lifecycleState ::= lifecycle 0*( SP done ) "." SP next 0*( SP todo )
-# lifecycleState  /= lifecycle 1*( SP done ) "."
+# lifecycleState ::= lifecycle 0*( SP done ) SP "." SP next 0*( SP todo )
+# lifecycleState  /= lifecycle 1*( SP done ) SP "."
 # 
 # next ::= event     "@" timestamp
 # next  /= lifecycle "?" event
@@ -32,7 +32,7 @@
 # event     ::= identifier
 # variable  ::= identifier
 # 
-# identifier ::= [a-z-_]+[0-9]*
+# identifier ::= [a-zA-Z-_]+[0-9]*
 # timestamp  ::= [0-9]+
 # value      ::= [^ .]*
 #

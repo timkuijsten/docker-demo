@@ -37,7 +37,8 @@ FROM arpa2:base
 
 RUN DEBIAN_FRONTEND=noninteractive SLAPD_PASSWORD=sekreet \
 	apt-get install --no-install-recommends -y \
-	slapd libsasl2-modules-gssapi-mit
+	slapd libsasl2-modules-gssapi-mit \
+	libsqlite3-dev liblog4cpp5v5
 
 COPY --from=steamworks /usr/local/bin/pulley /usr/local/bin/pulley
 COPY --from=steamworks /usr/local/bin/crank  /usr/local/bin/crank

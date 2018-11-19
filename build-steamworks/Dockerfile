@@ -29,6 +29,11 @@ ADD https://github.com/arpa2/steamworks/archive/version-0.93-beta4.tar.gz /root/
 RUN cd /usr/local/src && tar -xzvf /root/steamworks-version-0.93-beta4.tar.gz
 RUN cd /usr/local/src/steamworks-version-0.93-beta4 && mkdir build && cd build && cmake .. && make all test install
 
+# Install PulleyBack-LifeCycle
+RUN cd /usr/local/src ; git clone https://github.com/arpa2/pulleyback-lifecycle pulleyback-lifecycle.git
+RUN cd /usr/local/src/pulleyback-lifecycle.git ; mkdir build ; cd build ; cmake .. ; make all test install
+RUN mkdir -p /usr/local/share/steamworks/pulleyscript && cp /usr/local/src/pulleyback-lifecycle.git/example/certflow/certflow.ply /usr/local/share/steamworks/pulleyscript/certflow.ply
+
 # Add a few Pulley Scripts
 ADD pulley/ /root/pulley
 
