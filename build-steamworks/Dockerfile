@@ -32,7 +32,12 @@ RUN cd /usr/local/src/steamworks-version-0.93-beta4 && mkdir build && cd build &
 # Install PulleyBack-LifeCycle
 RUN cd /usr/local/src ; git clone https://github.com/arpa2/pulleyback-lifecycle pulleyback-lifecycle.git
 RUN cd /usr/local/src/pulleyback-lifecycle.git ; mkdir build ; cd build ; cmake .. ; make all test install
-RUN mkdir -p /usr/local/share/steamworks/pulleyscript && cp /usr/local/src/pulleyback-lifecycle.git/example/certflow/certflow.ply /usr/local/share/steamworks/pulleyscript/certflow.ply
+RUN mkdir -p /usr/local/share/steamworks/pulleyscript/ && cp /usr/local/src/pulleyback-lifecycle.git/example/certflow/* /usr/local/share/steamworks/pulleyscript/
+RUN cd /usr/local/share/steamworks/pulleyscript && ln -s a2lc_null a2lc_x509 && ln -s a2lc_null a2lc_acme && ln -s a2lc_null a2lc_dane && ln -s a2lc_null a2lc_tlspool
+
+RUN sed -i 's+a2lc_+/usr/local/share/steamworks/pulleyscript/a2lc_+g' /usr/local/share/steamworks/pulleyscript/certflow.ply
+
+RUN mkdir -p /var/db/pulley && cp /usr/local/src/steamworks-version-0.93-beta4/src/pulley/examples/pulley.properties /
 
 # Add a few Pulley Scripts
 ADD pulley/ /root/pulley
