@@ -130,7 +130,7 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.7
 # This attribute is a good candidate for equality indexing.
 #
 attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.8
-        NAME 'resourceClassUUID'
+        NAME ( 'rescls' 'resourceClassUUID' )
         DESC 'The UUID value for a resource class'
 	EQUALITY uuidMatch
 	ORDERING uuidOrderingMatch
@@ -138,23 +138,18 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.8
 	SINGLE-VALUE )
 
 # resourceInstance describes an instance key, always
-# within the scope of a given resourceClassUUID.  It is
-# represented as a DirectoryString, to capture general
-# UTF-8 forms.
+# within the scope of a given resourceClassUUID.
 #
 # When used extensively to distinguish within any given
 # resourceClassUUID, this attribute may be an interesting
-# candidate for equality indexing.  When doing so, note
-# that this is a case-sensitive format so it can hold a
-# maximum of key forms (and because it is easy to map to
-# a certain form if so desired).
+# candidate for equality indexing.
 #
 attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.9
-        NAME 'resourceInstanceKey'
+        NAME ( 'resins' 'resourceInstanceKey' )
         DESC 'The binary key for a resource instance'
-	EQUALITY caseExactMatch
-	SUBSTR caseExactSubstringsMatch
-	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+	EQUALITY octetStringMatch
+	ORDERING octetStringOrderingMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.40 )
 
 
 # identityHubUser is an object that describes users, as in, individuals.
@@ -265,7 +260,7 @@ objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.17
 # though we limit it here to the meaningful forms above.
 #
 attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.20
-	NAME 'accessControlList'
+	NAME ( 'acl' 'accessControlList' )
 	DESC 'ACL description in "( %level | selector )..." format'
 	EQUALITY caseIgnoreMatch
 	SUBSTR caseIgnoreSubstringsMatch
@@ -310,11 +305,6 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.22
 	SINGLE-VALUE )
 
 
-# 1.3.6.1.4.1.44469.666.389.1.3.23 -- lifecycleState attributeclass
-
-# 1.3.6.1.4.1.44469.666.389.1.3.28 -- lifecycleObject attributeclass
-
-
 # accessControlledObject is any object that employs
 # accessControlList attributes to indicate its intended access.
 #
@@ -330,7 +320,7 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.22
 # forms.  When not, the composite meaning is undefined.
 #
 objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.29
-        NAME 'accessControlledObject'
+        NAME ( 'aclObject' 'accessControlledObject' )
         DESC 'An object that may or resides under access control'
 	AUXILIARY
 	MAY ( accessControlList $ accessToken ) )

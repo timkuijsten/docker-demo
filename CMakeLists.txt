@@ -35,7 +35,7 @@ macro(builddir DIR)
 		string (REGEX REPLACE "^([^: ]+):([^: ]+).*$" "\\1-\\2" SRC4 "${EXTDEP}")
 		#DEBUG# message("External dependency: ${EXTDEP} added as ${SRC4}")
 		add_custom_target(${SRC4}
-			COMMAND sh -c "docker inspect -f 'Found ${EXTDEP}' ${EXTDEP} || docker pull ${EXTDEP}")
+			COMMAND docker pull ${EXTDEP})
 	endforeach()
 endmacro(builddir)
 
