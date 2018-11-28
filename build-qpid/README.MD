@@ -47,7 +47,7 @@ Each of these tools has its own purpose:
 ## Use of AMQP in Reservoir
 
 The [Reservoir](http://reservoir.arpa2.net)
-design includes messages that are pushed to users.
+design includes objects (or messages) to be pushed to users.
 We use AMQP 1.0 for that, as it is fit for connections
 between domains, and can indeed be declared in an SRV record
 so the server to address for a domain can be found in DNS.
@@ -85,8 +85,11 @@ exist, even for
 
 The IdentityHub design is
 [built with blocks](http://internetwide.org/blog/2017/05/03/building-with-blocks.html)
-that connect through some delivery channel.  Inside the hosting stack, this may well
-be the Qpid Dispatch, which takes no ownership over messages but finds end points
+that connect through some delivery channel.  The shells that we design for use
+by operators have become
+[shells with a JSON backdoor](http://internetwide.org/blog/2018/11/22/backbone-innovations.html)
+that is ajar for AMQP input channels.  Inside the hosting stack, delivery may well
+be through Qpid Dispatch, which takes no ownership over messages but finds end points
 that it connects as a pass-through.
 
 The intention of a set of blocks is mostly to allow domains to take out blocks and
@@ -100,7 +103,7 @@ continue to work.  The customer's tooling may go through power cycles without
 disrupting service or otherwise disadvantage the IdentityHub and its other domains.
 
 
-## User of AMQP in ServiceHub
+## Use of AMQP in ServiceHub
 
 The ServiceHub design has not been worked out; this is merely a preview of things
 that are likely to come.
