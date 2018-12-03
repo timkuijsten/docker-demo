@@ -31,6 +31,9 @@
 # ARPA2 base image is the moving target Debian Stable
 FROM arpa2:build-bin
 
+# Add tshark, tcpdump and several ping utilities for traffic analysis
+RUN apt-get install -y tshark tcpdump mtr-tiny \
+	2ping mailping echoping fping hping3 httping ssmping
 
 # Install the source code, patch and compile.
 
@@ -45,5 +48,5 @@ RUN mkdir /dev/net ; mknod /dev/net/tun c 10 200
 #TODO# Setup script to run
 
 # Define default command
-CMD ["/bin/bash"]
+CMD ["/usr/local/sbin/6bed4peer", "-ref"]
 
