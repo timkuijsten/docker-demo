@@ -4,7 +4,7 @@
 
 We use shells as a convenient interface to operators, with
 builtin authorisation based on an operator's Kerberos
-ticket and access control lists that determine who may
+ticket and Access Control Lists that determine who may
 do what on the various resources that are edited.  Since
 the shells are purpose-specific, it is quite possible to
 control operations in this manner.
@@ -43,14 +43,15 @@ accordingly.
 
 These formats easily wrap into JSON.  As a rule, the literal
 tokens end up together in a dictionary key `"do_"` which
-holds a string of words or a list of word strings.  So, the
-possible values for the second form would be
+holds a string of words or a list of word strings, prefixed
+with the shell name.  So, the possible values for the second
+form would be
 
 ```
-"do_" : "dane add"
-"do_" : "dane del"
-"do_" : [ "dane", "add" ]
-"do_" : [ "dane", "del" ]
+"do_" : "arpa2dns dane add"
+"do_" : "arpa2dns dane del"
+"do_" : [ "arpa2dns", "dane", "add" ]
+"do_" : [ "arpa2dns", "dane", "del" ]
 ```
 
 The variable names in angular brackets become keys in the
@@ -64,7 +65,7 @@ A complete JSON command of the second form might therefore be
 
 ```
  {
-   "do_"           : [ "dane", "add" ],
+   "do_"           : [ "arpa2dns", "dane", "add" ],
    "zone"          : "orvelte.nep",
    "_proto"        : "_tcp",
    "port"          : "443",
@@ -73,12 +74,16 @@ A complete JSON command of the second form might therefore be
  }
 ```
 
-The first form is even easier; it constitutes completely
+Note that all values are represented as strings, including numbers.
+When multiple values occur, it is possible to use an array of strings;
+in fact, a sole string is short-hand for an array of one string.
+
+The first subcommand of `dane` is even easier; it constitutes completely
 of literal words, so an example of that form in JSON would be
 
 ```
  {
-   "do_" : [ "dane", "config", "any-end", "pubkey", "sha512" ]
+   "do_" : [ "arpa2dns", "dane", "config", "any-end", "pubkey", "sha512" ]
  }
 ```
 
@@ -86,7 +91,7 @@ or, if that's easier,
 
 ```
  {
-   "do_" : "dane config any-end pubkey sha512"
+   "do_" : "arpa2dns dane config any-end pubkey sha512"
  }
 ```
 
@@ -95,6 +100,14 @@ Had the `to-be-matched` variable been of a binary nature, or
 had it included quotes, than JSON would offer a standard way
 of dealing with it in your most beloved programming language.
 No shell interface could beat that.
+
+In everyday use, expect a JSON array to surround these JSON
+command formats.  This allows the composition of batches of
+shell commands, a bit like a shell script.  We shall need
+that if and when we introduce transactions.  You can already
+use it now to combine commands into one authenticated
+message, as long as they are all runnable on the same
+destination.
 
 
 ## Streaming input, output and error
@@ -122,18 +135,19 @@ best-effort attempt.
 An attempt is made to parse the `stdout` stream before returning
 the call, at least when `stderr` had nothing sent to it.  First,
 HTTP-style headers are parsed in any content up to and excluding
-an empty line.  These are returned as a list of pairs in JSON
-output key `"headers_"`, where the pair is flattened to a list
+an empty line.  These are returned as an array of pairs in JSON
+output key `"headers_"`, where the pair is flattened to an array
 of two components.  The `"headers_"` will be included if the
 format ended in an empty line; it follows then that if `stdout`
 starts with an an empty line, that `"headers_"` is set to an
-empty list.  Since the output is a list, a header name may appear
+empty array.  Since the output is an array, a header name may appear
 as often as desired.
 
 After the optional headers, an attempt is made to parse the
 remainder as a JSON message.  Anything found there is the value
 sent back, with possible new values for the said variables, which
 all end in an underscore in the hope to avoid unintended clashes.
+If a clash does occur, it counts as a failure to parse as JSON.
 
 
 ## Basic Commands for Testing
@@ -199,7 +213,7 @@ shell$
 
 ## Authentication of Shell Sessions
 
-To authenticate to a shell, you setup a Kerberos credential.
+To authenticate to an ARPA2 shell, you setup a Kerberos credential.
 Typically, this means
 
 ```
@@ -311,19 +325,21 @@ library, so we either take it or leave it.  (We take it!)
 The layering that we have now is:
 
 ```
-+------------------+
-|  Shell Commands  |
-+------------------+
-|       JSON       |
-+------------------+
-|     GSS-API      |
-+------------------+
-|     AMQP 1.0     |
-+------------------+
-|    TCP / SCTP    |
-+------------------+
-|       IPv6       |
-+------------------+
++------------------------+
+|  ARPA2 Shell Commands  |
++------------------------+
+:  Transactional Batch   :  (TODO, see below)
++------------------------+
+|          JSON          |
++------------------------+
+|         GSS-API        |
++------------------------+
+|        AMQP 1.0        |
++------------------------+
+|       TCP / SCTP       |
++------------------------+
+|          IPv6          |
++------------------------+
 ```
 
 We provide a library to take away the burden of using this,
@@ -347,7 +363,7 @@ that we use the GSS-API layer of each individual message,
 not the bulk authentication.
 
 
-## Future TODO: Batch Processing
+## Preparing for the Future: Batch Processing and Transactions
 
 **TODO:** We might consider processing batches as processes.
 This might involve a special header printed on `stdout`, namely
@@ -357,4 +373,21 @@ or `rollback` command that would be retained until the shell is
 exited.  The stability of the InternetWide Environment could
 greatly benefit from such transactional facilitation.
 
+To already accommodate batches of commands, we make the
+following extensions to the format above:
+
+ 1. Zero or more JSON commands can be combined into a
+    JSON array, to be parsed in one pass so any syntax
+    problem in the batch is detected early.
+ 2. Every JSON command starts its `"do_"` with one
+    extra word, naming the shell to run it in, for
+    instance `"arpa2dns"` would work.
+
+Responses are also collected into an array where each of the
+individual responses are included.
+
+There will probably be an extra JSON command such as
+`"arpa2txn"` to control transactional behaviour.  This
+shell is not currently supported, but batches of JSON
+commands are.
 

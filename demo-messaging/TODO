@@ -1,3 +1,4 @@
+- switch from wrapping command lines to JSON processing
 + server cannot handle consecutive clients yet (fixed corlid?)
 + client should be more temporary (address, random corlid)
 + client should use proper corlid for actual traffic

@@ -184,7 +184,7 @@ can also support remote operator intervention.  (This is
 probably what OpenSSH ticket forwarding uses too.)
 
 
-## Design Alternatives: GGSAPI over SCTP of AMQP
+## Design Alternatives: GGSAPI over SCTP or AMQP
 
 The idea of secure messaging through GSSAPI clearly has
 merit in the InternetWide Architecture.  There are in
