@@ -21,12 +21,16 @@ ADD krb5.conf /etc/krb5.conf
 # ADD selections.debconf /tmp/selections.debconf
 # RUN debconf-set-selections /tmp/selections.debconf
 
-RUN apt-get install -y krb5-user openldap-utils ldapvi nano procps less lrzsz net-tools netcat python2.7 # python3
+RUN apt-get install -y krb5-user openldap-utils ldapvi nano procps less lrzsz net-tools netcat python2.7 # python-setuptools # python3
 
 RUN ln -s /bin/nano /usr/bin/vi
 
 RUN ln -s /usr/bin/python2.7 /usr/bin/python
 # RUN ln -s /usr/bin/python3 /usr/bin/python
+
+ADD sharetty /usr/bin/sharetty
+ADD https://github.com/anishathalye/seashells/archive/v0.1.2.tar.gz /usr/local/src/seashells-0.1.2.tar.gz
+RUN cd /usr/local/src ; tar -xzvf seashells-0.1.2.tar.gz
 
 ADD arpa2shell /usr/bin/arpa2shell
 ADD arpa2cmd.py /usr/lib/python2.7/dist-packages/arpa2cmd.py
