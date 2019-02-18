@@ -27,7 +27,7 @@ RUN \
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get install -y python2.7 build-essential \
-	git vim nano man \
+	git vim nano man tmux \
 	flex bison \
 	rsyslog strace gdb \
 	cmake cmake-curses-gui pkg-config \

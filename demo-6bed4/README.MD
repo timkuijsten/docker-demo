@@ -53,4 +53,6 @@ only work if it is indeed routed properly.
     work.
 
   * We needed `--privileged` to get this working, but it's pretty big.
-
+    Apparently, this is a
+    [known problem](https://stackoverflow.com/questions/23537560/docker-build-read-only-file-system)
+    with no work-around but to be all-mighty.

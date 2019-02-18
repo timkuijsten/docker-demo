@@ -22,7 +22,7 @@ FROM arpa2:build-bin
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
-RUN apt-get install -y liblog4cpp5-dev libsqlite3-dev
+RUN apt-get install -y liblog4cpp5-dev libsqlite3-dev libfcgi-bin
 
 # Install SteamWorks
 ADD https://github.com/arpa2/steamworks/archive/version-0.93-beta4.tar.gz /root/steamworks-version-0.93-beta4.tar.gz

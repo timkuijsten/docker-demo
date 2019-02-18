@@ -30,9 +30,9 @@ arpa2dns> ?dane
 
 dane config (ca-root|pkix-end|trust-root|any-end)
             (cert|pubkey)
-            (full|sha256|sha512)
+            (full|sha256|sha512) |
 
-dane ( add | del ) <zone> <_proto> <port> <owner> <to-be-matched> |
+dane ( add | del ) <zone> <_proto> <port> <owner> <to-be-matched>
 ```
 
 This format is entered in the documentation for each of the
@@ -220,7 +220,7 @@ Typically, this means
 shell$ klist
 klist: No credentials cache found (filename: /tmp/krb5cc_0)
 
-shell$ kinit demo@ARPA2.ORG
+shell$ kinit demo@ARPA2.NET
 Password for demo@ARPA2.NET: sekreet
 
 shell$ klist 
@@ -361,6 +361,18 @@ for what they send us.  We do still authorise every single
 resource access that we deem worthy of protection, and for
 that we use the GSS-API layer of each individual message,
 not the bulk authentication.
+
+
+## Distribution Model
+
+There are two levels in distributing commands in the
+ARPA2 infrastructure.  The first level is the host, the
+second is a host-local shell.
+
+  * The host is reached through its AMQP queue, usually
+    with a name like `/internetwide/arpa2.net/reservoir`
+  * The shell is reached by a command prefix such as
+    `arpa2acl`.
 
 
 ## Preparing for the Future: Batch Processing and Transactions

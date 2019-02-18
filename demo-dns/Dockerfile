@@ -3,7 +3,7 @@
 
 FROM arpa2:build-bin AS src
 
-RUN cd /usr/local/src ; git clone https://gitlab.labs.nic.cz/knot/knot-dns knot.git
+RUN cd /usr/local/src ; git clone https://gitlab.labs.nic.cz/knot/knot-dns knot.git ; sed 's/@python_libknot_VERSION@/git.version/' < knot.git/python/libknot/__init__.py.in > knot.git/python/libknot/__init__.py
 
 FROM arpa2:build-pip AS pip
 
@@ -36,5 +36,8 @@ COPY tightknot.py /usr/local/lib/python2.7/dist-packages/
 COPY arpa2dns.py /usr/local/lib/python2.7/dist-packages/
 RUN ln -s /usr/local/lib/python2.7/dist-packages/arpa2dns.py /usr/bin/arpa2dns
 RUN chmod ugo+x /usr/bin/arpa2dns
+
+#TODO# Test
+COPY test.py /
 
 CMD ["bash"]

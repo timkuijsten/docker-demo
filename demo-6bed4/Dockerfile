@@ -33,7 +33,8 @@ FROM arpa2:build-bin
 
 # Add tshark, tcpdump and several ping utilities for traffic analysis
 RUN apt-get install -y tshark tcpdump mtr-tiny \
-	2ping mailping echoping fping hping3 httping ssmping
+	2ping mailping echoping fping hping3 httping ssmping #\
+	# radvd wide-dhcpv6-server
 
 # Install the source code, patch and compile.
 

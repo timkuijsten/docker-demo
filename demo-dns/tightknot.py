@@ -129,13 +129,21 @@ class TightKnot:
 		   knot.  If there was a failure, abort instead.  The
 		   function returns the (overall) success of all
 		   actions run through knot().
+
+		   It is utterly safe to call this procedure without
+		   any transaction in progress.  In that case, it
+		   quickly returns True for success.
 		"""
-		if self.txn_success:
+		all_success = self.txn_success
+		if all_success and self.txn_conf == False and len (self.txn_zone) == 0:
+			# no change
+			return True
+		if all_success:
 			pass #self.knot (cmd='conf-check')
 		for zone in self.txn_zone:
 			if self.txn_success:
 				pass #self.knot (cmd='zone-check', item=zone)
-		if self.txn_success:
+		if all_success:
 			# Success
 			conf_cmd = 'conf-commit'
 			zone_cmd = 'zone-commit'
@@ -152,7 +160,9 @@ class TightKnot:
 			self.txn_conf = False
 		if not self.txn_success:
 			raise InternalError ('Unexpected failure during %s and/or %s' % (conf_cmd, zone_cmd))
-		return self.txn_success
+		all_success = all_success and self.txn_success
+		self.txn_success = True
+		return all_success
 
 	def force_abort (self):
 		"""Deliberately abort all transactions run against knot.
@@ -181,7 +191,7 @@ class TightKnot:
 		self.knot (cmd='conf-begin')
 		self.txn_conf = True
 
-	def have_zones (self, zones, conf=False):
+	def have_zones (self, zones='--', conf=False):
 		"""Use this method to claim locks on a set (or list)
 		   of zones.  A single zone may be used too, supplied
 		   as a string.  Under the assumption that other knot
@@ -193,14 +203,18 @@ class TightKnot:
 		  
 		   To prevent deadlock, you cannot call this function
 		   more than once; you need to supply all the zones
-		   at the same time.
+		   at the same time.  If you provide no zones at all,
+		   all zones will be locked.  After this, any further
+		   attempts to have_zones() will be silently skipped.
 		  
 		   #TODO# We could allow sequencing for sub-zones?
 		"""
 		if len (self.txn_zone) > 0:
 			raise Exception ('Lock all zones at once to stave off deadlocks')
+		if '--' in self.txn_zone:
+			return
 		if type (zones) == type (''):
-			ordered_zones = [zones]
+			ordered_zones = [zones.lower ()]
 		else:
 			ordered_zones = map (string.lower, zones)
 			ordered_zones.sort ()
@@ -210,19 +224,40 @@ class TightKnot:
 			self.knot (cmd='zone-begin', data=zone)
 			self.txn_zone.add (zone)
 
-	def add_zone (self, zone):
-		"""Add a zone.
+
+	def add_zonekeys (self, zone):
+		if os.system ('keymgr %s generate zsk=yes ksk=yes algorithm=ECDSAP256SHA256' % (zone,)) != 0:
+			raise Exception ('Failed to generate DNSKEY')
+
+	def del_zonekeys (self, zone):
+		if os.system ('keymgr %s list | while read k rest ; do keymgr %s delete $k ; done' % (zone,zone)) != 0:
+			raise Exception ('Failed to cleanup DNSKEY')
+
+	def add_zone (self, zone, addkeys=False):
+		"""Add a zone.  Possibly add keys.  Do not communicate with the parent.
 		"""
 		if not self.txn_conf:
 			raise Exception ('Configuration not locked')
+		if addkeys:
+			self.add_zonekeys (zone)
 		self.knot (cmd='conf-set', section='zone', item='domain', data=zone)
 
-	def del_zone (self, zone):
-		"""Delete a zone.
+	def del_zone (self, zone, delkeys=False):
+		"""Delete a zone.  Possibly delete keys.  Do not communicate with the parent.
 		"""
 		if not self.txn_conf:
 			raise Exception ('Configuration not locked')
+		if delkeys:
+			self.del_zonekeys (zone)
 		self.knot (cmd='conf-unset', section='zone', item='domain', data=zone)
+
+	def list_zones (self):
+		"""Return a list of zones.
+		"""
+		if not self.txn_conf:
+			raise Exception ('Configuration not locked')
+		curdata = self.knot (cmd='conf-read', section='zone', item='domain')
+		return map (lambda z:z.rstrip('.'),curdata['zone'].keys ())
 
 	def _rr (self, cmd, zone, owner, ttl, rtype, rdata):
 		"""Called with add_del either 'add' or 'del' to
@@ -251,14 +286,18 @@ class TightKnot:
 			return 0
 		old_success = self.txn_success
 		oldrdata = self.knot (cmd='zone-get', zone=zone, owner=owner, rtype=rtype)
-		if oldrdata is None:
-			self.txn_success = old_success
-			oldrdata = self.knot (cmd='zone-get', zone=zone, owner='@', rtype='SOA')
-			soadata = oldrdata.values()[0].values()[0] ['SOA']
-			retval = min (int (soadata ['data'][0].split()[-1]), int (soadata ['ttl']))
-		else:
-			rrdata = oldrdata.values()[0].values()[0] [rtype]
-			retval = int (rrdata ['ttl'])
+		print 'DEBUG: oldrdata = %r' % (oldrdata,)
+		try:
+			if oldrdata in [None,{}]:
+				self.txn_success = old_success
+				oldrdata = self.knot (cmd='zone-get', zone=zone, owner='@', rtype='SOA')
+				soadata = oldrdata.values()[0].values()[0] ['SOA']
+				retval = min (int (soadata ['data'][0].split()[-1]), int (soadata ['ttl']))
+			else:
+				rrdata = oldrdata.values()[0].values()[0] [rtype]
+				retval = int (rrdata ['ttl'])
+		except:
+			retval = 0
 		self.txn_success = old_success
 		return retval
 
@@ -282,6 +321,35 @@ class TightKnot:
 			print 'Cache-Update-Delay:', done_after
 		else:
 			print 'DEBUG: No done_after available'
+
+	def list_rr (self, zone, owner, rtype):
+		"""List the given resource record's rdata.
+		   Return [] when nothing is found, None on error.
+		"""
+		zone = zone.rstrip('.') + '.'
+		if not self.txn_success:
+			return None
+		if not zone in self.txn_zone:
+			raise Exception ('Zone not locked: %s' % zone)
+			self.txn_success = False
+			return None
+		findings = self.knot (cmd='zone-get', zone=zone, owner=owner, rtype=rtype)
+		if findings is None:
+			return None
+		if findings == {}:
+			return None
+		try:
+			return findings[zone][zone][rtype.upper()]['data']
+		except:
+			return None
+
+	def count_rr (self, zone, owner, rtype):
+		"""Count how many instance of the given resource
+		   record exist.  Return 0 when nothing is found,
+		   None on error.
+		"""
+		findings = self.list_rr (zone, owner, rtype)
+		return None if findings is None else len (findings)
 
 	def _knotc_shell (self, knotc_subcommand, expect_ok=True):
 		"""Send a command to knotc, using the commandline.

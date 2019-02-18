@@ -2,6 +2,8 @@
 #
 # arpa2amqp.d -- Receive requests to ARPA2 shells over AMQP.
 #
+#TODO#JSON# Integrate this into the arpa2shell.py module.
+#
 # This is an AMQP 1.0 server that receives shell command
 # requests, finds the shells to run them in, and sends
 # back the result.
@@ -24,19 +26,27 @@
 
 import sys
 import time
+import re
 
 import arpa2cmd
 
+import json
 import gssapi
 from gssapi.raw.misc import GSSError
-
-# Note: cStringIO is faster, but ASCII-only
-from StringIO import StringIO
 
 
 from proton import Message
 from proton.handlers import MessagingHandler
 from proton.reactor import Container
+
+
+# Regular expressions to parse stdout_ information
+#
+rex_hdr = '^([A-Za-z0-9-]+): ([^\n]*)$'
+rex_out = '^(' + rex_hdr + ')*\n(.*)$'
+
+re_hdr = re.compile (rex_hdr)
+re_out = re.compile (rex_out)
 
 
 class ARPA2ShellDaemon (MessagingHandler):
@@ -154,38 +164,41 @@ class ARPA2ShellDaemon (MessagingHandler):
 		return text
 
 
+	# Parse special forms in the standard output.
+	# This may be # be expanded to accommodate our requirements.
+	# Currently: <hdrname>: <value>\n...\n\n<body...>
+	#
+	def _parse_stdout (self, jout):
+		if jout.has_key ('stderr_'):
+			return
+		try:
+			out = jout ['stdout_']
+			(hd,tl) = out.split ('\n\n', 1)
+			headers = [ re_hdr.match (ln).groups () for ln in hd.split ('\n') ]
+			# Success, so fill "headers_" and "body_" keys
+			jout ['headers_'] = headers
+			jout ['body_'] = tl
+		except:
+			return
+
+
 	# Run a command in a given shell and collect the results.
 	# The command may span multiple lines, adding to stdin.
-	# Return the string to be inserted in the reply message.
+	# Update the command value with several new JSON keys.
 	#
 	def run_command (self, shellname, command, name, life):
 		#DEBUG# print 'running shell', shellname, 'for', command
-		savedio = (sys.stdin, sys.stdout, sys.stderr)
-		if '\n' in command:
-			(command,input) = command.split ('\n', 1)
-		else:
-			input = ''
-		sys.stdin  = StringIO (input)
-		sys.stdout = StringIO ()
-		sys.stderr = StringIO ()
 		try:
 			shell = self.get_shell (shellname)
 			shell.gss_name = name
 			shell.gss_life = life + time.time ()
-			shell.onecmd (command)
+			jout = shell.onecmd_json (jin)
+			self._parse_stdout (jout)
 		except Exception as e:
 			sys.stderr.write (str (e) + '\n')
 		finally:
 			shell.gss_name = None
 			shell.gss_life = None
-			cmdout = sys.stdout.getvalue ()
-			cmderr = sys.stderr.getvalue ()
-			(sys.stdin, sys.stdout, sys.stderr) = savedio
-		reply  = shellname + '>> ' + command + '\n'
-		reply += self._prefix_lines ('>> ', cmderr)
-		reply += self._prefix_lines ('> ',  cmdout)
-		#DEBUG# print 'returning reply', reply
-		return reply
 
 
 	# Split a message into shell commands that are run
@@ -196,28 +209,23 @@ class ARPA2ShellDaemon (MessagingHandler):
 		shellnames = set ()
 		name = ctx.initiator_name
 		life = ctx.lifetime
-		reply = ''
-		while message != '':
-			#DEBUG# print 'splitting message', message
-			endcmd = message.find ('\narpa2')
-			if endcmd != -1:
-				endcmd += 1
-			assert (endcmd != 0)
-			#DEBUG# print 'Splitting prompt off of', message, '[:' + str (endcmd) + ']'
-			try:
-				(shell,cmd) = message [:endcmd].split ('> ', 1)
-				shellnames.add (shell)
-				if life > 0:
-					reply += self.run_command (shell, cmd, name, life)
-				else:
-					reply += shell + '>> ' + cmd.split ('\n') [0] + ('\n>> You expired %.3f seconds ago' % life)
-			except Exception as e:
-				reply += 'Exception when running: ' + str (e) + '\n'
-			if endcmd != -1:
-				message = message [endcmd:]
+		reply = []
+		for jin in message:
+			jout = jin.copy ()
+			jin_do = jin ['do_']
+			if type (jin_do) != type ([]):
+				jin_do = jin_do.split ()
+			shell = jin_do [0]
+			jout ['do_'] = jin_do [1:]
+			shellnames.add (shell)
+			if life > 0:
+				try:
+					self.run_command (shell, jout, name, life)
+				except Exception e:
+					jout ['stderr_'] = 'Exception: ' + str (e)
 			else:
-				message = ''
-			reply += '\n'
+				jout ['stderr_'] = 'Access denied: Credentials expired'
+			reply.append (jout)
 		for shellname in shellnames:
 			#DEBUG# print 'resetting shell', shellname
 			self.get_shell (shellname).reset ()
@@ -237,14 +245,14 @@ class ARPA2ShellDaemon (MessagingHandler):
 
 
 	def _decrypted_message (self, body, (ctx,corlid)):
-		body2 = ctx.decrypt (body)
+		body2 = json.loads (ctx.decrypt (body))
 		return body2
 
 	def _encrypted_message (self, body, (ctx,corlid), **kwargs):
 		try:
-			body2 = ctx.encrypt (body)
+			body2 = ctx.encrypt (json.dumps (body))
 		except GSSError as ge:
-			body2 = 'GSSAPI Error: ' + str (ge) + '\n'
+			body2 = json.dumps ('GSSAPI Error: ' + str (ge))
 		return Message (body=body2, **kwargs)
 
 	# Receive an AMQP message.  Run its batch of commands,
@@ -274,10 +282,10 @@ class ARPA2ShellDaemon (MessagingHandler):
 			ans = self.run_message (body2,ctx)
 		except GSSError as ge:
 			#DEBUG# print 'responding with gssapi error', ge
-			ans = '>> GSSAPI error: ' + str (ge) + '\n'
+			ans = [ { 'stderr_': 'GSS-API Error: ' + str (e) } ]
 		except Exception as e:
 			#DEBUG# print 'responding with exception', e
-			ans = '>> Exception: ' + str (e) + '\n'
+			ans = [ { 'stderr_': 'Exception: ' + str (e) } ]
 		#DEBUG# print 'answer will be\n', ans,
 		if msg.reply_to is not None:
 			#DEBUG# print 'composing reply'

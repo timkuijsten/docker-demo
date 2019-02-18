@@ -13,7 +13,12 @@
 
 FROM arpa2:build-pip AS pip
 
-RUN pip install cmdparser python-ldap riak six
+#TEST#JSON#VARIANT# RUN pip install cmdparser python-ldap riak six
+RUN pip install python-ldap riak six
+
+RUN cd /usr/local/src ; git clone https://github.com/arpa2/arpa2shell-cmdparser cmdparser.git
+
+RUN cd /usr/local/src/cmdparser.git/cmdparser ; python setup.py install
 
 
 ### Prepare: Build Riak KV from source

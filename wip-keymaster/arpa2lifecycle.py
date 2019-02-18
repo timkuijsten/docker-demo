@@ -132,3 +132,169 @@ if poststate == prestate:
 else:
 	raise NotImplementedError ('Need to update LDAP')
 
+
+
+class LifecycleState (object):
+	"""Parse and manage a lifecycleState attribute.
+	"""
+
+	def __init__ (self, lcstate):
+		"""Setup an object with the lifecycleState attribute value.
+		   Allow further processing and, at the end, possibly
+		   derive extra elements to put into an LDAP modification
+		   statement.
+		"""
+		self.lcstate = lcstate.split ()
+		self.rollback ()
+
+
+	def rollback (self):
+		"""Rollback any changes made here.  This can be used to
+		   avoid modifying LDAP when something went wrong.
+		"""
+		TODO:SETUP:OBJECT:FROM:self.lcstate
+		dotidx = prestate.index ('.')
+
+
+	def ldapmods (self):
+		"""Return changes to the lcstate since initialisation or
+		   since the last rollback in the form of an LDAP modify.
+		"""
+		TODO:RETURN:SOMETHING:USEFUL
+
+
+class LifecycleObject (object):
+	"""Wrap around an LDAP object with a given DN.  Collect changes
+	   into one grand update.
+	   TODO: Support additional changes to other objects, as this
+	   may be desired by the life cycle too.  A subclass may setup
+	   such things.
+	"""
+
+	def __init__ (self, dn):
+		"""Setup an object for the given distinguishedName.
+		"""
+		self.dn = dn
+		self.rollback ()
+
+
+	def rollback (self):
+		"""Rollback any changes made here.  This can be used to
+		   avoid modifying LDAP when something went wrong.
+		"""
+		TODO:SETUP:OBJECT:FROM:self.dn
+
+
+	def addmods (self, mods):
+		"""Add modifications to the LDAP object from an external
+		   source.  Usually, this is the change to the
+		   lifecycleState, which is not manually done.
+		"""
+		TODO:ADD:TO:MODS
+
+
+	def commit (self):
+		"""Commit the transaction.  LDAP is not supportive of
+		   two-phase commit, so this function may raise an
+		   exception.
+		"""
+		TODO:COMMIT:CHANGES
+
+
+class LifecycleHandler (object):
+	"""The Lifecycle Handler class represents a processing node for
+	   pairs of distinguishedName (DN) and lifecycleState (LCS) that
+	   triggers do_xxx actions defined in a subclass.  These actions
+	   may modify the LDAP object as stored at the DN.
+	"""
+
+
+	"""The name of this Lifecycle Handler must be overridden
+	   in a subclass, and will be used to compare against the
+	   input provided.  This serves as a correctness criterium.
+	"""
+	lcname = None
+
+
+	def __init__ (self, stream):
+		"""Create a new Lifecycle handler, which serves
+		   multiple instances of a named life cycle.  Updates
+		   are collected from an input stream that sends pairs
+		   of lines; one line with the DN for the life cycle
+		   instance and a second line with the current content
+		   of the lifecycleState for our life cycle.
+		"""
+		self.stream = stream
+
+
+	def _linepairs (self):
+		"""Internal function.  Generator for line pairs from
+		   the input stream.
+		"""
+		while True:
+			ln1 = self.stream.readline ()
+			if ln1 == '':
+				return
+			if ln1 [-1:] == '\n':
+				ln1 = ln1 [:-1]
+			else:
+				syslog.syslog (syslog.LOG_WARN, 'Input DN line not properly terminated:' % ln1)
+			ln2 = self.stream.readline ()
+			if ln2 == '':
+				syslog.syslog (syslog.LOG_ERR, 'Line pair incomplete; dropping DN %s' % ln1)
+			if ln2 [-1:] == '\n':
+				ln2 = ln2 [:-1]
+			else:
+				syslog.syslog (syslog.LOG_WARN, 'Input LCS line not properly terminated:' % ln2)
+			yield (ln1,ln2)
+
+
+	def handle_forever (self):
+		"""Start looping on input lines, and handling them in
+		   a pairwise manner.  Each time when an action named
+		   xxx may fire, a subclass call self.do_xxx(req) is
+		   made.  The request contains the lifecycleState in
+		   a parsed and ready-for-updates manner, and it can
+		   also dig up other attributes in LDAP.
+		"""
+		for (dn,lcs) in self._linepairs ():
+			self.process_request (dn, lcs)
+
+
+	def process_request (self, dn, lcs):
+		"""Process a request, which is of pair of DN and LCS.
+		   This may invoke self.do_xxx(lcstate,ldapobj) methods
+		   in the subclass.
+		   TODO: How about doing more than one action at once?
+		"""
+		try:
+			lcstate = LifecycleState (lcs)
+			ldapobj = LifecycleObject (dn)
+			lcname = lcstate.lifecycle ()
+			action = lcstate.nextaction ()
+		except Exception as e:
+			exc = str (e)
+			syslog.syslog (syslog.LOG_ERR, 'Request error: %s' % (exc,))
+			return
+		if not lcname == self.lcname:
+			syslog.syslog (syslog.LOG_ERR, 'Lifecycle name %s does not match handler name %s' % (lcname,self.lcname or '(unset)')
+			return
+		mth = getattr (self, 'do_' + action, None)
+		if mth is None:
+			syslog.syslog (syslog.LOG_ERR, 'Ignoring unknown action %s in life cycle %s' % (action,lcname))
+			return
+		try:
+			mth (self, lcstate, ldapobj)
+		except Exception as e:
+			exc = str (e)
+			syslog.syslog (syslog.LOG_ERR, 'Action %s on object %s failed: %s' % (action,dn,exc))
+			return
+		try:
+			ldapobj.addmods (lcstate.ldapmods ())
+			ldapobj.commit ()
+		except Exception as e:
+			exc = str (e)
+			syslog.syslog (syslog.LOG_ERR, 'Saving to LDAP object %s failed: ' % (dn,exc))
+			return
+
+

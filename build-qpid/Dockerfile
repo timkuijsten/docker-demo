@@ -15,7 +15,7 @@ FROM arpa2:build-pip
 COPY README.MD /Qpid.md
 
 # Prepare by adding Ruby (for C++ Broker)
-#TODO# should libboost-dev should be in build-bin?
+#TODO# should libboost-dev be included in build-bin?
 #
 RUN apt-get install -y ruby-dev libboost-program-options1.62 libboost-system1.62 uuid-dev \
 	libcunit1-dev doxygen valgrind swig python-unittest2

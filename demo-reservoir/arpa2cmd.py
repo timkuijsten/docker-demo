@@ -12,11 +12,13 @@ import sys
 import time
 
 import cmd
+from cmdparser import cmdparser
 
 import types
 
 
 
+@cmdparser.CmdClassDecorator()
 class Cmd (cmd.Cmd):
 
 	version = (0,0)
@@ -50,37 +52,66 @@ class Cmd (cmd.Cmd):
 		"""
 		raise NotImplementedError ('No reset method for this shell')
 
+	@cmdparser.CmdMethodDecorator()
+	def do_help (self, args, fields):
+		"""help [<cmd>]
+		   
+		   Trigger the help command in the superclass, but apply
+		   the cmdparser wrapper so it can be called over JSON.
+		   There is a shorthand notation, namely a question mark.
+		"""
+		cmd.Cmd.do_help (self, ' '.join (args [1:]))
+
+	@cmdparser.CmdMethodDecorator()
 	def do_version (self, *ignored):
-		"""Print the name and current version of this shell.
+		"""version
+		   
+		   Print the name and current version of this shell.
 		"""
 		sys.stdout.write ('%s-%d.%d\n' % (self.prompt.split ('>') [0], self.version [0], self.version [1]))
+		return False
 
+	@cmdparser.CmdMethodDecorator()
 	def do_ping (self, *ignored):
-		"""Respond to ping requests (with output on stderr).
+		"""ping
+		   
+		   Respond to ping requests (with output on stderr).
 		"""
 		sys.stderr.write ('EPROTONOSUPPORT: Please upgrade to ping6\n')
+		return False
 
+	@cmdparser.CmdMethodDecorator()
 	def do_ping6 (self, *ignored):
-		"""Respond to ping6 requests (with output on stdout).
+		"""ping6
+		   
+		   Respond to ping6 requests (with output on stdout).
 		"""
 		sys.stdout.write ('pong6\n')
+		return False
 
+	@cmdparser.CmdMethodDecorator()
 	def do_date (self, *ignored):
-		"""Request the current time on the system running the shell.
+		"""date
+		   
+		   Request the current time on the system running the shell.
 		"""
 		sys.stdout.write ('%s\n' % time.asctime (time.gmtime ()))
+		return False
 
+	@cmdparser.CmdMethodDecorator()
 	def do_whoami (self, *ignored):
-		"""Ask who you are, and how the shell sees you during ACL processing.
+		"""whoami
+		   
+		   Ask who you are, and how the shell sees you during ACL processing.
 		"""
 		if self.gss_name is None or self.gss_life is None:
 			sys.stderr.write ('You are nobody\n')
-			return
+			return False
 		try:
 			import gssapi
 		except ImportError as ie:
 			sys.stderr.write ('This shell does not support GSSAPI\n')
-			return
+			return False
 		try:
 			exp = time.asctime (time.gmtime (self.gss_life))
 			sys.stdout.write ('You are:    %s\nExpiration: %s\n' % (self.gss_name,exp))
@@ -94,8 +125,9 @@ class Cmd (cmd.Cmd):
 			sys.stderr.write ('GSSAPI Error: %s\n' % str (ge))
 		except Exception as e:
 			sys.stderr.write ('General error: %s\n' % str (e))
+		return False
 
-	"""Termination commands.
+	"""Termination commands.  No JSON wrappers.
 	"""
 	def do_EOF (self, *ignored):
 		"""Exit this shell.

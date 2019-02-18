@@ -26,7 +26,12 @@
 #
 FROM arpa2:build-pip AS pip
 
-RUN pip install cmdparser python-ldap web2ldap
+#TEST#JSON#VARIANT# RUN pip install cmdparser python-ldap web2ldap
+RUN pip install python-ldap web2ldap
+
+RUN cd /usr/local/src ; git clone https://github.com/arpa2/arpa2shell-cmdparser cmdparser.git
+
+RUN cd /usr/local/src/cmdparser.git/cmdparser ; python setup.py install
 
 
 

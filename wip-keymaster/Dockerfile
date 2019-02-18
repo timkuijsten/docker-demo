@@ -38,10 +38,11 @@ FROM arpa2:base
 RUN DEBIAN_FRONTEND=noninteractive SLAPD_PASSWORD=sekreet \
 	apt-get install --no-install-recommends -y \
 	slapd libsasl2-modules-gssapi-mit \
-	libsqlite3-dev liblog4cpp5v5
+	libsqlite3-dev liblog4cpp5v5 libfcgi-bin
 
-COPY --from=steamworks /usr/local/bin/pulley /usr/local/bin/pulley
-COPY --from=steamworks /usr/local/bin/crank  /usr/local/bin/crank
+COPY --from=steamworks /usr/local/bin/pulley       /usr/local/bin/pulley
+COPY --from=steamworks /usr/local/bin/crank        /usr/local/bin/crank
+COPY --from=steamworks /usr/local/share/steamworks /usr/local/share/steamworks/
 
 COPY schema/* /etc/ldap/schema/
 RUN rm -rf /etc/ldap/slapd.d
