@@ -30,6 +30,8 @@ digraph arpa2demo{
    "arpa2:build-steamworks" -> "arpa2:wip-keymaster"
    "arpa2:build-pip" -> "arpa2:wip-keymaster"
    "arpa2:base" -> "arpa2:wip-keymaster"
+   "arpa2:build-quickder-lillydap" -> "arpa2:wip-kxover"
+   "arpa2:build-bin" -> "arpa2:wip-kxover"
    "arpa2:base" -> "arpa2:wip-rfcmarkup"
    "arpa2:build-quickder-lillydap" -> "arpa2:wip-tlspool"
    "arpa2:build-bin" -> "arpa2:wip-tlspool"

@@ -48,6 +48,8 @@ ADD https://github.com/vanrein/quick-der/archive/version-1.2-6.tar.gz /root/quic
 RUN cd /usr/local/src && tar -xzvf /root/quick-der-version-1.2-6.tar.gz
 #TODO#PYTHON#SETUP#INCOMPATIBLE#CHANGES# RUN cd /usr/local/src/quick-der-version-1.2-6 && mkdir build && cd build && cmake .. && make all test install
 RUN cd /usr/local/src/quick-der-version-1.2-6 && mkdir build && cd build && cmake .. && make all install
+#TODO# Ugly direct copy:
+RUN cd /usr/local/src/quick-der-version-1.2-6 && cp python/scripts/* /usr/local/bin && cp -r python/quick_der /usr/local/lib/python2.7/dist-packages/quick_der
 
 # Install LillyDAP
 ADD https://github.com/vanrein/lillydap/archive/version-0.9-1.tar.gz /root/lillydap-version-0.9-1.tar.gz
