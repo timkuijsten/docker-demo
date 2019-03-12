@@ -15,6 +15,7 @@ COPY krb5.conf /etc/krb5.conf
 COPY shishi.conf /etc/shishi.conf
 
 RUN shisa --add SHISHI.ARPA2.LAB
+RUN shisa --add SHISHI.ARPA2.LAB krbtgt/SHISHI.ARPA2.LAB
 RUN shisa --add SHISHI.ARPA2.LAB demo  --password=sekreet
 RUN shisa --add SHISHI.ARPA2.LAB demo1 --password=sekreet1
 RUN shisa --add SHISHI.ARPA2.LAB demo2 --password=sekreet2
