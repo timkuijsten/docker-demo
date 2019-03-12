@@ -1,1 +1,3 @@
 Python tests all fail.  The reason is that setuptools.py have evolved beyond what is said here.
+
+derdump.quickder is a test version, with known bugs when producing ASN.1 symbols -- but it still is very useful.

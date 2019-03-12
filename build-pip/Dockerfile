@@ -28,7 +28,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get install -y python2.7 python-pip
 
-RUN pip install gnureadline
+RUN pip install gnureadline colored
 
 # Sigh.  Work around zeal of GNU licensing.  Not perfect.
 COPY arpa2gnu /usr/bin/arpa2gnu

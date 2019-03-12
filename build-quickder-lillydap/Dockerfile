@@ -51,6 +51,12 @@ RUN cd /usr/local/src/quick-der-version-1.2-6 && mkdir build && cd build && cmak
 #TODO# Ugly direct copy:
 RUN cd /usr/local/src/quick-der-version-1.2-6 && cp python/scripts/* /usr/local/bin && cp -r python/quick_der /usr/local/lib/python2.7/dist-packages/quick_der
 
+# Install hexio -- TODO: Temporary branch with experimental derdump.quickder
+RUN cd /usr/local/src ; git clone -b quick-derdump --single-branch \
+		https://github.com/vanrein/hexio hexio.git
+RUN cd /usr/local/src/hexio.git ; make hexin hexout ; install hexin hexout derdump derdump.quickder /usr/local/bin
+RUN cp /usr/local/src/hexio.git/README.MD /HEXIO.MD
+
 # Install LillyDAP
 ADD https://github.com/vanrein/lillydap/archive/version-0.9-1.tar.gz /root/lillydap-version-0.9-1.tar.gz
 RUN cd /usr/local/src && tar -xzvf /root/lillydap-version-0.9-1.tar.gz
