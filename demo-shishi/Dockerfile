@@ -21,6 +21,8 @@ RUN shisa --add SHISHI.ARPA2.LAB demo1 --password=sekreet1
 RUN shisa --add SHISHI.ARPA2.LAB demo2 --password=sekreet2
 RUN shisa --add SHISHI.ARPA2.LAB demo3 --password=sekreet3
 
+COPY README.MD /README.MD
+
 #NOTHERE# RUN /etc/init.d/shishi-kdc start
 
 CMD ["bash"]
