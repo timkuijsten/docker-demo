@@ -27,8 +27,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
 # libgnutls30 is present without a -dev for it?
-RUN apt-get install -y libdb5.3-dev softhsm2 libgnutls28-dev gnutls-bin libldns-dev libunbound-dev libpython-dev swig
-#DROPHSM# RUN apt-get install -y libdb5.3-dev libgnutls28-dev gnutls-bin libldns-dev libunbound-dev libpython-dev swig
+RUN apt-get install -y libdb5.3-dev softhsm2 libgnutls28-dev gnutls-bin libldns-dev libunbound-dev libpython-dev swig ppp
+#DROPHSM# RUN apt-get install -y libdb5.3-dev libgnutls28-dev gnutls-bin libldns-dev libunbound-dev libpython-dev swig ppp
+
+# Note: We install ppp for the chat(8) man page
 
 # Install Quick DER
 COPY --from=quickder /usr/local/include/quick-der /usr/local/include/quick-der
@@ -51,7 +53,8 @@ ADD https://github.com/arpa2/tlspool/archive/0.20-beta9.tar.gz /root/tlspool-0.2
 RUN useradd tlspool
 RUN cd /usr/local/src && tar -xzvf /root/tlspool-0.20-beta9.tar.gz
 RUN cd /usr/local/src/tlspool-0.20-beta9 && make -C lib/python clean && mkdir build && cd build && cmake .. && make all test install
-RUN cp /usr/local/src/tlspool-0.20-beta9/etc/tlspool.conf /etc/tlspool.conf
+#OVERRULED_BELOW# RUN cp /usr/local/src/tlspool-0.20-beta9/etc/tlspool.conf /etc/tlspool.conf
+RUN cp /usr/local/src/tlspool-0.20-beta9/etc/root.key /etc/dnsroot-tlspool
 
 # Setup SoftHSM2 (includes creating missing directory)
 RUN chmod ugo+rx /etc/softhsm && chmod ugo+r /etc/softhsm/softhsm2.conf
@@ -69,7 +72,7 @@ RUN cd /usr/local/src/tlspool-0.20-beta9/testdata && chown -R tlspool . && ( su 
 # RUN  cd /usr/local/src/tlspool-0.20-beta9/testdata \
 # 	&& sed -i -e 's+^pkcs11_path .*$+pkcs11_path /usr/lib/softhsm/libsofthsm2.so+' ../etc/tlspool.conf \
 # 	&& make install
-RUN sed < /usr/local/src/tlspool-0.20-beta9/etc/tlspool.conf > /etc/tlspool.conf -E -e '/^db_/p' -e '/^db_/d' -e 's+ (file:)?\.\./+ \1/usr/local/src/tlspool-0.20-beta9/+'
+RUN sed < /usr/local/src/tlspool-0.20-beta9/etc/tlspool.conf > /etc/tlspool.conf -E -e '/^db_/p' -e '/^db_/d' -e 's+ (file:)?\.\./+ \1/usr/local/src/tlspool-0.20-beta9/+' -e 's+^dnssec_rootkey .*+dnssec_rootkey /etc/dnsroot-tlspool+'
 COPY tlspool.sh /tlspool.sh
 COPY README.MD /TLS_Pool.md
 

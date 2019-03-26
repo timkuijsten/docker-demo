@@ -181,7 +181,7 @@ You have to first start logging through
 You can now start the TLS Pool with
 
 ```
-tlspool -kc /etc/tlspool.conf
+tlspool-daemon -kc /etc/tlspool.conf
 ```
 
 For your convenience, we provide a script
@@ -199,13 +199,13 @@ While the TLS Pool is running, you can run tests on other
 shells through, for instance
 
 ```
-docker exec -it tipi0 testcli
+docker exec -it tipi0 tlspool-test-client
 ```
 
 and
 
 ```
-docker exec -it tipi0 testsrv
+docker exec -it tipi0 tlspool-test-server
 ```
 
 The two programs function as a line-based chat system.
