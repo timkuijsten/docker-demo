@@ -39,7 +39,7 @@ You will find this file as `/KIP.MD`.
 ## Preparing your Docker Container
 
 This domain is setup in DNS, with DNSSEC protection, and points to a fixed
-host name `kipsvc.unicorn.demo.arpa2.org` port 9876, which must be present
+host name `kipsvc.unicorn.demo.arpa2.lab` port 9876, which must be present
 locally.
 
 So, edit `/etc/hosts` and extend the last line, with our local IPv4 address,
