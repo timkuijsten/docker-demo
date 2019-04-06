@@ -6,7 +6,7 @@
 
 
 # ARPA2 base image is build-tlspool
-FROM arpa2:build-tlspool AS apache
+FROM build-tlspool:latest AS apache
 
 
 # Install the source code, patch and compile.
