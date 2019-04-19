@@ -7,6 +7,8 @@ The demo runs under a prepared demonstration domain: `unicorn.demo.arpa2.org`
 It refers to the Docker container by a funny name: `kipsvc.unicorn.demo.arpa2.lab`
 (note the last part!)
 
+.. ![Overview of KIP](kip-overview.png)
+
 
 ## Example KIP file
 
