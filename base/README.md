@@ -52,6 +52,31 @@ Until you run `exit`, you can view the container in another shell on the host, u
 
 You can make local changes, for instance to install extra software.  These changes will not end up in the original `arpa2:base` image, but instead in a temporary image layered on top of it.  Try it!
 
+## Minimal Core OS
+
+The `Dockerfile` defines an `ENTRYPOINT` through `dumb-init`.  This means that PID 1 starts that program, with the main task of
+[forwarding signals more intuitively](https://engineeringblog.yelp.com/2016/01/dumb-init-an-init-for-docker.html)
+than a `bash` or `python` executable in PID 1.  If you don't override it, your inherited containers will use the same setup.
+
+The second level is filled with any `CMD` that you specify in your specialising containers.  This basically runs under PID 1 if you don't change the `ENTRYPOINT`.
+
+A default `CMD` is provided for this image too, but it does little more than starting `bash` as a fallback.  However, it leaves you with a number of very nice extra hooks:
+
+  * `/usr/arpa2/bin/docker.go` replaces the usual `bash`.  It produces `PS1` prompts like `kip1.3#` for the first boot, third shell.
+  * `/var/arpa2/docker.boots` lists the booting times.
+  * `/tmp/docker.runs` lists the shell starts in the current boot.  Used for `PS1`.
+  * `/var/arpa2/docker.name` can be used to set a small string with a name.  Used for `PS1`.
+  * `/var/arpa2/docker.hostname` can be used to set additional, fixed hostnames.
+  * `/usr/arpa2/bin/docker.install` is run as a one-time setup program during the first starting time.
+  * `/usr/arpa2/bin/docker.daemon` is run when `tty` yields `not a tty` and daemons have not started.
+  * `/usr/arpa2/bin/docker.interact` is run when `tty` yields a valid device name.
+
+Note that it does not make complete sense, but fix it if you can!
+
+  * The container will loop forever if it is run without foreground and no `docker.daemon` script.  You can use `^C` but this is locked out once you send `^Z`.
+  * The `exec` command does not default to `CMD` so you would have to manually run `docker.go` -- or should we make this a startup script for `bash` instead?
+
+
 ## Support for ARPA2 Shells
 
 There is a generic `arpa2shell` command, which looks through the Python system for modules named `arpa2xxx` that inherit `arpa2cmd.Cmd` into a module-specific `Cmd` class.  These classes are instantiated as sub-shells, into which `arpa2shell` can drop in.  No sub-shells have been included in this release, but images built on top of `arpa2:base` can.  In that case, they can all be addressed from `arpa2shell`.
