@@ -26,7 +26,7 @@ ADD krb5.conf /etc/krb5.conf
 # ADD selections.debconf /tmp/selections.debconf
 # RUN debconf-set-selections /tmp/selections.debconf
 
-RUN apt-get install -y dumb-init krb5-user openldap-utils ldapvi nano procps less lrzsz net-tools netcat python2.7 # python-setuptools # python3
+RUN apt-get install -y dumb-init runit krb5-user openldap-utils ldapvi nano procps less lrzsz net-tools netcat python2.7 # python-setuptools # python3
 
 RUN ln -s /bin/nano /usr/bin/vi
 
@@ -62,4 +62,5 @@ RUN echo /usr/arpa2/bin/docker.go >> /root/.bash_login
 CMD [ "/usr/arpa2/bin/docker.go" ]
 
 # Define default entry point via dumb-init
-ENTRYPOINT [ "/usr/bin/dumb-init", "--" ]
+ENTRYPOINT [ "/usr/bin/dumb-init", "-v", "--" ]
+#STUCK-PITTY# ENTRYPOINT [ "/sbin/runit-init" ]

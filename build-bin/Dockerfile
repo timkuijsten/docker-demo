@@ -31,7 +31,8 @@ RUN apt-get install -y python2.7 build-essential \
 	flex bison \
 	rsyslog strace gdb \
 	cmake cmake-curses-gui pkg-config \
-	libldap-dev libsasl2-dev libkrb5-dev
+	libldap-dev libsasl2-dev libkrb5-dev \
+	runit
 	#TODO#libgnutls-dev
 
 # Install ARPA2CM
@@ -39,6 +40,13 @@ ADD https://github.com/arpa2/arpa2cm/archive/version-0.5.tar.gz /root/arpa2cm-ve
 RUN cd /usr/local/src && tar -xzvf /root/arpa2cm-version-0.5.tar.gz
 RUN cd /usr/local/src/arpa2cm-version-0.5 && mkdir build && cd build && cmake .. && make all install
 
+# Install runit-docker (base already holds runit but not activated)
+RUN git clone https://github.com/pixers/runit-docker /usr/local/src/runit-docker.git
+RUN make -C /usr/local/src/runit-docker.git install
+COPY service/ /etc/service/
+
 # Define default command
 CMD ["/bin/bash"]
 
+# Use runit-docker as the entrypoint
+ENTRYPOINT ["/sbin/runit-docker"]
