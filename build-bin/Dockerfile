@@ -41,7 +41,7 @@ RUN cd /usr/local/src && tar -xzvf /root/arpa2cm-version-0.5.tar.gz
 RUN cd /usr/local/src/arpa2cm-version-0.5 && mkdir build && cd build && cmake .. && make all install
 
 # Install runit-docker (base already holds runit but not activated)
-RUN git clone https://github.com/pixers/runit-docker /usr/local/src/runit-docker.git
+RUN git clone https://github.com/arpa2/runit-docker /usr/local/src/runit-docker.git
 RUN make -C /usr/local/src/runit-docker.git install
 COPY service/ /etc/service/
 
