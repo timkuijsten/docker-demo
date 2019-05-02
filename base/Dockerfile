@@ -4,6 +4,11 @@
 # enhanced with software that we generally use within the
 # ARPA2 projects.
 #
+# It defines a default ENTRYPOINT based on dumb-init to
+# allow you to just specify a CMD that will run if you
+# start the container.  Signals are caught by PID 1 and
+# propagated to your programs.
+#
 # From: Rick van Rein <rick@openfortress.nl>
 
 
@@ -21,7 +26,7 @@ ADD krb5.conf /etc/krb5.conf
 # ADD selections.debconf /tmp/selections.debconf
 # RUN debconf-set-selections /tmp/selections.debconf
 
-RUN apt-get install -y krb5-user openldap-utils ldapvi nano procps less lrzsz net-tools netcat python2.7 # python-setuptools # python3
+RUN apt-get install -y dumb-init runit krb5-user openldap-utils ldapvi nano procps less lrzsz net-tools netcat python2.7 # python-setuptools # python3
 
 RUN ln -s /bin/nano /usr/bin/vi
 
@@ -47,5 +52,15 @@ ADD arpa2cmd.py /usr/lib/python2.7/dist-packages/arpa2cmd.py
 # Define working directory
 # WORK /var/www
 
-# Define default command
-CMD ["/bin/bash"]
+# Install the ARPA2 install / daemon / shell startup context
+ADD usr-arpa2-bin /usr/arpa2/bin
+RUN mkdir -p /var/arpa2
+RUN echo base > /var/arpa2/docker.name
+RUN echo /usr/arpa2/bin/docker.go >> /root/.bash_login
+
+# Your default command could be anything beyond a shell
+CMD [ "/usr/arpa2/bin/docker.go" ]
+
+# Define default entry point via dumb-init
+ENTRYPOINT [ "/usr/bin/dumb-init", "-v", "--" ]
+#STUCK-PITTY# ENTRYPOINT [ "/sbin/runit-init" ]
