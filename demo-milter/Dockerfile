@@ -17,7 +17,8 @@ COPY README.md /
 
 COPY .bashrc /root
 
-RUN git clone https://github.com/arpa2/libarpa2service.git && \
+RUN cd /usr/local/src && \
+	git clone https://github.com/arpa2/libarpa2service.git && \
 	cd libarpa2service/build && \
 	cmake .. && \
 	make && \
@@ -29,11 +30,12 @@ RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set
 	apt-get install -y libmilter-dev postfix msmtp && \
 	echo 'smtpd_milters = inet:127.0.0.1:7000' >> /etc/postfix/main.cf
 
-RUN git clone https://github.com/arpa2/arpa2mail.git && \
+RUN cd /usr/local/src && \
+	git clone https://github.com/arpa2/arpa2mail.git && \
 	mkdir arpa2mail/a2aclmilter/build && \
 	cd arpa2mail/a2aclmilter/build && \
 	cmake .. && \
 	make && \
 	make install
 
-COPY demopolicy /app
+COPY demopolicy /

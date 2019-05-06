@@ -25,10 +25,10 @@ docker run -it a2aclmilter bash
 # Start logging and postfix
 service rsyslog start && service postfix start
 
-# Start a2aclmilter with policy file /app/demopolicy, as user id 2498 and
+# Start a2aclmilter with policy file /demopolicy, as user id 2498 and
 # chrooted to /etc/opt. Postfix communicates with the milter via
 # tcp://127.0.0.1:7000
-a2aclmilter /app/demopolicy 2498 /etc/opt inet:7000@127.0.0.1
+a2aclmilter /demopolicy 2498 /etc/opt inet:7000@127.0.0.1
 
 # 1. Send a Whitelisted mail
 echo hi | msmtp -v --host 127.0.0.1 --port 25 --from \
@@ -53,9 +53,9 @@ a2aclmilter [-dhqv] [-g group] acldb user chrootdir sockaddr
 man a2aclmilter
 
 ## modify policy for other experiments
-vi /app/demopolicy
+vi /demopolicy
 
 ## testing with a local repository
-docker run -v /Users/tim/code/libarpa2service:/app -it a2aclmilter bash
+docker run -v /Users/tim/code/libarpa2service:/usr/local/src/libarpa2service -it a2aclmilter bash
 
 [demopolicy]: ./demopolicy
