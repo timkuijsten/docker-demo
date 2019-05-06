@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
 	nvi \
 	tmux
 
+COPY README.md /
+
 COPY .bashrc /root
 
 RUN git clone https://github.com/arpa2/libarpa2service.git && \
