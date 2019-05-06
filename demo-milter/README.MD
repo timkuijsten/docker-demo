@@ -55,4 +55,7 @@ man a2aclmilter
 ## modify policy for other experiments
 vi /app/demopolicy
 
+## testing with a local repository
+docker run -v /Users/tim/code/libarpa2service:/app -it a2aclmilter bash
+
 [demopolicy]: ./demopolicy
