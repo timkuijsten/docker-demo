@@ -10,7 +10,7 @@
 # From: Rick van Rein <rick@openfortress.nl>
 
 
-FROM build-tlspool
+FROM arpa2:build-tlspool
 
 # Install required packages (already done in arpa2:base)
 # RUN \
