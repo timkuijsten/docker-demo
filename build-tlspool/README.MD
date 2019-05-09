@@ -116,7 +116,7 @@ on the server side.
 You probably want one main process,
 
 ```
-docker run -it --name tipi0 arpa2:build-tlspool
+docker run -it --name tipi0 arpa2/build-tlspool
 ```
 
 or, if you want to be able to use `gdb` or `strace`,

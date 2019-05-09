@@ -23,7 +23,7 @@
 
 ### First stage: Setup Python support
 #
-FROM arpa2:build-pip AS pip
+FROM arpa2/build-pip AS pip
 
 # RUN pip install cherrypi
 
@@ -31,8 +31,8 @@ FROM arpa2:build-pip AS pip
 
 ### Second stage: Actually construct the image
 #
-# FROM arpa2:build-bin
-FROM arpa2:build-tlspool
+# FROM arpa2/build-bin
+FROM arpa2/build-tlspool
 
 
 # ADD https://github.com/cherrypy/cherrypy/archive/v17.4.0.tar.gz /root/cherrypy-17.4.0.tar.gz
@@ -51,7 +51,7 @@ RUN cd /usr/local/src/cheroot.git  ; python setup.py install
 
 ### Final stage: Actually construct the image
 #
-#TODO#SPLIT#DELIVERABLE# FROM arpa2:base
+#TODO#SPLIT#DELIVERABLE# FROM arpa2/base
 
 COPY README.MD		/CherryPi.md
 

@@ -1,5 +1,5 @@
 
-FROM arpa2:build-bin
+FROM arpa2/build-bin
 
 RUN apt-get -y install libssl-dev libunbound-dev
 

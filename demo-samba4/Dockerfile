@@ -3,7 +3,7 @@
 # From: Rick van Rein <rick@openfortress.nl>
 
 
-FROM arpa2:build-bin
+FROM arpa2/build-bin
 
 RUN apt-get install -y --no-install-recommends --assume-yes \
 	samba samba-dsdb-modules winbind smbclient smbldap-tools ldb-tools bind9 bind9utils samba-vfs-modules

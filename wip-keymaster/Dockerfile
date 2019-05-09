@@ -21,19 +21,19 @@
 
 ### First stage: Import SteamWorks build environment
 #
-FROM arpa2:build-steamworks AS steamworks
+FROM arpa2/build-steamworks AS steamworks
 
 
 
 ### Second stage: Incorporate Python dependencies
 #
-FROM arpa2:build-pip AS pip
+FROM arpa2/build-pip AS pip
 
 
 
 ### Final stage: Construct the runtime image
 #
-FROM arpa2:base
+FROM arpa2/base
 
 RUN DEBIAN_FRONTEND=noninteractive SLAPD_PASSWORD=sekreet \
 	apt-get install --no-install-recommends -y \

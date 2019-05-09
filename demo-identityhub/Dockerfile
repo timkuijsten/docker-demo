@@ -24,7 +24,7 @@
 
 ### First stage: Setup Python support
 #
-FROM arpa2:build-pip AS pip
+FROM arpa2/build-pip AS pip
 
 #TEST#JSON#VARIANT# RUN pip install cmdparser python-ldap web2ldap
 RUN pip install python-ldap web2ldap
@@ -37,7 +37,7 @@ RUN cd /usr/local/src/cmdparser.git/cmdparser ; python setup.py install
 
 ### Second stage: Actually construct the image
 #
-FROM arpa2:base
+FROM arpa2/base
 
 COPY README.MD		/IdentityHub.md
 

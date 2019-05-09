@@ -1,12 +1,12 @@
 # Dockerfile for apache2 tlspool module
 #
-# This is arpa2:wip-apachemod_arpa2.
+# This is arpa2/wip-apachemod_arpa2.
 #
 # From: Henri Manson <hfmanson@gmail.com>
 
 
 # ARPA2 base image is build-tlspool
-FROM build-tlspool:latest AS apache
+FROM build-tlspool/latest AS apache
 
 
 # Install the source code, patch and compile.
@@ -31,7 +31,7 @@ CMD ["/bin/bash"]
 
 ### FUTURE: EXTRACT FROM THIS IMAGE
 #
-# FROM arpa2:base
+# FROM arpa2/base
 # COPY --from=apache /usr/local/apache2 /usr/local/apache2
 # COPY --from=apache /usr/local/lib/libtlspool.so /usr/local/lib/
 # COPY README.MD /ApacheHTTPD.MD

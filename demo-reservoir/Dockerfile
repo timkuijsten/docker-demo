@@ -11,7 +11,7 @@
 #
 # Install Python dependencies for Reservoir
 
-FROM arpa2:build-pip AS pip
+FROM arpa2/build-pip AS pip
 
 #TEST#JSON#VARIANT# RUN pip install cmdparser python-ldap riak six
 RUN pip install python-ldap riak six
@@ -47,7 +47,7 @@ RUN cd /usr/local/src/cmdparser.git/cmdparser ; python setup.py install
 # No idea who they are; found them only on IRC at
 # freenode.net #riak -- so doubtful as a source.
 
-# FROM arpa2:build-bin AS bin
+# FROM arpa2/build-bin AS bin
 # 
 # RUN apt-get install -y erlang
 # 
@@ -68,7 +68,7 @@ RUN cd /usr/local/src/cmdparser.git/cmdparser ; python setup.py install
 # copy Riak KV from there.
 
 
-#BELOW# FROM arpa2:base AS riakkv
+#BELOW# FROM arpa2/base AS riakkv
 
 #
 # Option 1. Setting up an instable environment
@@ -108,7 +108,7 @@ RUN cd /usr/local/src/cmdparser.git/cmdparser ; python setup.py install
 #
 
 
-FROM arpa2:base
+FROM arpa2/base
 
 
 # Install Riak KV from .deb (moved from option 2 above)
@@ -135,7 +135,7 @@ RUN dpkg -i /root/riak_2.2.6-1_amd64.deb
 
 
 
-# Install OpenLDAP's slapd daemon (overlaps arpa2:identityhub)
+# Install OpenLDAP's slapd daemon (overlaps arpa2/identityhub)
 #
 
 RUN DEBIAN_FRONTEND=noninteractive SLAPD_PASSWORD=sekreet \

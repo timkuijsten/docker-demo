@@ -2,7 +2,7 @@
 #
 # In this container you can test a communication pair with an ACL policy file.
 
-FROM arpa2:base
+FROM arpa2/base
 
 RUN apt-get update && apt-get install -y \
 	man \

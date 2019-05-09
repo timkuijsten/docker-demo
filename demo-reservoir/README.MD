@@ -1,4 +1,4 @@
-# README for Docker Image arpa2:reservoir
+# README for Docker Image arpa2/reservoir
 
 > *This is a simple, initial version of the ARPA2 Reservoir
 > as designed in the InternetWide.org project, and implemented
@@ -39,7 +39,7 @@ There are many things open for tinkering:
 
 ## Deploy the Image
 
-To build this image on top of the `arpa2:base` image:
+To build this image on top of the `arpa2/base` image:
 
 ```
 docker build -t rv <THIS-DIRECTORY>
@@ -241,8 +241,8 @@ To update this image, please build it with the public tag and
 push it:
 
 ```
-docker tag rv arpa2:reservoir
-docker push arpa2:reservoir
+docker tag rv arpa2/reservoir
+docker push arpa2/reservoir
 ```
 
 Cleaning up is easy in docker, but also necessary because of

@@ -15,14 +15,14 @@
 
 # Prepare setuptools for import
 #
-FROM arpa2:build-pip AS pip
+FROM arpa2/build-pip AS pip
 
 
 # Build on top of the ARPA2 build base image
 #
-FROM arpa2:build-bin
+FROM arpa2/build-bin
 
-# Install required packages (already done in arpa2:base)
+# Install required packages (already done in arpa2/base)
 # RUN \
 #     apt-get update && \
 #     apt-get -y upgrade

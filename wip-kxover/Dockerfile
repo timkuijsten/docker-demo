@@ -10,22 +10,22 @@
 
 # Include the Quick DER build for later import
 #
-FROM arpa2:build-quickder-lillydap AS quickder
+FROM arpa2/build-quickder-lillydap AS quickder
 
 
 # Include the TLS Pool build for later import
 #
-FROM arpa2:build-tlspool AS tlspool
+FROM arpa2/build-tlspool AS tlspool
 
 
 # Include the KDC demonstration for later import
 #
-FROM arpa2:demo-kerberos AS kdc
+FROM arpa2/demo-kerberos AS kdc
 
 
 # Start with the binary + python build environment
 #
-FROM arpa2:build-bin
+FROM arpa2/build-bin
 
 # Install Debian software packages
 #

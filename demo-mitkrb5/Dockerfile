@@ -3,7 +3,7 @@
 # From: Rick van Rein <rick@openfortress.nl>
 
 
-FROM arpa2:build-bin
+FROM arpa2/build-bin
 
 RUN apt-get install -y --no-install-recommends --assume-yes \
 	krb5-kdc krb5-admin-server #OUT_OF_FASHION# krb5-rsh-server krb5-ftpd krb5-telnetd

@@ -1,15 +1,15 @@
 # demo-dns is a DNS master server
 
 
-FROM arpa2:build-bin AS src
+FROM arpa2/build-bin AS src
 
 RUN cd /usr/local/src ; git clone https://gitlab.labs.nic.cz/knot/knot-dns knot.git ; sed 's/@python_libknot_VERSION@/git.version/' < knot.git/python/libknot/__init__.py.in > knot.git/python/libknot/__init__.py
 
-FROM arpa2:build-pip AS pip
+FROM arpa2/build-pip AS pip
 
 RUN pip install cmdparser
 
-FROM arpa2:base
+FROM arpa2/base
 
 RUN apt-get install -y gnupg python-six python-enum34 apt-transport-https ca-certificates
 

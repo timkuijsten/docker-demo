@@ -12,15 +12,15 @@
 
 # Include the Quick DER source for later import
 #
-FROM arpa2:build-quickder-lillydap AS quickder
+FROM arpa2/build-quickder-lillydap AS quickder
 
 # ARPA2 base image is the moving target Debian Stable
 #
-FROM arpa2:build-bin
+FROM arpa2/build-bin
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install required packages (already done in arpa2:base)
+# Install required packages (already done in arpa2/base)
 # RUN \
 #     apt-get update && \
 #     apt-get -y upgrade
@@ -85,3 +85,4 @@ RUN ldconfig
 #NAH# CMD ["/tlspool.sh"]
 CMD ["bash"]
 
+ENTRYPOINT []

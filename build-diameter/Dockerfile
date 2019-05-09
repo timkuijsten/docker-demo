@@ -8,7 +8,7 @@
 # From: Rick van Rein <rick@openfortress.nl>
 
 
-FROM arpa2:build-bin
+FROM arpa2/build-bin
 
 RUN apt-get install -y libgnutls28-dev gnutls-bin libidn11-dev libsctp-dev lksctp-tools libgcrypt11-dev # mercurial
 

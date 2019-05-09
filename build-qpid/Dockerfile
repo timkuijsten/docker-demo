@@ -8,7 +8,7 @@
 
 # Start with the binary + python build environment
 #
-FROM arpa2:build-pip
+FROM arpa2/build-pip
 
 # Include the README.MD in the root
 #

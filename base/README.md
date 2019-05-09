@@ -1,4 +1,4 @@
-# Docker Image arpa2:base
+# Docker Image arpa2/base
 
 > *This is the basic image that we shall use for most
 > or all of the ARPA2 distribution images.*
@@ -30,17 +30,17 @@ The hash code identifies what has just been built.  You can also find it with:
 
 Oops &mdash; forgot to give it a name.  Let's rebuild (and see how these hashes allow for reuse):
 
-    docker build docker-arpa2-base -t arpa2:base
+    docker build docker-arpa2-base -t arpa2/base
 
 If you list the images once more, you will find that the `<none>` entries have been replaced with `arpa2` and `base`.
 
 Docker keeps those hashed images by default, but you can use `docker image rm` or `docker image prune` to cleanup.
 
-## Running Commands in arpa2:base
+## Running Commands in arpa2/base
 
-The `Dockerfile` in `arpa2:base` has a shell as its default command, so you can simply run it (with an interactive terminal) to enter commands:
+The `Dockerfile` in `arpa2/base` has a shell as its default command, so you can simply run it (with an interactive terminal) to enter commands:
 
-    shell$ docker run -it arpa2:base
+    shell$ docker run -it arpa2/base
     root@02fc270bb848:/# hostname
     02fc270bb848
     root@02fc270bb848:/# exit
@@ -50,7 +50,7 @@ Note how the hex code (in fact the hostname) is not the same as the image hash. 
 
 Until you run `exit`, you can view the container in another shell on the host, using `docker container ls`.  Once you quit, the container will be removed.
 
-You can make local changes, for instance to install extra software.  These changes will not end up in the original `arpa2:base` image, but instead in a temporary image layered on top of it.  Try it!
+You can make local changes, for instance to install extra software.  These changes will not end up in the original `arpa2/base` image, but instead in a temporary image layered on top of it.  Try it!
 
 ## Minimal Core OS
 
@@ -79,7 +79,7 @@ Note that it does not make complete sense, but fix it if you can!
 
 ## Support for ARPA2 Shells
 
-There is a generic `arpa2shell` command, which looks through the Python system for modules named `arpa2xxx` that inherit `arpa2cmd.Cmd` into a module-specific `Cmd` class.  These classes are instantiated as sub-shells, into which `arpa2shell` can drop in.  No sub-shells have been included in this release, but images built on top of `arpa2:base` can.  In that case, they can all be addressed from `arpa2shell`.
+There is a generic `arpa2shell` command, which looks through the Python system for modules named `arpa2xxx` that inherit `arpa2cmd.Cmd` into a module-specific `Cmd` class.  These classes are instantiated as sub-shells, into which `arpa2shell` can drop in.  No sub-shells have been included in this release, but images built on top of `arpa2/base` can.  In that case, they can all be addressed from `arpa2shell`.
 
 ## Connecting to a Containers
 
@@ -87,13 +87,13 @@ Not all containers are interactive on a terminal.  They may as well run a comman
 
 Another facility that is useful during deployment, is the ability to mount a file system layer with data into the container's filesystem.  For applications such as a web server, this facilitates dynamic data and limits rebuilds of images to code changes.
 
-## Adding layers atop arpa2:base
+## Adding layers atop arpa2/base
 
-To develop additional layers on top of `arpa2:base`, you can run a container for `arpa2:base` and enter any commands that you think are needed.  Keep note of them in a new
+To develop additional layers on top of `arpa2/base`, you can run a container for `arpa2/base` and enter any commands that you think are needed.  Keep note of them in a new
 [Dockerfile](https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/),
 that adheres to the following pattern:
 
-    FROM arpa2:base
+    FROM arpa2/base
     
     RUN apt-get update && apt-get -y upgrade
     

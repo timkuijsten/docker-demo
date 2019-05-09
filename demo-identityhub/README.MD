@@ -1,4 +1,4 @@
-# README for Docker Image arpa2:identityhub
+# README for Docker Image arpa2/identityhub
 
 > *This is a simple, initial version of the IdentityHub
 > as designed in the InternetWide.org project, and implemented
@@ -42,7 +42,7 @@ at the same level as the `Dockerprep.sh` file.  We do this
 to avoid adding `pip` and its many, many dependencies to
 the runtime.
 
-To build this image on top of the `arpa2:base` image:
+To build this image on top of the `arpa2/base` image:
 
 ```
 docker build -t idhub <THIS-DIRECTORY>
@@ -165,8 +165,8 @@ To update this image, please build it with the public tag and
 push it:
 
 ```
-docker tag idhub arpa2:identityhub
-docker push arpa2:identityhub
+docker tag idhub arpa2/identityhub
+docker push arpa2/identityhub
 ```
 
 Cleaning up is easy in docker, but also necessary because of
@@ -181,8 +181,8 @@ docker image     prune
 
 Apropos [build confusion and small images!](https://docs.docker.com/develop/develop-images/multistage-build/#use-multi-stage-builds) The people over at Docker understood the problem, as one would expect:
 
-  * We can start off building `FROM arpa2:base AS idhub-dev` to collect build image stuff
-  * We restart in the same `Dockerfile` with the target, `FROM arpa2:base AS idhub`
+  * We can start off building `FROM arpa2/base AS idhub-dev` to collect build image stuff
+  * We restart in the same `Dockerfile` with the target, `FROM arpa2/base AS idhub`
   * We can then `COPY --from=idhub-dev /path/in/dev/stage /target/image/location`
 
 A prior phase using `pip` seems the perfect solution then.  It would install a lot of

@@ -7,7 +7,7 @@ Run a detached Docker image, assuming you don't want
 to lock your shell to OpenLDAP's output:
 
 ```
-docker run -d --name id0 arpa2:identityhub
+docker run -d --name id0 arpa2/identityhub
 ```
 
 Now start a session in the container you just created:

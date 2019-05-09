@@ -2,7 +2,7 @@
 #
 # In this container you can test the milter with an ACL policy file.
 
-FROM arpa2:base
+FROM arpa2/base
 
 RUN apt-get update && apt-get install -y \
 	man \

@@ -7,7 +7,7 @@
 # From: Henri Manson <info@mansoft.nl>
 
 
-FROM arpa2:base
+FROM arpa2/base
 
 RUN apt-get update && \
 	apt-get install -y firefox-esr openssh-server \

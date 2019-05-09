@@ -6,12 +6,12 @@
 
 ### Prepare a name for the Apache Qpid image
 #
-FROM arpa2:build-qpid AS qpid
+FROM arpa2/build-qpid AS qpid
 
 
 ### Prepare Python packages with pip -- and forego building it
 #
-FROM arpa2:build-pip AS pip
+FROM arpa2/build-pip AS pip
 
 #TOO_NEW# RUN pip install qpid-python qpid-tools qpid-bow qpid-qmf 
 
@@ -27,7 +27,7 @@ RUN pip install gssapi
 
 ### Start off with the base image
 #
-FROM arpa2:base
+FROM arpa2/base
 
 
 ### Install basic toys

@@ -1,6 +1,6 @@
 # Dockerfile for 6bed4 demonstration
 #
-# This is arpa2:demo-6bed4.
+# This is arpa2/demo-6bed4.
 #
 # TODO: This does not seem to be possible in a
 #       Docker container?  Also, gdb breaks out.
@@ -29,7 +29,7 @@
 
 
 # ARPA2 base image is the moving target Debian Stable
-FROM arpa2:build-bin
+FROM arpa2/build-bin
 
 # Add tshark, tcpdump and several ping utilities for traffic analysis
 RUN apt-get install -y tshark tcpdump mtr-tiny \

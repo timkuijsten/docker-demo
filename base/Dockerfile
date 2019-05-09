@@ -1,6 +1,6 @@
 # Dockerfile for ARPA2 base image
 #
-# This is arpa2:base -- an image based on debian:stable and
+# This is arpa2/base -- an image based on debian:stable and
 # enhanced with software that we generally use within the
 # ARPA2 projects.
 #

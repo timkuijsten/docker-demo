@@ -40,12 +40,12 @@ actually be tried, at which time it moves to
 `demo-*` -- this may save some disappointments.
 
 A good approach is probably to start off with
-`FROM arpa2:build-xxx` and when it all works, strip away
+`FROM arpa2/build-xxx` and when it all works, strip away
 the unnecessary build environment by switching to
-`FROM arpa2:base` or another runtime base, and
+`FROM arpa2/base` or another runtime base, and
 using `COPY --from=xxx` to copy necessary elements
-from the original `arpa2:build-xxx` that is now
-a preliminary phase `FROM arpa2:build-xxx AS xxx`
+from the original `arpa2/build-xxx` that is now
+a preliminary phase `FROM arpa2/build-xxx AS xxx`
 
 You can create a typescript console "video" with
 

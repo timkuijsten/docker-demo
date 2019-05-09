@@ -1,4 +1,4 @@
-FROM arpa2:build-bin
+FROM arpa2/build-bin
 
 # RUN apt-get -y install binutils-gold libboost-all-dev libgmp-dev libgmpxx4ldbl libmpfr-dev
 # RUN cd /usr/local/src ; git clone https://github.com/epiqc/ScaffCC.git scaffcc.git
