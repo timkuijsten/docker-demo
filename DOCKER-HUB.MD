@@ -21,8 +21,8 @@ To build these demo's automatically with Docker Hub, we can do the following:
 After this, we can go to the repository, and test build the example `some-project`.  When satisfied, we can notify Docker Hub with tags:
 
 ```
-docker tag --force some-project-latest
-docker push --tags --force
+git tag --force some-project-latest
+git push --tags --force
 ```
 
 Now wait a few minutes, and see the positive result in blueish green.
@@ -37,3 +37,49 @@ Then, the World can download your demo with one of
 docker pull arpa2/some-project
 docker pull arpa2/some-project:latest
 ```
+
+## Naming
+
+A few names that may be handy to use for your projects:
+
+  * `demo-xxx` to demonstrate things to others.
+  * `build-xxx` to build some intermediates, see below.
+  * `wip-xxx` for work in progress.
+
+The `build-xxx` uses a powerful mechanism in Docker, where one
+image builds content that others can import, without a need to
+share the entire file system for it.  Here's the format from
+`wip-keymaster`:
+
+```
+### First stage: Import SteamWorks build environment
+#
+FROM arpa2/build-steamworks AS steamworks
+
+
+### Second stage: Incorporate Python dependencies
+#
+FROM arpa2/build-pip AS pip
+
+
+### Final stage: Construct the runtime image
+#
+FROM arpa2/base
+
+...
+
+COPY --from=steamworks /usr/local/bin/pulley       /usr/local/bin/pulley
+COPY --from=steamworks /usr/local/bin/crank        /usr/local/bin/crank
+COPY --from=steamworks /usr/local/share/steamworks /usr/local/share/steamworks/
+
+...
+
+COPY --from=pip /usr/bin/arpa2kinit /usr/bin/arpa2kinit
+COPY --from=pip /usr/bin/arpa2gnu   /usr/bin/arpa2gnu
+```
+
+The `--from` notation references the `AS` name as a source for copying.
+Build environments, even when taken off of Docker Hub, can help us to
+difficult build results, and quickly incorporate them into our own
+working environments.  It is completely doable to focus your complete
+development in a Docker that sits under `build-bin` or similar!
