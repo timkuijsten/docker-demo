@@ -38,6 +38,10 @@ RUN rm /usr/local/lib/python3*/dist-packages/gnureadline*.so
 
 COPY arpa2kinit /usr/bin/arpa2kinit
 
+# Environment variables $PYTHON and $PIP
+ENV PYTHON=python3
+ENV PIP=pip3
+
 
 # Define default command
 CMD ["/bin/bash"]
