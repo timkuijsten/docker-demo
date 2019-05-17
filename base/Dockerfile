@@ -62,6 +62,9 @@ RUN echo /usr/arpa2/bin/docker.go >> /root/.bash_login
 # Your default command could be anything beyond a shell
 CMD [ "/usr/arpa2/bin/docker.go" ]
 
+# Vim is quickly becoming unusable.  Be conservative to at least be stable.
+COPY vimrc /root/.vimrc
+
 # Define default entry point via dumb-init
 # ENTRYPOINT [ "/usr/bin/dumb-init", "-v", "--" ]
 ENTRYPOINT [ "/usr/bin/dumb-init", "--" ]
