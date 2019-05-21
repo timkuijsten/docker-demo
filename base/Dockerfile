@@ -26,7 +26,7 @@ ADD krb5.conf /etc/krb5.conf
 # ADD selections.debconf /tmp/selections.debconf
 # RUN debconf-set-selections /tmp/selections.debconf
 
-RUN apt-get install -y dumb-init runit ca-certificates krb5-user openldap-utils ldapvi nano procps less lrzsz net-tools netcat python2.7 python3 python3-setuptools
+RUN apt-get install -y dumb-init runit ca-certificates krb5-user openldap-utils ldapvi nano procps less lrzsz net-tools netcat python2.7 python-setuptools python3 python3-setuptools
 # python-setuptools # python3
 
 RUN ln -s /bin/nano /usr/bin/vi

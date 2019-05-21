@@ -44,12 +44,12 @@ RUN cd /usr/local/src && tar -xzvf /root/asn1ate-v0.6.tar.gz
 RUN cd /usr/local/src/asn1ate-0.6 && python setup.py install
 
 # Install Quick DER
-ADD https://github.com/vanrein/quick-der/archive/version-1.2-6.tar.gz /root/quick-der-version-1.2-6.tar.gz
-RUN cd /usr/local/src && tar -xzvf /root/quick-der-version-1.2-6.tar.gz
-#TODO#PYTHON#SETUP#INCOMPATIBLE#CHANGES# RUN cd /usr/local/src/quick-der-version-1.2-6 && mkdir build && cd build && cmake .. && make all test install
-RUN cd /usr/local/src/quick-der-version-1.2-6 && mkdir build && cd build && cmake .. && make all install
+ADD https://github.com/vanrein/quick-der/archive/version-1.3.0.tar.gz /root/quick-der-version-1.3.0.tar.gz
+RUN cd /usr/local/src && tar -xzvf /root/quick-der-version-1.3.0.tar.gz
+#TODO#PYTHON#SETUP#INCOMPATIBLE#CHANGES# RUN cd /usr/local/src/quick-der-version-1.3.0 && mkdir build && cd build && cmake .. && make all test install
+RUN cd /usr/local/src/quick-der-version-1.3.0 && mkdir build && cd build && cmake .. && make all install
 #TODO# Ugly direct copy:
-RUN cd /usr/local/src/quick-der-version-1.2-6 && cp python/scripts/* /usr/local/bin && cp -r python/quick_der /usr/local/lib/python2.7/dist-packages/quick_der
+RUN cd /usr/local/src/quick-der-version-1.3.0 && cp python/scripts/* /usr/local/bin && cp -r python/quick_der /usr/local/lib/python2.7/dist-packages/quick_der
 
 # Install hexio -- TODO: Temporary branch with experimental derdump.quickder
 RUN cd /usr/local/src ; git clone -b quick-derdump --single-branch \
