@@ -34,6 +34,7 @@ RUN apt-get install -y libdb5.3-dev softhsm2 libgnutls28-dev gnutls-bin libldns-
 
 # Install Quick DER
 COPY --from=quickder /usr/local/include/quick-der /usr/local/include/quick-der
+COPY --from=quickder /usr/local/include/arpa2/quick-der.h /usr/local/include/arpa2/quick-der.h
 COPY --from=quickder /usr/local/lib/pkgconfig/Quick-DER.pc /usr/local/lib/pkgconfig/Quick-DER.pc
 COPY --from=quickder /usr/local/lib/libquickder.so /usr/local/lib/libquickder.so
 COPY --from=quickder /usr/local/lib/libquickder.a /usr/local/lib/libquickder.a
@@ -48,15 +49,17 @@ COPY --from=quickder /usr/local/share/doc/quick-der/ /usr/local/share/doc/quick-
 # Need to have rsyslogd running
 #WONTBERUN# RUN update-rc.d rsyslog enable
 
-# Install TLS Pool
-ADD https://github.com/arpa2/tlspool/archive/0.9.2.tar.gz /root/tlspool-0.9.2.tar.gz
-# ADD dockerdemo.0.patch /root/dockerdemo.0.patch
+# Create an account for the TLS Pool
 RUN useradd tlspool
-RUN cd /usr/local/src && tar -xzvf /root/tlspool-0.9.2.tar.gz && cd tlspool-0.9.2 # && patch -p1 < /root/dockerdemo.0.patch
-# run cd /usr/local/src && git clone https://github.com/arpa2/tlspool tlspool-0.9.2
-RUN cd /usr/local/src/tlspool-0.9.2 && make -C lib/python clean && mkdir build && cd build && cmake .. && make all test install
-#OVERRULED_BELOW# RUN cp /usr/local/src/tlspool-0.9.2/etc/tlspool.conf /etc/tlspool.conf
-RUN cp /usr/local/src/tlspool-0.9.2/etc/root.key /etc/dnsroot-tlspool
+
+# Install TLS Pool
+ADD https://github.com/arpa2/tlspool/archive/0.9.3.tar.gz /root/tlspool-0.9.3.tar.gz
+RUN cd /usr/local/src && tar -xzvf /root/tlspool-0.9.3.tar.gz && cd tlspool-0.9.3
+#ALT# RUN git clone -b master https://github.com/arpa2/tlspool/ /usr/local/src/tlspool-0.9.3
+# run cd /usr/local/src && git clone https://github.com/arpa2/tlspool tlspool-0.9.3
+RUN cd /usr/local/src/tlspool-0.9.3 && make -C lib/python clean && mkdir build && cd build && cmake -D TEST_UNDER_TLSPOOL:BOOL=ON -D CMAKE_INSTALL_PREFIX:PATH=/ .. && make all install
+#OVERRULED_BELOW# RUN cp /usr/local/src/tlspool-0.9.3/etc/tlspool.conf /etc/tlspool.conf
+RUN cp /usr/local/src/tlspool-0.9.3/etc/root.key /etc/dnsroot-tlspool
 
 # Setup SoftHSM2 (includes creating missing directory)
 RUN chmod ugo+rx /etc/softhsm && chmod ugo+r /etc/softhsm/softhsm2.conf
@@ -66,17 +69,21 @@ RUN su -c 'softhsm2-util --init-token --free --label TLS_Pool_dev_data --so-pin=
 #FROMDEB# RUN softhsm2-util --init-token --free --label 'TLS_Pool_dev_data' --so-pin=sekreet --pin=1234
 
 # Setup TLS Pool testdata
-#GITDIDIT# RUN cd /usr/local/src/tlspool-0.9.2/testdata && sed -i -e 's+^pkcs11_path .*$+pkcs11_path /usr/lib/softhsm/libsofthsm2.so+' ../etc/tlspool.conf
-#SU-NOW-IN-INIT# RUN cd /usr/local/src/tlspool-0.9.2/testdata && chown tlspool . && ( su -c 'TOOLDIR=../build/tool make all' tlspool || su -c 'TOOLDIR=../build/tool make all' tlspool )
-#NOTNEEDED# RUN sed -i -e 's/^RSABITS=2048/RSABITS=4096/g' /usr/local/src/tlspool-0.9.2/testdata/Makefile
-RUN cd /usr/local/src/tlspool-0.9.2/testdata && chown -R tlspool . && ( su -c 'TOOLDIR=../build/tool make all' tlspool || su -c 'TOOLDIR=../build/tool make all' tlspool )
+RUN mkdir -p /var/db/tlspool && chown tlspool /var/db/tlspool
+#GITDIDIT# RUN cd /usr/local/src/tlspool-0.9.3/testdata && sed -i -e 's+^pkcs11_path .*$+pkcs11_path /usr/lib/softhsm/libsofthsm2.so+' ../etc/tlspool.conf
+#SU-NOW-IN-INIT# RUN cd /usr/local/src/tlspool-0.9.3/testdata && chown tlspool . && ( su -c 'TOOLDIR=../build/tool make all' tlspool || su -c 'TOOLDIR=../build/tool make all' tlspool )
+#NOTNEEDED# RUN sed -i -e 's/^RSABITS=2048/RSABITS=4096/g' /usr/local/src/tlspool-0.9.3/testdata/Makefile
+RUN cd /usr/local/src/tlspool-0.9.3/testdata && chown -R tlspool . && ( su -c 'TOOLDIR=../build/tool make all' tlspool || su -c 'TOOLDIR=../build/tool make all' tlspool ) && ( su -c 'cp -pir ../testdata/* /var/db/tlspool/' tlspool )
 #NOMORE# RUN chown -R tlspool /var/lib/softhsm/tokens/*
-# RUN  cd /usr/local/src/tlspool-0.9.2/testdata \
+# RUN  cd /usr/local/src/tlspool-0.9.3/testdata \
 # 	&& sed -i -e 's+^pkcs11_path .*$+pkcs11_path /usr/lib/softhsm/libsofthsm2.so+' ../etc/tlspool.conf \
 # 	&& make install
-RUN sed < /usr/local/src/tlspool-0.9.2/etc/tlspool.conf > /etc/tlspool.conf -E -e '/^db_/p' -e '/^db_/d' -e 's+ (file:)?\.\./+ \1/usr/local/src/tlspool-0.9.2/+' -e 's+^dnssec_rootkey .*+dnssec_rootkey /etc/dnsroot-tlspool+'
+#NOMORE# RUN sed < /usr/local/src/tlspool-0.9.3/etc/tlspool.conf > /etc/tlspool.conf -E -e '/^db_/p' -e '/^db_/d' -e 's+ (file:)?\.\./+ \1/usr/local/src/tlspool-0.9.3/+' -e 's+^dnssec_rootkey .*+dnssec_rootkey /etc/dnsroot-tlspool+'
 COPY tlspool.sh /tlspool.sh
 COPY README.MD /TLS_Pool.md
+
+# Run TLS Pool tests -- TODO -- needs rsyslogd and tlspool-daemon running
+# RUN cd /usr/local/src/tlspool-0.9.3/build && ln -s Testing/Temporary/LastTest.log /tmp/lastlog && ctest || ctest --rerun-failed
 
 # Make sure all libraries can be found (including libquickder which was copied)
 RUN ldconfig
