@@ -16,15 +16,10 @@ is blacklisted.
 is abandoned.
 
 
-## Create the demo image
-From the project root, run:
+## Pull and run the demo image
 ```sh
-make demo-a2aclmilter
-```
-
-## Create a new container and run the demo
-```sh
-docker run -it demo-a2aclmilter bash
+docker pull arpa2/demo-a2aclmilter
+docker run -ti arpa2/demo-a2aclmilter bash
 
 # Start logging and postfix
 service rsyslog start && service postfix start
