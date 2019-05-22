@@ -31,7 +31,7 @@ RUN apt-get install -y dumb-init runit ca-certificates krb5-user openldap-utils 
 
 RUN ln -s /bin/nano /usr/bin/vi
 
-RUN ln -s /usr/bin/python2.7 /usr/bin/python
+RUN ln -fs /usr/bin/python2.7 /usr/bin/python
 # RUN ln -s /usr/bin/python3 /usr/bin/python
 
 ADD sharetty /usr/bin/sharetty
