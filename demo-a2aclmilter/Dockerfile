@@ -2,20 +2,13 @@
 #
 # In this container you can test the milter with an ACL policy file.
 
-FROM arpa2/base
+FROM arpa2/build-bin
 
-RUN apt-get update && apt-get install -y \
-	man \
-	gcc \
-	cmake \
-	rsyslog \
-	git \
-	nvi \
-	tmux
-
-COPY README.md /
+COPY README.md /A2ACLMILTER.md
 
 COPY .bashrc /root
+
+RUN apt-get install -y liblmdb-dev
 
 RUN cd /usr/local/src && \
 	git clone https://github.com/arpa2/libarpa2service.git && \
