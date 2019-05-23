@@ -13,13 +13,10 @@ RUN \
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get install -y qemu-system-arm
+RUN apt-get install -y qemu-system-arm wget libarchive-tools
 
-ADD https://github.com/dhruvvyas90/qemu-rpi-kernel/blob/master/kernel-qemu-4.4.34-jessie?raw=true /root/kernel-qemu-4.4.34-jessie.bzImage
-
-ADD https://downloads.raspberrypi.org/raspbian_full_latest /root/raspbian.img
-
-RUN fdisk -l /root/raspbian.img
+ADD https://github.com/dhruvvyas90/qemu-rpi-kernel/blob/master/kernel-qemu-4.14.79-stretch?raw=true /root/kernel-qemu-4.14.79-stretch
+ADD https://github.com/dhruvvyas90/qemu-rpi-kernel/blob/master/versatile-pb.dtb?raw=true /root/versatile-pb.dtb
 
 ENV QEMU_AUDIO_DRV=none
 

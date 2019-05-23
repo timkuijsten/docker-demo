@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ -r /root/raspbian-image/2019-04-08-raspbian-stretch-full.img ]; then
+	echo 'Raspbian image already installed'
+else
+	MB_FREE=$(df -m / | cut -c 12-24 | grep -v block)
+	echo "Free space: $MB_FREE MB"
+
+	if [ ${MB_FREE:-0} -lt 8000 -a -z "$MB_WAIVER" ]
+	then
+		echo > /dev/stderr 'You need 5 GB and have less than 8 GB -- let us not do this now'
+		echo > /dev/stderr 'Set MB_WAIVER to override this check'
+		exit 1
+	fi
+
+	echo 'Proceeding to Raspbian download and installation'
+
+	cd /root/raspbian-image
+	wget -qO- https://downloads.raspberrypi.org/raspbian_full_latest | bsdtar -xvf-
+fi
