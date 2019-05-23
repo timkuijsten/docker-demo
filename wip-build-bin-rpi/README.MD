@@ -8,11 +8,14 @@
 
 
 # In the Docker, run:
-# 
-# qemu-system-arm -kernel /root/kernel-qemu-4.4.34-jessie.img -cpu arm1176 -m 256 -M versatilepb -serial stdio -display none -append "root=/dev/sda2 rootfstype=ext4 rw" -hda /root/raspbian.img -redir tcp:5022::22 -no-reboot
-#
-# This will start, rattle about audio setup trouble, and emit its swan song:
-#
-# Uncompressing Linux... done, booting the kernel.
+ 
+```
+qemu-system-arm -kernel /root/kernel-qemu-4.4.34-jessie.img -cpu arm1176 -m 256 -M versatilepb -serial stdio -display none -append "root=/dev/sda2 rootfstype=ext4 rw" -hda /root/raspbian.img -redir tcp:5022::22 -no-reboot
+```
 
-# After this, it is stuck.  Forever and ever, amen.
+This will start, rattle about audio setup trouble, and emit its swan song:
+```
+Uncompressing Linux... done, booting the kernel.
+```
+
+After this, it is stuck.  Forever and ever, amen.
