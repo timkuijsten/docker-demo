@@ -1,6 +1,8 @@
 #!/bin/bash
 
-if [ -r /root/raspbian-image/2019-04-08-raspbian-stretch-full.img ]; then
+RASPBIANSZ=${RASPBIANSZ:-lite}
+
+if [ -r /root/raspbian-image/2019-04-08-raspbian-stretch-${RASPBIANSZ}.img ]; then
 	echo 'Raspbian image already installed'
 else
 	MB_FREE=$(df -m / | cut -c 12-24 | grep -v block)
@@ -16,5 +18,7 @@ else
 	echo 'Proceeding to Raspbian download and installation'
 
 	cd /root/raspbian-image
-	wget -qO- https://downloads.raspberrypi.org/raspbian_full_latest | bsdtar -xvf-
+	wget -qO- https://downloads.raspberrypi.org/raspbian_${RASPBIANSZ}_latest | bsdtar -xvf-
 fi
+
+echo "Raspbian ${RASPBIANSZ} image should now be ready for use"

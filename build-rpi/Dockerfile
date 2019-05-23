@@ -13,7 +13,7 @@ RUN \
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get install -y qemu-system-arm wget libarchive-tools
+RUN apt-get install -y qemu-system-arm wget libarchive-tools ssh
 
 ADD https://github.com/dhruvvyas90/qemu-rpi-kernel/blob/master/kernel-qemu-4.14.79-stretch?raw=true /root/kernel-qemu-4.14.79-stretch
 ADD https://github.com/dhruvvyas90/qemu-rpi-kernel/blob/master/versatile-pb.dtb?raw=true /root/versatile-pb.dtb
@@ -29,3 +29,4 @@ CMD ["/bin/bash"]
 
 #RUNIT# Use runit-docker as the entrypoint
 #RUNIT# ENTRYPOINT ["/sbin/runit-docker"]
+ENTRYPOINT [ ]

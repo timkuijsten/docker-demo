@@ -1,0 +1,10 @@
+#!/bin/sh
+
+docker run --name rpi0 --rm --mount src=raspbian-image,dst=/root/raspbian-image -t -d build-rpi
+
+# copy files to /tmp of docker
+docker cp setup-docker-volume/install-raspbian-image rpi0:/tmp
+docker exec -t rpi0 /tmp/install-raspbian-image
+
+# stop container 
+docker stop rpi0
