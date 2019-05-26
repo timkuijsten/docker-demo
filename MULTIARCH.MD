@@ -143,3 +143,17 @@ armhf#  objdump -D lib/libkip.a | sed '/kipdata_random/,$!d' | head -n 10
 
 
 Maybe KIP should be ported to Z80 too?  Would be rather cool, to pass the data in and out via the ZX Spectrum tape interface.  Lacking any network, the separation of the secrets would be perfect :-D  Closer to home would be a variant based on LLC.
+
+
+## Relation to Docker Hub
+
+Docker may support foreign binaries on your desktop, it does not at Docker Hub.  This is not unfair; it takes a lot of extra compute time.  But it means that the usual tagging does not work; you will have to `docker push` the `armhf` binaries built locally.  Note that this implies that no `README.MD` is automatically added either.  The steps are:
+
+ 1. `docker build my-thingy`
+ 2. `docker tag xxxxxxxx my-thingy:latest`
+ 3. `docker run --rm -it my-thingy:latest bash`
+ 4. `docker tag my-thingy:latest arpa2/my-thingy:latest`
+ 5. `docker login`
+ 6. `docker push arpa2/my-thingy:latest`
+ 7. Edit `README.MD` on Docker Hub
+
