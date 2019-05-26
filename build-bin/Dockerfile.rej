@@ -1,0 +1,18 @@
+***************
+*** 26,33 ****
+  
+  ENV DEBIAN_FRONTEND=noninteractive
+  
+- RUN apt-get install -y python2.7 \
+- 	build-essential \
+  	git vim nano man tmux \
+  	flex bison \
+  	rsyslog strace gdb \
+--- 26,32 ----
+  
+  ENV DEBIAN_FRONTEND=noninteractive
+  
++ RUN apt-get install -y python2.7 build-essential \
+  	git vim nano man tmux \
+  	flex bison \
+  	rsyslog strace gdb \

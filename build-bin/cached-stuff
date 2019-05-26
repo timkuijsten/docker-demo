@@ -1,0 +1,18 @@
+ ---> a8b3e8c0b876
+Step 8/12 : RUN git clone https://github.com/arpa2/runit-docker /usr/local/src/runit-docker.git
+ ---> Running in f85fbad88fe5
+Cloning into '/usr/local/src/runit-docker.git'...
+Removing intermediate container f85fbad88fe5
+ ---> dd964cb8fb6a
+Step 9/12 : RUN make -C /usr/local/src/runit-docker.git install
+ ---> Running in c36a467a8550
+make: Entering directory '/usr/local/src/runit-docker.git'
+gcc -shared -std=c99 -Wall -O2 -fPIC -D_POSIX_SOURCE -D_GNU_SOURCE -ldl -o runit-docker.so runit-docker.c
+mkdir -p /sbin
+mkdir -p /lib
+install -m 755 runit-docker /sbin/
+install -m 755 runit-docker.so /lib/
+make: Leaving directory '/usr/local/src/runit-docker.git'
+Removing intermediate container c36a467a8550
+ ---> 6e5f448e08dd
+Successfully built 084a17567d2e

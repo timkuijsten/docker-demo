@@ -1,17 +1,26 @@
 # Dockerfile for ARPA2 build preparation (binutils)
 #
-# This is arpa2/buildphase-binutils -- an image based
+# TARGET PLATFORM: armhf (used on Raspberry Pi)
+# HOST   PLATFORM: amd64 or Docker's default
+#
+# This is arpa2/build-armhf -- an image based
 # on debian:stable via arpa2/base and enhanced with
 # software that we use to build ARPA2 binaries.
+# It uses the multiarch code to install development
+# programs with :armhf attached.  These target code
+# for those platforms.  Python too?  Yes, for its
+# production of library extensions we have to.
 #
 # Other layers can include this one as their basis,
 # do some building and restart with another FROM that
 # then copies from the build phase.  Tag this image
-# arpa2/buildphase-binutils to match with the FROM
-# of such preparing build phases.
+# arpa2/build-armhf to match with the FROM of such
+# preparing build phases.
 #
 # See:
 # https://docs.docker.com/develop/develop-images/multistage-build/
+# https://wiki.debian.org/Multiarch
+# https://wiki.debian.org/Multiarch/HOWTO
 #
 # From: Rick van Rein <rick@openfortress.nl>
 
@@ -21,18 +30,19 @@ FROM arpa2/base
 
 # Install required packages
 RUN \
+    dpkg --add-architecture armhf && \
     apt-get update && \
     apt-get -y upgrade
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get install -y python2.7 \
-	build-essential \
+RUN apt-get install -y python2.7:armhf \
+	gcc:armhf g++:armhf binutils:armhf make:armhf \
 	git vim nano man tmux \
 	flex bison \
-	rsyslog strace gdb \
-	cmake cmake-curses-gui pkg-config \
-	libldap-dev libsasl2-dev libkrb5-dev \
+	rsyslog strace gdb:armhf \
+	cmake cmake-curses-gui pkg-config:armhf \
+	libldap-dev:armhf libsasl2-dev:armhf libkrb5-dev:armhf \
 	runit
 	#TODO#libgnutls-dev
 

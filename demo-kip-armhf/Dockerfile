@@ -1,7 +1,8 @@
 
-FROM arpa2/build-bin
+# FROM arpa2/build-bin
+FROM arpa2/build-armhf
 
-RUN apt-get -y install libssl-dev libunbound-dev python-setuptools python-dev
+RUN apt-get -y install libssl-dev:armhf libunbound-dev:armhf python-setuptools:armhf python-dev:armhf
 
 RUN easy_install six pyparsing asn1ate
 
