@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+# find-in-docker: a "find" utility that spans over all Docker containers
+#
+# This can be useful if Docker has stopped all containers after a reboot,
+# and lack of tagging makes it difficult to establish what image holds
+# certain data.
+#
+# It does not matter if containers are running for any of the images.
+# New temporary containers will be started for the purposes of these
+# tests.
+#
+# Another assumption is that "find" is installed in all your containers.
+# This comes with all its power, including "-exec" facilitation.
+#
+# This is an example of how I used it to look for DEFAULT usage changes
+# made in an ASN.1 specification within the KIP project:
+#
+# fid / -name kip\* -exec grep -sr DEFAULT {}/asn1/kip-document.asn1 \;
+#
+# The command will be printed without the escapes, but that is okay.
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+fid() {
+	docker images | sed -E -e 1d -e 's/ +/ /g' | cut '-d ' -f 3 | \
+	while read IMAGE
+	do
+		echo $IMAGE -- find "$@"
+		docker run -t --rm $IMAGE find "$@"
+	done
+}
+
+fid "$@"
