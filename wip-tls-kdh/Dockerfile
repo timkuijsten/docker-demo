@@ -9,7 +9,7 @@ FROM arpa2/build-bin
 
 LABEL net.arpa2.project="tls-kdh"
 
-# Install the required packages from the official repos
+## Install the required packages from the official repos
 RUN apt update && apt install -y \
     autoconf \
     autogen \
@@ -26,15 +26,17 @@ RUN apt update && apt install -y \
     guile-2.0-dev \
     libidn2-0-dev \
     libp11-kit-dev \
-    libtasn1-6-dev \    
-    libtool \    
+    libtasn1-6-dev \
+    libtool \
     libtspi-dev \
     libunbound-dev \
     libunistring-dev \
+    lzip \
     nettle-dev \
-    wget  
+    wget
 
-# Install packages that we have to build ourselves 
+## Install packages that we have to build ourselves 
+# libnettle
 RUN cd tmp \
  && curl https://ftp.gnu.org/gnu/nettle/nettle-3.4.1.tar.gz | tar -zx \
  && cd nettle-3.4.1/ \
@@ -43,7 +45,16 @@ RUN cd tmp \
  && make check \
  && make install
 
-# Retrieve, build and install the latest stabel tls-kdh source
+# libidn2
+RUN cd tmp \
+ && curl https://ftp.gnu.org/gnu/libidn/libidn2-2.2.0.tar.lz | tar --lzip -xv \
+ && cd libidn2-2.2.0/ \
+ && ./configure \
+ && make \
+ && make check \
+ && make install
+
+## Retrieve, build and install the latest stable tls-kdh source
 RUN cd tmp \
  && git clone --single-branch --branch tls-kdh12 https://gitlab.com/Vrancken/gnutls.git \
  && cd gnutls \
