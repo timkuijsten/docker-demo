@@ -36,12 +36,12 @@ RUN \
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get install -y python2.7:armhf \
+RUN apt-get install -y python2.7-minimal:armhf python-setuptools:armhf python-pkg-resources:armhf \
 	gcc:armhf g++:armhf binutils:armhf make:armhf \
 	git vim nano man tmux \
 	flex bison \
 	rsyslog strace gdb:armhf \
-	cmake cmake-curses-gui pkg-config:armhf \
+	cmake cmake-curses-gui pkg-config \
 	libldap-dev:armhf libsasl2-dev:armhf libkrb5-dev:armhf \
 	runit
 	#TODO#libgnutls-dev
