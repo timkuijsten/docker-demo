@@ -15,7 +15,7 @@
 
 # Prepare setuptools for import
 #
-FROM arpa2/build-pip AS pip
+#UNUSED# FROM arpa2/build-pip AS pip
 
 
 # Build on top of the ARPA2 build base image
@@ -32,11 +32,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install dependencies
 # RUN apt-get install -y libdb5.3-dev libgnutls28-dev gnutls-bin libldns-dev
 RUN apt-get install -y \
-	python-pyparsing python-six \
+	python3-pyparsing python3-six \
 	gperf
 
-COPY --from=pip /usr/lib/python2.7/dist-packages/setuptools/ /usr/lib/python2.7/dist-packages/setuptools
-COPY --from=pip /usr/lib/python2.7/dist-packages/pkg_resources/ /usr/lib/python2.7/dist-packages/pkg_resources
+#UNUSED# COPY --from=pip /usr/lib/python3.7/dist-packages/setuptools/ /usr/lib/python3.7/dist-packages/setuptools
+#UNUSED# COPY --from=pip /usr/lib/python3.7/dist-packages/pkg_resources/ /usr/lib/python3.7/dist-packages/pkg_resources
 
 # Install asn1ate
 ADD https://github.com/kimgr/asn1ate/archive/v0.6.tar.gz /root/asn1ate-v0.6.tar.gz
@@ -49,7 +49,7 @@ RUN cd /usr/local/src && tar -xzvf /root/quick-der-version-1.3.0.tar.gz
 #TODO#PYTHON#SETUP#INCOMPATIBLE#CHANGES# RUN cd /usr/local/src/quick-der-version-1.3.0 && mkdir build && cd build && cmake .. && make all test install
 RUN cd /usr/local/src/quick-der-version-1.3.0 && mkdir build && cd build && cmake .. && make all install
 #TODO# Ugly direct copy:
-RUN cd /usr/local/src/quick-der-version-1.3.0 && cp python/scripts/* /usr/local/bin && cp -r python/quick_der /usr/local/lib/python2.7/dist-packages/quick_der
+RUN cd /usr/local/src/quick-der-version-1.3.0 && cp python/scripts/* /usr/local/bin && cp -r python/quick_der /usr/local/lib/python3.7/dist-packages/quick_der
 
 # Install hexio -- TODO: Temporary branch with experimental derdump.quickder
 RUN cd /usr/local/src ; git clone -b quick-derdump --single-branch \
