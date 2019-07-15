@@ -26,21 +26,23 @@ RUN \
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get install -y python2.7 python-pip
+RUN apt-get install -y python3 python3-pip
+
+RUN ln -s /usr/bin/pip3 /usr/bin/pip
 
 RUN pip install gnureadline colored
 
 # Sigh.  Work around zeal of GNU licensing.  Not perfect.
 COPY arpa2gnu /usr/bin/arpa2gnu
-RUN base64 /usr/local/lib/python2.7/dist-packages/gnureadline.so >> /usr/bin/arpa2gnu
+RUN base64 /usr/local/lib/python3*/dist-packages/gnureadline*.so >> /usr/bin/arpa2gnu
 RUN echo EOF >> /usr/bin/arpa2gnu
-RUN rm /usr/local/lib/python2.7/dist-packages/gnureadline.so
+RUN rm /usr/local/lib/python3*/dist-packages/gnureadline*.so
 
 COPY arpa2kinit /usr/bin/arpa2kinit
 
 # Environment variables $PYTHON and $PIP
-ENV PYTHON=python
-ENV PIP=pip
+ENV PYTHON=python3
+ENV PIP=pip3
 
 
 # Define default command

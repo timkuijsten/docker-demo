@@ -36,8 +36,6 @@ RUN apt-get install -y \
 	runit
 	#TODO#libgnutls-dev
 
-#NOMORE# RUN rm -f /usr/bin/python ; ln -s `which python3` /usr/bin/python
-
 # Install ARPA2CM
 ADD https://github.com/arpa2/arpa2cm/archive/version-0.5.tar.gz /root/arpa2cm-version-0.5.tar.gz
 RUN cd /usr/local/src && tar -xzvf /root/arpa2cm-version-0.5.tar.gz
