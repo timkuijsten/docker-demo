@@ -26,7 +26,7 @@ RUN \
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get install -y python2.7 python-setuptools \
+RUN apt-get install -y \
 	build-essential \
 	git vim nano man tmux \
 	flex bison \
@@ -35,6 +35,8 @@ RUN apt-get install -y python2.7 python-setuptools \
 	libldap-dev libsasl2-dev libkrb5-dev \
 	runit
 	#TODO#libgnutls-dev
+
+#NOMORE# RUN rm -f /usr/bin/python ; ln -s `which python3` /usr/bin/python
 
 # Install ARPA2CM
 ADD https://github.com/arpa2/arpa2cm/archive/version-0.5.tar.gz /root/arpa2cm-version-0.5.tar.gz
