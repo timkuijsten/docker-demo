@@ -56,7 +56,7 @@ RUN cd /usr/local/src \
 
 ## Retrieve, build and install the latest stable tls-kdh source
 RUN cd /usr/local/src \
- && git clone --single-branch --branch tls-kdh12 https://gitlab.com/Vrancken/gnutls.git \
+ && git clone --single-branch --branch tls-kdh https://gitlab.com/Vrancken/gnutls.git \
  && cd gnutls \
  && ./bootstrap \
  && ./configure --disable-doc --disable-guile \
