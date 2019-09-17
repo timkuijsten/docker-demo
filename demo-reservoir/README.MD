@@ -409,7 +409,6 @@ dn: resourceInstance=bcc718d8-a25f-4580-8259-2cdb7af20e92,associatedDomain=orv
 resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
 resourceInstance: bcc718d8-a25f-4580-8259-2cdb7af20e92
 accessControlList: 999 %wr demo@orvelte.nep
-accessControlList: %w smid@orvelte.nep %k @orvelte.nep
 accessControlList: 0 %w smid@orvelte.nep %k @orvelte.nep
 
 # search result
