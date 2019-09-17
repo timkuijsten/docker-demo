@@ -1,0 +1,67 @@
+# Reservoir is a domain service, located under the ServiceDIT.
+# It is normally provided by the identity hosting provider, as
+# part of a storage back bone that can be used by various services.
+#
+# Reservoir can hold personal Resource Collections, as well as ones
+# written out by plugin services, for instance as backup.
+#
+# Resource Collections can be pointed at by way of their UUID,
+# in "reservoir" attributes on any "reservoirObject" object.
+# Following the UUID can be a space and a description for human
+# consumption.  The UUID need only be shown to the user if the
+# description is ambiguous (meaning, not locally unique).
+#
+# Any public access to Reservoir must be explicitly exported if it
+# is to appear as LDAP repository.  Access control must then be
+# arranged with care, especially for nested access.  It is however
+# quite possible to reflect hierarchical paths in LDAP, just like
+# it is done for WebDAV.
+#
+dn: ou=Reservoir,o=arpa2.org,ou=ServiceDIT
+objectclass: organizationalUnit
+objectclass: labeledURIObject
+description: Reservoir stores metadata in LDAP, referencing objects in Riak KV
+ou: Reservoir
+labeledURI: http://reservoir.arpa2.net ARPA2 project description for Reservoir
+
+# The node with the client domain
+#
+dn: associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.org,ou=ServiceDIT
+objectclass: organization
+objectclass: domainRelatedObject
+o: Orvelte, maar dan Nep
+associatedDomain: orvelte.nep
+
+# The node heading the entire Reservoir.
+# This node and anything below may be exported (at another DN).
+#
+dn: ou=Reservoir,associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.org,ou=ServiceDIT
+objectclass: organizationalUnit
+objectclass: resourceClass
+ou: Reservoir
+resourceClassUUID: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+
+# An example node of a Resource Collection.
+#
+dn: resourceInstanceKey=8b161292-6f9f-46f8-b820-fbecb7a60d1e,ou=Reservoir,associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.org,ou=ServiceDIT
+objectclass: documentSeries
+objectclass: resourceInstance
+resourceClassUUID: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstanceKey: 8b161292-6f9f-46f8-b820-fbecb7a60d1e
+cn: Exampe of a Resource Collection
+description: Added this from an LDIF file, to have something to play with
+
+# An example object in the example node of a Resource Collection 
+dn: documentIdentifier=2b4b7845-57f7-43b6-b716-fdae37b27853,resourceInstanceKey=8b161292-6f9f-46f8-b820-fbecb7a60d1e,ou=Reservoir,associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.org,ou=ServiceDIT
+objectclass: document
+documentIdentifier: 2b4b7845-57f7-43b6-b716-fdae37b27853
+cn: Just something that got stuck here
+documentPublisher: Rick, going once
+
+# Another example object in the example node of a Resource Collection 
+dn: documentIdentifier=660684e7-2131-4a86-a736-a6112b1bbd5e,resourceInstanceKey=8b161292-6f9f-46f8-b820-fbecb7a60d1e,ou=Reservoir,associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.org,ou=ServiceDIT
+objectclass: document
+documentIdentifier: 660684e7-2131-4a86-a736-a6112b1bbd5e
+cn: Just something else that got stuck here
+documentPublisher: Rick, going twice
+

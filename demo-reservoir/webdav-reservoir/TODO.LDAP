@@ -1,0 +1,17 @@
+
+ + Add reservoir attribute type
+ + Add reservoirNode object class
+ + Add lockedBy attribute type
+ + Add lockableObject object class
+
+ + Some time later, we shall add remote references too.
+ + Having an sftp:// URI scheme will be important for that.
+
+
+In a2reservoir:
+
+ + Drop 2nd level ou=Reservoir -- it has no contents and need not be stored
+ + Rename attrs in DN to the subclassed, nicer ones
+ + Add the mediaType value
+ * Allow metadata edits
+ + Add the reservoirIndex to reservoirCollection
