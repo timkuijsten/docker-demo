@@ -192,7 +192,7 @@ def cmd_collection_add (domain, collname):
 		('rescls', reservoir_uuid),
 		('resins', colluuid),
 		('cn', collname),
-		('accessControlList', [ str ('999 %wr ' + whoami_uid + '@' + domain) ] )
+		('accessControlList', [ str ('999 %wr ' + whoami_uid + '@' + whoami_dom) ] )
 	]
 	print ('adding', dn1)
 	dap.add_s (dn1, at1)
