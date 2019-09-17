@@ -8,7 +8,7 @@
 #
 # The software in this image is mostly OpenLDAP, hosting a tree
 # under ou=IdentityHub,o=arpa2.net,ou=InternetWide.  It also
-# reveals this host through web2ldap.
+# reveals this host through web2ldap.  TODO: web2ldap is not yet Py3
 #
 # This image should grow to extract ACL data, and add them to
 # and remove them from key->value database entries.  And to
@@ -24,14 +24,7 @@
 
 ### First stage: Setup Python support
 #
-FROM arpa2/build-pip AS pip
-
-#TEST#JSON#VARIANT# RUN pip install cmdparser python-ldap web2ldap
-RUN pip install python-ldap web2ldap
-
-RUN cd /usr/local/src ; git clone https://github.com/arpa2/arpa2shell-cmdparser cmdparser.git
-
-RUN cd /usr/local/src/cmdparser.git/cmdparser ; python setup.py install
+#PIP2EASYINSTALL# FROM arpa2/build-pip AS pip
 
 
 
@@ -41,28 +34,33 @@ FROM arpa2/base
 
 COPY README.MD		/IdentityHub.md
 
-COPY --from=pip /usr/local/lib/python2.7/dist-packages /usr/local/lib/python2.7/dist-packages
-
-RUN apt-get update && apt-get -y upgrade
+#PIP2EASYINSTALL# COPY --from=pip /usr/local/lib/python3.7/dist-packages /usr/local/lib/python3.7/dist-packages
 
 RUN DEBIAN_FRONTEND=noninteractive SLAPD_PASSWORD=sekreet \
 	apt-get install --no-install-recommends -y \
-	slapd libsasl2-modules-gssapi-mit
+	slapd libsasl2-modules-gssapi-mit python3-setuptools
 
 
 COPY identityhub.sh /usr/bin/identityhub.sh
 COPY initial.ldif /root/initial.ldif
 
-COPY arpa2id.py /usr/local/lib/python2.7/dist-packages/arpa2identityhub.py
-RUN ln -s /usr/local/lib/python2.7/dist-packages/arpa2identityhub.py /usr/bin/arpa2identityhub
-COPY --from=pip /usr/bin/arpa2kinit /usr/bin/arpa2kinit
-COPY --from=pip /usr/bin/arpa2gnu /usr/bin/arpa2gnu
+RUN python3 /usr/lib/python3/dist-packages/easy_install.py python3-ldap #TODO:AWAIT:PY3#web2ldap
+
+#TODO:BUILD# RUN cd /usr/local/src ; git clone https://github.com/arpa2/arpa2shell-cmdparser cmdparser.git
+#TODO:BUILD# RUN cd /usr/local/src/cmdparser.git/cmdparser ; python setup.py install
+
+COPY arpa2id.py /usr/local/lib/python3.7/dist-packages/arpa2identityhub.py
+COPY arpa2acl.py /usr/local/lib/python3.7/dist-packages/arpa2acl.py
+RUN ln -s /usr/local/lib/python3.7/dist-packages/arpa2identityhub.py /usr/bin/arpa2identityhub
+RUN ln -s /usr/local/lib/python3.7/dist-packages/arpa2acl.py /usr/bin/arpa2acl
+COPY arpa2kinit /usr/bin/arpa2kinit
+COPY arpa2gnu   /usr/bin/arpa2gnu
 
 COPY schema/*		/etc/ldap/schema/
 RUN rm -rf /etc/ldap/slapd.d
 COPY slapd.conf		/etc/ldap/slapd.conf
 COPY ldap.conf		/etc/ldap/ldap.conf
-COPY etc/web2ldap	/etc/web2ldap/
+#TODO:AWAIT:PY3# COPY etc/web2ldap	/etc/web2ldap/
 COPY slapd.keytab	/etc/krb5.keytab
 
 RUN chmod go+r          /etc/krb5.keytab

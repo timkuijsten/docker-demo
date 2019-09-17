@@ -130,7 +130,7 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.7
 # This attribute is a good candidate for equality indexing.
 #
 attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.8
-        NAME 'resourceClass' 'resourceClassUUID' 'rescls'
+        NAME ( 'resourceClass' 'resourceClassUUID' 'rescls' )
         DESC 'The UUID value for a resource class'
 	EQUALITY uuidMatch
 	ORDERING uuidOrderingMatch
@@ -145,7 +145,7 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.8
 # candidate for equality indexing.
 #
 attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.9
-        NAME 'resourceInstance' 'resourceInstanceKey' 'resins'
+        NAME ( 'resourceInstance' 'resourceInstanceKey' 'resins' )
         DESC 'The binary key for a resource instance'
 	EQUALITY octetStringMatch
 	ORDERING octetStringOrderingMatch
@@ -316,7 +316,7 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.22
 # corresponding resourceClass is known in the context).
 #
 objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.28
-	NAME 'resourceControlledChildObject' 'aclchild'
+	NAME ( 'resourceControlledChildObject' 'aclchild' )
 	DESC 'A child object inheriting settings such as ACL from the direct parent accessControlledObject'
 	AUXILIARY )
 
