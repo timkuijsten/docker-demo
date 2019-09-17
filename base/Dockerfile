@@ -26,7 +26,8 @@ ADD krb5.conf /etc/krb5.conf
 # ADD selections.debconf /tmp/selections.debconf
 # RUN debconf-set-selections /tmp/selections.debconf
 
-RUN apt-get install -y dumb-init runit ca-certificates krb5-user openldap-utils ldapvi nano procps less lrzsz net-tools netcat python3 python3-setuptools
+#NO_MORE_INIT# RUN apt-get install -y dumb-init runit ca-certificates krb5-user openldap-utils ldapvi nano procps less lrzsz net-tools netcat python3 python3-setuptools
+RUN apt-get install -y ca-certificates krb5-user openldap-utils ldapvi nano procps less lrzsz net-tools netcat python3 python3-setuptools
 
 RUN ln -s /bin/nano        /usr/bin/vi && \
     ln -s /usr/bin/python3 /usr/bin/python
@@ -62,5 +63,5 @@ COPY vimrc /root/.vimrc
 
 # Define default entry point via dumb-init
 # ENTRYPOINT [ "/usr/bin/dumb-init", "-v", "--" ]
-ENTRYPOINT [ "/usr/bin/dumb-init", "--" ]
-#STUCK-PITTY# ENTRYPOINT [ "/sbin/runit-init" ]
+#NO_MORE_INIT# ENTRYPOINT [ "/usr/bin/dumb-init", "--" ]
+#NO_MORE_INIT# #STUCK-PITTY# ENTRYPOINT [ "/sbin/runit-init" ]

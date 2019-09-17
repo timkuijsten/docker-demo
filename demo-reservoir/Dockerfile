@@ -11,14 +11,11 @@
 #
 # Install Python dependencies for Reservoir
 
-FROM arpa2/build-pip AS pip
+#PIP2EASYINSTALL# FROM arpa2/build-pip AS pip
 
 #TEST#JSON#VARIANT# RUN pip install cmdparser python-ldap riak six
-RUN pip install python-ldap riak six
 
-RUN cd /usr/local/src ; git clone https://github.com/arpa2/arpa2shell-cmdparser cmdparser.git
-
-RUN cd /usr/local/src/cmdparser.git/cmdparser ; python setup.py install
+#PIP2EASYINSTALL# RUN pip install python-ldap riak six
 
 
 ### Prepare: Build Riak KV from source
@@ -120,18 +117,12 @@ FROM arpa2/base
 
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get install --no-install-recommends -y \
-	openssl logrotate sudo
+	openssl logrotate sudo libncurses5 libtinfo5
 
-#TRY_TIOT_JP# COPY riak_*_amd64.deb /root
-#TRY_TIOT_JP# RUN ( dpkg -i --force-depends /root/riak_*_amd64.deb || /bin/true )
+RUN python3 /usr/lib/python3/dist-packages/easy_install.py python3-ldap riak six #TODO:AWAIT:PY3#web2ldap
 
-ADD https://files.tiot.jp/riak/kv/2.2/2.2.6/debian/9/riak_2.2.6-1_amd64.deb /root/riak_2.2.6-1_amd64.deb
-RUN dpkg -i /root/riak_2.2.6-1_amd64.deb
-
-#SATISFIED-DEPENDENCY# # Upgrade Riak KV dependency on libssl1.0.0 to Debian Stable libssl1.0.2l+
-#SATISFIED-DEPENDENCY# RUN grep libssl1.0.0 /var/lib/dpkg/status
-#SATISFIED-DEPENDENCY# RUN sed -i -e 's+libssl1\.0\.0 (>= 1\.0\.0)+libssl1.0.2 (>= 1.0.2l)+' /var/lib/dpkg/status
-#SATISFIED-DEPENDENCY# #WILLNOWFAIL!# RUN grep libssl1.0.0 /var/lib/dpkg/status
+#TODO:BUILD# RUN cd /usr/local/src ; git clone https://github.com/arpa2/arpa2shell-cmdparser cmdparser.git
+#TODO:BUILD# RUN cd /usr/local/src/cmdparser.git/cmdparser ; python setup.py install
 
 
 
@@ -155,6 +146,24 @@ RUN chmod go+r /etc/krb5.keytab
 #RATHER #RUN chown opldap:openldap /etc/ldap/slapd.keytab
 
 
+# Install Riak KV -- which is really quite broken in terms of dependencies :'-(
+#
+
+#TRY_TIOT_JP# COPY riak_*_amd64.deb /root
+#TRY_TIOT_JP# RUN ( dpkg -i --force-depends /root/riak_*_amd64.deb || /bin/true )
+
+# ADD https://files.tiot.jp/riak/kv/2.2/2.2.6/debian/9/riak_2.2.6-1_amd64.deb /root/riak_2.2.6-1_amd64.deb
+# RUN dpkg -i /root/riak_2.2.6-1_amd64.deb
+
+ADD https://files-source.tiot.jp/riak/kv/2.9/2.9.0p4/debian/9/riak_2.9.0p4-1_amd64.deb /root/riak_2.9.0p4-1_amd64.deb
+RUN dpkg --force-depends -i /root/riak_2.9.0p4-1_amd64.deb
+
+#SATISFIED-DEPENDENCY# # Upgrade Riak KV dependency on libssl1.0.0 to Debian Stable libssl1.0.2l+
+#SATISFIED-DEPENDENCY# RUN grep libssl1.0.0 /var/lib/dpkg/status
+#SATISFIED-DEPENDENCY# RUN sed -i -e 's+libssl1\.0\.0 (>= 1\.0\.0)+libssl1.0.2 (>= 1.0.2l)+' /var/lib/dpkg/status
+#SATISFIED-DEPENDENCY# #WILLNOWFAIL!# RUN grep libssl1.0.0 /var/lib/dpkg/status
+
+
 # Install operator's shells to play around with the Reservoir
 #
 
@@ -165,8 +174,8 @@ RUN ln -s /usr/local/lib/python2.7/dist-packages/arpa2reservoir.py /usr/bin/arpa
 COPY arpa2acl.py /usr/local/lib/python2.7/dist-packages/arpa2acl.py
 RUN ln -s /usr/local/lib/python2.7/dist-packages/arpa2acl.py /usr/bin/arpa2acl
 RUN chmod ugo+x /usr/bin/arpa2reservoir /usr/bin/arpa2acl
-COPY --from=pip /usr/bin/arpa2gnu /usr/bin/arpa2gnu
-COPY --from=pip /usr/bin/arpa2kinit /usr/bin/arpa2kinit
+COPY arpa2gnu /usr/bin/arpa2gnu
+COPY arpa2kinit /usr/bin/arpa2kinit
 
 
 # Install some Python extras
@@ -175,8 +184,8 @@ COPY --from=pip /usr/bin/arpa2kinit /usr/bin/arpa2kinit
 # COPY py/lib/python2.7/site-packages/ /usr/lib/python2.7/dist-packages/
 # COPY py/lib/python2.7/site-packages/ /site-packages/
 
-COPY --from=pip /usr/local/lib/python2.7/dist-packages/ /usr/local/lib/python2.7/dist-packages
-COPY --from=pip       /usr/lib/python2.7/dist-packages/       /usr/lib/python2.7/dist-packages
+#PIP2EASYINSTALL# COPY --from=pip /usr/local/lib/python2.7/dist-packages/ /usr/local/lib/python2.7/dist-packages
+#PIP2EASYINSTALL# COPY --from=pip       /usr/lib/python2.7/dist-packages/       /usr/lib/python2.7/dist-packages
 
 
 # Install the main script for the Reservoir service

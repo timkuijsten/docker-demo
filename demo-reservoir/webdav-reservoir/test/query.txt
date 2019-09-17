@@ -1,0 +1,31 @@
+
+
+shell$ ldapsearch -b ou=Reservoir,o=arpa2.org,ou=ServiceDIT -W -D uid=me -H ldapi://%2ftmp%2fldap-socket '(&(objectClass=accessControlledObject)(resourceClassUUID=904dfdb5-6b34-3818-b580-b9a0b4f7e7a9))' resourceInstanceKey
+
+# extended LDIF
+#
+# LDAPv3
+# base <ou=Reservoir,o=arpa2.org,ou=ServiceDIT> with scope subtree
+# filter: (&(objectClass=accessControlledObject)(resourceClassUUID=904dfdb5-6b34-3818-b580-b9a0b4f7e7a9))
+# requesting: resourceInstanceKey
+#
+
+# 0d66e17f-dd49-4df1-a576-d3befb857843, Reservoir, groengemak.nought, Reservo
+ ir, arpa2.org, ServiceDIT
+dn: resourceInstanceKey=0d66e17f-dd49-4df1-a576-d3befb857843,ou=Reservoir,asso
+ ciatedDomain=groengemak.nought,ou=Reservoir,o=arpa2.org,ou=ServiceDIT
+resourceInstanceKey: 0d66e17f-dd49-4df1-a576-d3befb857843
+
+# c8f988ce-6d1d-4d1c-9065-4ca1f3e7a066, Reservoir, groengemak.nought, Reservo
+ ir, arpa2.org, ServiceDIT
+dn: resourceInstanceKey=c8f988ce-6d1d-4d1c-9065-4ca1f3e7a066,ou=Reservoir,asso
+ ciatedDomain=groengemak.nought,ou=Reservoir,o=arpa2.org,ou=ServiceDIT
+resourceInstanceKey: c8f988ce-6d1d-4d1c-9065-4ca1f3e7a066
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 3
+# numEntries: 2
+

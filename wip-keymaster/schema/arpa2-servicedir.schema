@@ -123,14 +123,14 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.7
         DESC 'Reference to a member that we explicitly do not acknowledge in this group'
 	SUP uid )
 
-# resourceClassUUID describes what a resource looks like in
+# resourceClass describes what a resource looks like in
 # terms of a unique code.  Instances of resources may have
 # further identifiers in terms of a DoNAI.
 #
 # This attribute is a good candidate for equality indexing.
 #
 attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.8
-        NAME ( 'rescls' 'resourceClassUUID' )
+        NAME ( 'resourceClass' 'resourceClassUUID' 'rescls' )
         DESC 'The UUID value for a resource class'
 	EQUALITY uuidMatch
 	ORDERING uuidOrderingMatch
@@ -138,14 +138,14 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.8
 	SINGLE-VALUE )
 
 # resourceInstance describes an instance key, always
-# within the scope of a given resourceClassUUID.
+# within the scope of a given resourceClass.
 #
 # When used extensively to distinguish within any given
-# resourceClassUUID, this attribute may be an interesting
+# resourceClass, this attribute may be an interesting
 # candidate for equality indexing.
 #
 attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.9
-        NAME ( 'resins' 'resourceInstanceKey' )
+        NAME ( 'resourceInstance' 'resourceInstanceKey' 'resins' )
         DESC 'The binary key for a resource instance'
 	EQUALITY octetStringMatch
 	ORDERING octetStringOrderingMatch
@@ -188,34 +188,34 @@ objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.12
 	MAY ( uidAlias $ uidPseudonym $ uidGroup $ uidRole $ uidOccupant $ uidDecline $
 	      cn $ description $ labeledURI $ seeAlso ) )
 
-# resourceClass is attached to an object that describes a
-# resource class.  The additional attributes resourceClassUUID
+# resourceClassObjects are attached to objects that describe a
+# resource class.  The additional attributes resourceClass
 # holds an UUID that identifies an application statically.
 #
-# Very often, a resourceClass is an accessControlledObject,
+# Often, a resourceClassObject is an accessControlledObject,
 # but this is not required and certainly not enforced.
 #
 objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.15
-        NAME 'resourceClass'
+        NAME 'resourceClassObject'
         DESC 'A description of a resource class'
 	AUXILIARY
-	MUST ( resourceClassUUID )
+	MUST ( resourceClass )
         MAY ( cn $ description $ labeledURI $ seeAlso ) )
 
-# resourceInstance is attached to an object that describes a
-# resource instance.  The additional attribute resourceClassUUID
+# resourceInstanceObjects are attached to objects that describe
+# a resource instance.  The additional attribute resourceClass
 # holds an UUID that identifies an application statically, and
-# resourceInstanceKey holds an binary key that identifies a
-# possibly dynamic instance of the resource class.
+# the resourceInstance holds a key in a resource-class-specific
+# form that identifies a possibly dynamic instance thereof.
 #
-# Very often, a resourceInstance is an accessControlledObject,
+# Often, a resourceInstanceObject is an accessControlledObject,
 # but this is not required and certainly not enforced.
 #
 objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.16
-        NAME 'resourceInstance'
+        NAME 'resourceInstanceObject'
         DESC 'A description of a resource instance'
 	AUXILIARY
-	MUST ( resourceClassUUID $ resourceInstanceKey )
+	MUST ( resourceClass $ resourceInstance )
         MAY ( cn $ description $ labeledURI $ seeAlso ) )
 
 # resourceRequirement is a reference from an object to a
@@ -231,40 +231,41 @@ objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.17
         NAME 'resourceRequirement'
         DESC 'A link to a required resourceObject'
 	AUXILIARY
-	MUST ( resourceClassUUID )
-        MAY ( resourceInstanceKey ) )
+	MUST ( resourceClass )
+        MAY ( resourceInstance ) )
 
 
 # accessControlList describes a number of properties in a
-# whitspace-separated (space, tab, newline) string with each
-# word in one of these forms:
+# space separated string:
+#	lineno level[ selector...]
+# where lineno is a non-negative integer in decimal text
+# representation, indicating the desired order of display,
+# level is a required word starting with a letter, and a
+# series of 0 or more space-prefixed DoNAI Selectors
+# indicates what to match against to reach the intended
+# level.
 #
-#	%level    -> to specify a level for following selectors
-#	selector  -> to define a selector under the last %level
-#	%%elector -> is an escaped selector %elector
-# 
-# Not all forms are meaningful; the first word needs to set a
-# level and it is useless when the last word does.  It is also
-# meaningless to have more than one %level in direct succession.
-# Use of this attribute must be limited to meaningful forms.
+# When no DoNAI Selector is used, it really means an empty list,
+# so no matches at all.  This may be useful for transient uses
+# and has not been assigned any special meaning.  It would be
+# really UNIXy, and really confusing, to use such a notation for
+# a default, for example.  This shall not be done because it is
+# quite possible to express defaults with catch-all Selectors.
 #
-# The level is a sequence of characters, each of which has a
-# meaning depending on the kind of accessControlList that is
-# expected where it is defined.
+# When the lineno matches but levels do not, the order of
+# processing is undefined.  This may be safe to use when there
+# is no overlap between DoNAI Selectors, but it is usually
+# better to avoid this form, and software may warn against it
+# as one way of handling this undefinedness.
 #
-# The selector is a (possibly abstracted) form for the format
-# user@domain.name.
-#
-# We shall be laid-back and describe the syntax below as a simple
-# DirectoryString which is just a string of UTF-8 characters,
-# though we limit it here to the meaningful forms above.
+# We shall be utterly lame and describe the syntax below as a
+# simple IA5String, though it is restricted to the above.
 #
 attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.20
-	NAME ( 'acl' 'accessControlList' )
-	DESC 'ACL description in "( %level | selector )..." format'
-	EQUALITY caseIgnoreMatch
-	SUBSTR caseIgnoreSubstringsMatch
-	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+	NAME 'accessControlList'
+	DESC 'ACL description in "lineno level[ selector...]" format'
+	EQUALITY caseIgnoreIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
 
 
 # accessControlInheritance references a more general node in
@@ -305,23 +306,30 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.1.3.22
 	SINGLE-VALUE )
 
 
+# accessControlledChildObjects are located one level under an
+# accessControlledObject, which is a resource class/instance.
+#
+# The mere mention of this object class is a sign that the
+# ACL is determined by the immediate parent.  Note that this
+# means that a resourceInstance RDN for the parent of this
+# object may be read as a thing to lookup (when the
+# corresponding resourceClass is known in the context).
+#
+objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.28
+	NAME ( 'resourceControlledChildObject' 'aclchild' )
+	DESC 'A child object inheriting settings such as ACL from the direct parent accessControlledObject'
+	AUXILIARY )
+
+
 # accessControlledObject is any object that employs
 # accessControlList attributes to indicate its intended access.
-#
-# There is no requirement of actually specifying an
-# accessControlList, not even when an object carries this
-# objectClass.  When none is specified, access is restricted
-# to the lowest possible level, meaning either no access at
-# all, or just a form of guest-mode access, depending on the
-# ACL patterns in use.
-#
-# Multiple accessControlList attributes on one LDAP object
-# may be concatenated provided that they all have meaningful
-# forms.  When not, the composite meaning is undefined.
+# At least one such attribute must be present, even if it is
+# just a default, or just an empty list of DoNAI Selectors.
 #
 objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.29
-        NAME ( 'aclObject' 'accessControlledObject' )
+        NAME 'accessControlledObject'
         DESC 'An object that may or resides under access control'
 	AUXILIARY
-	MAY ( accessControlList $ accessToken ) )
+	MUST ( accessControlList  )
+	MAY ( accessToken ) )
 

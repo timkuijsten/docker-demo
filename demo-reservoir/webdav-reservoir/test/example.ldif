@@ -1,0 +1,45 @@
+dn: associatedDomain=groengemak.nought,ou=Reservoir,o=arpa2.org,ou=ServiceDI
+ T
+objectClass: organization
+objectClass: domainRelatedObject
+o: GroenGemak
+associatedDomain: groengemak.nought
+structuralObjectClass: organization
+entryUUID: 256e2c2a-b873-4012-8b0d-07444cb9ef58
+creatorsName: uid=me
+createTimestamp: 20180927161309Z
+entryCSN: 20180927161309.387725Z#000000#000#000000
+modifiersName: uid=me
+modifyTimestamp: 20180927161309Z
+
+dn: ou=Reservoir,associatedDomain=groengemak.nought,ou=Reservoir,o=arpa2.org
+ ,ou=ServiceDIT
+objectClass: organizationalUnit
+objectClass: resourceClass
+ou: Reservoir
+resourceClassUUID: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+structuralObjectClass: organizationalUnit
+entryUUID: 02e5f9f5-8471-425f-b14c-2c71371af9dc
+creatorsName: uid=me
+createTimestamp: 20180927161309Z
+entryCSN: 20180927161309.415099Z#000000#000#000000
+modifiersName: uid=me
+modifyTimestamp: 20180927161309Z
+
+dn: resourceInstanceKey=0d66e17f-dd49-4df1-a576-d3befb857843,ou=Reservoir,as
+ sociatedDomain=groengemak.nought,ou=Reservoir,o=arpa2.org,ou=ServiceDIT
+objectClass: documentSeries
+objectClass: resourceInstance
+objectClass: accessControlledObject
+resourceClassUUID: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstanceKey: 0d66e17f-dd49-4df1-a576-d3befb857843
+accessControlList: 999 V @.
+cn: Documentatiemap Permacultuur
+structuralObjectClass: documentSeries
+entryUUID: 5a6afe47-d793-40d0-ac70-1d5ba5b27a84
+creatorsName: uid=me
+createTimestamp: 20180927161312Z
+entryCSN: 20180927161312.468627Z#000000#000#000000
+modifiersName: uid=me
+modifyTimestamp: 20180927161312Z
+

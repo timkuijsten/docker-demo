@@ -1,0 +1,332 @@
+dn: dc=nodomain
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: nodomain
+dc: nodomain
+structuralObjectClass: organization
+entryUUID: 72dcca6a-6d8e-1039-8747-7d6cc95bff18
+creatorsName: cn=admin,dc=nodomain
+createTimestamp: 20190917120012Z
+entryCSN: 20190917120012.736262Z#000000#000#000000
+modifiersName: cn=admin,dc=nodomain
+modifyTimestamp: 20190917120012Z
+
+dn: cn=admin,dc=nodomain
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+description: LDAP administrator
+userPassword:: e1NTSEF9aEFKQi9vakFjYnFaaXRhL2g3dnYwT1Bxd0NPTFVxSXU=
+structuralObjectClass: organizationalRole
+entryUUID: 72dd198e-6d8e-1039-8748-7d6cc95bff18
+creatorsName: cn=admin,dc=nodomain
+createTimestamp: 20190917120012Z
+entryCSN: 20190917120012.738357Z#000000#000#000000
+modifiersName: cn=admin,dc=nodomain
+modifyTimestamp: 20190917120012Z
+
+dn: ou=InternetWide
+ou: InternetWide
+ou: Service Directory
+ou: InternetWide ServiceDIT
+ou: InternetWide Service Directory
+objectClass: organizationalUnit
+objectClass: labeledURIObject
+objectClass: domainRelatedObject
+description: Service Directory for InternetWide Architecture
+labeledURI: http://internetwide.org Blog and Project Description
+labeledURI: http://arpa2.net ARPA2 Umbrella for Partial Projects
+labeledURI: http://arpa2.org ARPA2 Umbrella for Project Infrastrucutre
+labeledURI: https://github.com/arpa2 ARPA2 Software Repositories
+associatedDomain: internetwide.org
+associatedDomain: arpa2.net
+associatedDomain: arpa2.org
+structuralObjectClass: organizationalUnit
+entryUUID: 2947c238-6da2-1039-9dc3-a7f58e42d01a
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=IdentityHub,o=arpa2.net
+ ,ou=InternetWide
+createTimestamp: 20190917142119Z
+entryCSN: 20190917142119.220441Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=IdentityHub,o=arpa2.ne
+ t,ou=InternetWide
+modifyTimestamp: 20190917142119Z
+
+dn: o=arpa2.net,ou=InternetWide
+o: arpa2.net
+o: ARPA2 projects of the InternetWide Organisation
+o: ARPA2
+objectClass: organization
+objectClass: labeledURIObject
+objectClass: domainRelatedObject
+description: IdentityHub Component of the InternetWide Architecture
+description: Authorisation details: users, groups, memberships, ...
+telephoneNumber: +3123456789
+labeledURI: http://internetwide.org Blog and Project Description
+labeledURI: http://internetwide.org/tag/architecture.html InternetWide Archi
+ tecture
+associatedDomain: arpa2.org
+structuralObjectClass: organization
+entryUUID: 29484a32-6da2-1039-9dc4-a7f58e42d01a
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=IdentityHub,o=arpa2.net
+ ,ou=InternetWide
+createTimestamp: 20190917142119Z
+entryCSN: 20190917142119.224025Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=IdentityHub,o=arpa2.ne
+ t,ou=InternetWide
+modifyTimestamp: 20190917142119Z
+
+dn: ou=Reservoir,o=arpa2.net,ou=InternetWide
+ou: IdentityHub
+ou: Reservoir
+objectClass: organizationalUnit
+objectClass: labeledURIObject
+description: Reservoir metadata, notably Resource Collections
+labeledURI: https://github.com/arpa2/reservoir Reservoir Architecture
+labeledURI: https://github.com/arpa2/webdav-reservoir WebDAV interface to Re
+ servoir
+labeledURI: http://reservoir.arpa2.net Project home page
+structuralObjectClass: organizationalUnit
+entryUUID: 294871a6-6da2-1039-9dc5-a7f58e42d01a
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=IdentityHub,o=arpa2.net
+ ,ou=InternetWide
+createTimestamp: 20190917142119Z
+entryCSN: 20190917142119.225042Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=IdentityHub,o=arpa2.ne
+ t,ou=InternetWide
+modifyTimestamp: 20190917142119Z
+
+dn: associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+objectClass: organization
+objectClass: domainRelatedObject
+objectClass: reservoirIndex
+objectClass: accessControlledObject
+o: orvelte.nep
+associatedDomain: orvelte.nep
+accessControlList: 998 %w admin@orvelte.nep
+accessControlList: 999 %r @orvelte.nep
+structuralObjectClass: organization
+entryUUID: 889fe2ce-6da7-1039-9efe-67b874f43b45
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.net
+ ,ou=internetwide
+createTimestamp: 20190917145946Z
+reservoirRef: 58113855-5c25-4472-a37b-c62768e8ed9d kunst
+reservoirRef: cad30662-6d31-479e-810c-022af25e04db ambacht
+entryCSN: 20190917150717.527382Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
+ t,ou=internetwide
+modifyTimestamp: 20190917150717Z
+
+dn: resourceInstance=cad30662-6d31-479e-810c-022af25e04db,associatedDomain=o
+ rvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+objectClass: reservoirCollection
+objectClass: resourceInstanceObject
+objectClass: accessControlledObject
+objectClass: reservoirIndex
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: cad30662-6d31-479e-810c-022af25e04db
+cn: Ambachten
+accessControlList: 999 %wr demo@orvelte.nep
+structuralObjectClass: reservoirCollection
+entryUUID: 5b94a304-6da8-1039-9eff-67b874f43b45
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.net
+ ,ou=internetwide
+createTimestamp: 20190917150540Z
+reservoirRef: c0743b9d-826d-43ac-83c2-ab915d974e60 schilden
+reservoirRef: bcc718d8-a25f-4580-8259-2cdb7af20e92 zwaarden
+reservoirRef: 7d9c75a4-6c6d-4f3b-8c53-f5c95dd0e6c4 hoefijzers
+reservoirRef: cdc98770-b09e-41c7-972c-eea34dada600 brood
+reservoirRef: 3cfde35a-98aa-4289-beb1-1649c52dba13 banket
+reservoirRef: 7c63433e-c603-4e62-b309-b89c008495b1 bakker
+reservoirRef: 5d6f9da0-6867-47c6-8b3e-d67a519eb31f smid
+entryCSN: 20190917151005.643092Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
+ t,ou=internetwide
+modifyTimestamp: 20190917151005Z
+
+dn: resourceInstance=58113855-5c25-4472-a37b-c62768e8ed9d,associatedDomain=o
+ rvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+objectClass: reservoirCollection
+objectClass: resourceInstanceObject
+objectClass: accessControlledObject
+objectClass: reservoirIndex
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: 58113855-5c25-4472-a37b-c62768e8ed9d
+cn: Kunstenaars
+accessControlList: 999 %wr demo@orvelte.nep
+structuralObjectClass: reservoirCollection
+entryUUID: 650a6568-6da8-1039-9f00-67b874f43b45
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.net
+ ,ou=internetwide
+createTimestamp: 20190917150556Z
+reservoirRef: c0743b9d-826d-43ac-83c2-ab915d974e60 schilden
+reservoirRef: bcc718d8-a25f-4580-8259-2cdb7af20e92 zwaarden
+reservoirRef: 3cfde35a-98aa-4289-beb1-1649c52dba13 banket
+reservoirRef: 7c63433e-c603-4e62-b309-b89c008495b1 bakker
+reservoirRef: 5d6f9da0-6867-47c6-8b3e-d67a519eb31f smid
+entryCSN: 20190917150843.378593Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
+ t,ou=internetwide
+modifyTimestamp: 20190917150843Z
+
+dn: resourceInstance=7c63433e-c603-4e62-b309-b89c008495b1,associatedDomain=o
+ rvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+objectClass: reservoirCollection
+objectClass: resourceInstanceObject
+objectClass: accessControlledObject
+objectClass: reservoirIndex
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: 7c63433e-c603-4e62-b309-b89c008495b1
+cn: Bakker
+accessControlList: 999 %wr demo@orvelte.nep
+structuralObjectClass: reservoirCollection
+entryUUID: 673e405c-6da8-1039-9f01-67b874f43b45
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.net
+ ,ou=internetwide
+createTimestamp: 20190917150600Z
+entryCSN: 20190917150600.157355Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
+ t,ou=internetwide
+modifyTimestamp: 20190917150600Z
+
+dn: resourceInstance=cdc98770-b09e-41c7-972c-eea34dada600,associatedDomain=o
+ rvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+objectClass: reservoirCollection
+objectClass: resourceInstanceObject
+objectClass: accessControlledObject
+objectClass: reservoirIndex
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: cdc98770-b09e-41c7-972c-eea34dada600
+cn: Brood
+accessControlList: 999 %wr demo@orvelte.nep
+structuralObjectClass: reservoirCollection
+entryUUID: 69c0104e-6da8-1039-9f02-67b874f43b45
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.net
+ ,ou=internetwide
+createTimestamp: 20190917150604Z
+entryCSN: 20190917150604.363517Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
+ t,ou=internetwide
+modifyTimestamp: 20190917150604Z
+
+dn: resourceInstance=3cfde35a-98aa-4289-beb1-1649c52dba13,associatedDomain=o
+ rvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+objectClass: reservoirCollection
+objectClass: resourceInstanceObject
+objectClass: accessControlledObject
+objectClass: reservoirIndex
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: 3cfde35a-98aa-4289-beb1-1649c52dba13
+cn: Banket
+accessControlList: 999 %wr demo@orvelte.nep
+structuralObjectClass: reservoirCollection
+entryUUID: 6bcaa2fa-6da8-1039-9f03-67b874f43b45
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.net
+ ,ou=internetwide
+createTimestamp: 20190917150607Z
+entryCSN: 20190917150607.788225Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
+ t,ou=internetwide
+modifyTimestamp: 20190917150607Z
+
+dn: resourceInstance=5d6f9da0-6867-47c6-8b3e-d67a519eb31f,associatedDomain=o
+ rvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+objectClass: reservoirCollection
+objectClass: resourceInstanceObject
+objectClass: accessControlledObject
+objectClass: reservoirIndex
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: 5d6f9da0-6867-47c6-8b3e-d67a519eb31f
+cn: Smid
+accessControlList: 999 %wr demo@orvelte.nep
+structuralObjectClass: reservoirCollection
+entryUUID: 6de91684-6da8-1039-9f04-67b874f43b45
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.net
+ ,ou=internetwide
+createTimestamp: 20190917150611Z
+entryCSN: 20190917150611.343277Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
+ t,ou=internetwide
+modifyTimestamp: 20190917150611Z
+
+dn: resourceInstance=7d9c75a4-6c6d-4f3b-8c53-f5c95dd0e6c4,associatedDomain=o
+ rvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+objectClass: reservoirCollection
+objectClass: resourceInstanceObject
+objectClass: accessControlledObject
+objectClass: reservoirIndex
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: 7d9c75a4-6c6d-4f3b-8c53-f5c95dd0e6c4
+cn: Hoefijzers
+accessControlList: 999 %wr demo@orvelte.nep
+structuralObjectClass: reservoirCollection
+entryUUID: 706901c6-6da8-1039-9f05-67b874f43b45
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.net
+ ,ou=internetwide
+createTimestamp: 20190917150615Z
+entryCSN: 20190917150615.536965Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
+ t,ou=internetwide
+modifyTimestamp: 20190917150615Z
+
+dn: resourceInstance=c0743b9d-826d-43ac-83c2-ab915d974e60,associatedDomain=o
+ rvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+objectClass: reservoirCollection
+objectClass: resourceInstanceObject
+objectClass: accessControlledObject
+objectClass: reservoirIndex
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: c0743b9d-826d-43ac-83c2-ab915d974e60
+cn: Schilden
+accessControlList: 999 %wr demo@orvelte.nep
+structuralObjectClass: reservoirCollection
+entryUUID: 72a3b7ec-6da8-1039-9f06-67b874f43b45
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.net
+ ,ou=internetwide
+createTimestamp: 20190917150619Z
+entryCSN: 20190917150619.277265Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
+ t,ou=internetwide
+modifyTimestamp: 20190917150619Z
+
+dn: resourceInstance=bcc718d8-a25f-4580-8259-2cdb7af20e92,associatedDomain=o
+ rvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+objectClass: reservoirCollection
+objectClass: resourceInstanceObject
+objectClass: accessControlledObject
+objectClass: reservoirIndex
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: bcc718d8-a25f-4580-8259-2cdb7af20e92
+cn: Zwaarden
+accessControlList: 999 %wr demo@orvelte.nep
+accessControlList: %w smid@orvelte.nep %k @orvelte.nep
+accessControlList: 0 %w smid@orvelte.nep %k @orvelte.nep
+structuralObjectClass: reservoirCollection
+entryUUID: 74b5a61c-6da8-1039-9f07-67b874f43b45
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.net
+ ,ou=internetwide
+createTimestamp: 20190917150622Z
+entryCSN: 20190917154147.537489Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
+ t,ou=internetwide
+modifyTimestamp: 20190917154147Z
+
+dn: associatedDomain=vanrein.org,ou=Reservoir,o=arpa2.net,ou=InternetWide
+objectClass: organization
+objectClass: domainRelatedObject
+objectClass: reservoirIndex
+objectClass: accessControlledObject
+o: vanrein.org
+associatedDomain: vanrein.org
+accessControlList: 998 %w admin@vanrein.org
+accessControlList: 999 %r @vanrein.org
+structuralObjectClass: organization
+entryUUID: 643fa272-6daa-1039-9f08-67b874f43b45
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.net
+ ,ou=internetwide
+createTimestamp: 20190917152014Z
+entryCSN: 20190917152014.126714Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
+ t,ou=internetwide
+modifyTimestamp: 20190917152014Z
+
