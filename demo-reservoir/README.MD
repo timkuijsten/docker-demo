@@ -207,6 +207,56 @@ into management utilities.  By that time we should
 probably split the words over the underscore characters,
 perhaps using the `cmdparser` package that was installed.
 
+```
+shell# arpa2acl 
+Edit Access Control Lists as saved in LDAP.
+
+arpa2acl> acl_dn resourceInstance={UUID_Zwaarden},associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+#EXAMPLE# acl_dn resourceInstance=bcc718d8-a25f-4580-8259-2cdb7af20e92,associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: bcc718d8-a25f-4580-8259-2cdb7af20e92
+cn: Zwaarden
+
+arpa2acl> acl_add %k @orvelte.nep
+('Adding rights', '%k', 'to selector', '@orvelte.nep')
+
+arpa2acl> acl_add %w smid@orvelte.nep
+('Adding rights', '%w', 'to selector', 'smid@orvelte.nep')
+
+arpa2acl> acl_save
+('OLD =', [])
+('NEW =', ['0', '%w', 'smid@orvelte.nep', '%k', '@orvelte.nep'])
+('MOD =', [(0, 'accessControlList', '0 %w smid@orvelte.nep %k @orvelte.nep')])
+```
+
+After this action, `slapcat` would reveal something like this for the `Zwaarden`
+object:
+
+**TODO:** Format change, missing line numbers missing.
+
+```
+dn: resourceInstance=bcc718d8-a25f-4580-8259-2cdb7af20e92,associatedDomain=o
+ rvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+objectClass: reservoirCollection
+objectClass: resourceInstanceObject
+objectClass: accessControlledObject
+objectClass: reservoirIndex
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: bcc718d8-a25f-4580-8259-2cdb7af20e92
+cn: Zwaarden
+accessControlList: 999 %wr demo@orvelte.nep
+accessControlList: 0 %w smid@orvelte.nep %k @orvelte.nep
+structuralObjectClass: reservoirCollection
+entryUUID: 74b5a61c-6da8-1039-9f07-67b874f43b45
+creatorsName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.net
+ ,ou=internetwide
+createTimestamp: 20190917150622Z
+entryCSN: 20190917153219.162745Z#000000#000#000000
+modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
+ t,ou=internetwide
+modifyTimestamp: 20190917153219Z
+```
+
 
 ## Using LDAP
 
@@ -228,6 +278,45 @@ is loaded from `/root/initial.ldif` as part of the startup script.
 This includes the standard `rootdn` and `rootpw` as setup
 in `/etc/ldap/slapd.conf` for the server, and for which the `BINDDN` but
 not the password is setup in `/etc/ldap/ldap.conf` for the client.
+
+
+## Using the ACL Shell
+
+The `arpa2acl` shell can be used to select a node in LDAP.
+Reservoir nodes are an example, but others are just as valid.
+In general, any object with a default setup as an
+`objectClass: accessControlledObject` can be edited, and
+the Reservoir is just one example of an application that
+creates such objects.  The IdentityHub should do the same
+to `uid` style objects, to make their access controllable.
+
+There are a few types of ACL, and they relate to the
+[kinds of objects controlled](http://donai.arpa2.net/acl-impl.html):
+
+  * `uidXXX` style objects are usually access-controlled
+    through a Communication ACL;
+  * `resourceClassObject` typed objects are representative
+    of a resource class (perhaps the general idea of Git service);
+  * `resourceInstanceObject` typed objects are representative
+    of a resource instance (perhaps a Git repository).
+
+To setup an ACL, one specifies the LDAP path of an object,
+so its `dn` or `distinguishedName`.  Interestingly, the
+first/lowest RDN in the path may give away details to identify
+the ACL object; an attribute (possibly inherited) of `uid`
+for a Communication ACL object, or a `rescls` or `resins` for
+a resource class and resource instance, respectively.  For
+instance in the Reservoir, we have a nesting `resins=, rescls=, ...`
+that can be helpful.
+
+Finally, resources are specific to a domain name, which serves
+as a realm.  This can be found in the `dn` as the user domain.
+For Reservoir, one would have `associatedDomain=orvelte.nep,
+ou=Reservoir, o=arpa2.net, ou=InternetWide` if `orvelte.nep`
+is the user domain.  Directly underneath would be `resins=,
+rescls=` levels.  Note that there is no more nesting than
+this, even when the cross-references between `rescls` objects
+may suggest otherwise.
 
 
 ## Image Updates

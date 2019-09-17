@@ -327,7 +327,7 @@ objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.28
 # just a default, or just an empty list of DoNAI Selectors.
 #
 objectclass ( 1.3.6.1.4.1.44469.666.389.1.3.29
-        NAME 'accessControlledObject'
+        NAME ( 'accessControlledObject' 'aclObject' )
         DESC 'An object that may or resides under access control'
 	AUXILIARY
 	MUST ( accessControlList  )

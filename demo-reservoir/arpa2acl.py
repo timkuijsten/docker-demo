@@ -109,17 +109,18 @@ class ACL ():
 		fl1 = '(objectClass=accessControlledObject)'
 		al1 = ['acl', 'rescls', 'resins', 'cn']
 		try:
-			#DEBUG# print 'Query for', dn1
+			#DEBUG# print ('Query for', dn1)
 			qr1 = self.dap.search_s (dn1, SCOPE_BASE, filterstr=fl1, attrlist=al1)
-			#DEBUG# print 'Query response', qr1
+			#(DEBUG# print 'Query response', qr1)
 			if qr1 == []:
 				raise NO_SUCH_OBJECT ()
 			[(dn1,at1)] = qr1
 			self.attr = at1
-			self.orig = at1.get ('acl', [])
+			self.orig = at1.get ('accessControlList', [])
 			for acl1 in self.orig:
 				rgt = None
-				for wrd1 in acl1.strip ().split ():
+				# Skip the line number, then collect %rights and [%%]selectors
+				for wrd1 in acl1.strip ().split () [1:]:
 					if wrd1 [:1] == '%' and wrd1 [:2] != '%%':
 						# Set rights for following Selectors
 						rgt = wrd1
@@ -147,7 +148,7 @@ class ACL ():
 
 	def selector_del (self, selector):
 		rights = self.selector2rights [selector]
-		print 'Removing rights', rights, 'from selector', selector
+		print ('Removing rights', rights, 'from selector', selector)
 		del self.selector2rights [selector]
 		if self.rights2selectors [rights] == [selector]:
 			del self.rights2selectors [rights]
@@ -157,7 +158,7 @@ class ACL ():
 	def selector_add (self, selector, rights):
 		if self.selector2rights.has_key (selector):
 			raise Exception ('Selector is already set')
-		print 'Adding rights', rights, 'to selector', selector
+		print ('Adding rights', rights, 'to selector', selector)
 		self.selector2rights [selector] = rights
 		if self.rights2selectors.has_key (rights):
 			self.rights2selectors [rights].append (selector)
@@ -165,8 +166,8 @@ class ACL ():
 			self.rights2selectors [rights] = [selector]
 
 	def save (self):
-		print 'OLD =', self.orig
-		new = [ ]
+		print ('OLD =', self.orig)
+		new = [ '0' ]  # Just the line number
 		for (rgt,sels) in self.rights2selectors.items ():
 			new.append (rgt)
 			for sel in sels:
@@ -174,16 +175,16 @@ class ACL ():
 					new.append ('%' + sel)
 				else:
 					new.append (sel)
-		print 'NEW =', new
+		print ('NEW =', new)
 		#TODO# Maybe stupid: deleting everything and pushing it back is leads to more work downstream
 		mod = [ ]
 		for acl in self.orig:
-			mod.append ( (MOD_DELETE, 'acl', acl) )
+			mod.append ( (MOD_DELETE, 'accessControlList', acl) )
 		#TODO# Maybe stupid: one line would always change as a whole, leading to more work downstream
 		new = ' '.join (new)
-		mod.append ( (MOD_ADD,    'acl', new) )
+		mod.append ( (MOD_ADD,    'accessControlList', new) )
 		try:
-			print 'MOD =', mod
+			print ('MOD =', mod)
 			dap.modify_s (self.dn, mod)
 			self.orig = [new]
 		except:
@@ -254,18 +255,18 @@ class Cmd (arpa2cmd.Cmd):
 
 	"""Command line completion for accessControlledObjects in LDAP."""
 	def complete_acl_dn (self, text, line, begidx, lastidx):
-		#DEBUG# print 'Completing line "' + line + '"'
+		#DEBUG# print ('Completing line "' + line + '"')
 		if self.acl_dns is None:
-			#DEBUG# print 'Need to query LDAP'
+			#DEBUG# print ('Need to query LDAP')
 			try:
 				dn1 = base
 				fl1 = '(objectClass=accessControlledObject)'
 				at1 = ['dn']
-				#DEBUG# print 'Querying', dn1
+				#DEBUG# print ('Querying', dn1)
 				qr1 = dap.search_s (dn1, SCOPE_SUBTREE, fl1, at1)
-				#DEBUG# print 'Query result', qr1
+				#DEBUG# print ('Query result', qr1)
 				self.acl_dns = [ dn for (dn,_) in qr1 ]
-				#DEBUG# print 'ACLs found', self.acl_dns
+				#DEBUG# print ('ACLs found', self.acl_dns)
 			except Exception as e:
 				print ('Exception:', e)
 				return [ ]
