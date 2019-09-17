@@ -316,6 +316,155 @@ modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
 modifyTimestamp: 20190917153219Z
 ```
 
+Much better would of course be to query using LDAP, for instance assuming that
+you have a Kerberos login,
+
+```
+shell$ ldapsearch -H ldapi://%2ftmp%2fldap-socket \
+	-Y gssapi \
+	-b associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide \
+	'(&(objectClass=accessControlledObject)(objectClass=resourceInstanceObject))' \
+	resourceClass resourceInstance accessControlList
+```
+
+which could yield something like
+
+```
+# extended LDIF
+#
+# LDAPv3
+# base <associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide> with scope subtree
+# filter: (&(objectClass=accessControlledObject)(objectClass=resourceInstanceObject))
+# requesting: resourceClass resourceInstance accessControlList 
+#
+
+# cad30662-6d31-479e-810c-022af25e04db, orvelte.nep, Reservoir, arpa2.net, Inte
+ rnetWide
+dn: resourceInstance=cad30662-6d31-479e-810c-022af25e04db,associatedDomain=orv
+ elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: cad30662-6d31-479e-810c-022af25e04db
+accessControlList: 999 %wr demo@orvelte.nep
+
+# 58113855-5c25-4472-a37b-c62768e8ed9d, orvelte.nep, Reservoir, arpa2.net, Inte
+ rnetWide
+dn: resourceInstance=58113855-5c25-4472-a37b-c62768e8ed9d,associatedDomain=orv
+ elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: 58113855-5c25-4472-a37b-c62768e8ed9d
+accessControlList: 999 %wr demo@orvelte.nep
+
+# 7c63433e-c603-4e62-b309-b89c008495b1, orvelte.nep, Reservoir, arpa2.net, Inte
+ rnetWide
+dn: resourceInstance=7c63433e-c603-4e62-b309-b89c008495b1,associatedDomain=orv
+ elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: 7c63433e-c603-4e62-b309-b89c008495b1
+accessControlList: 999 %wr demo@orvelte.nep
+
+# cdc98770-b09e-41c7-972c-eea34dada600, orvelte.nep, Reservoir, arpa2.net, Inte
+ rnetWide
+dn: resourceInstance=cdc98770-b09e-41c7-972c-eea34dada600,associatedDomain=orv
+ elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: cdc98770-b09e-41c7-972c-eea34dada600
+accessControlList: 999 %wr demo@orvelte.nep
+
+# 3cfde35a-98aa-4289-beb1-1649c52dba13, orvelte.nep, Reservoir, arpa2.net, Inte
+ rnetWide
+dn: resourceInstance=3cfde35a-98aa-4289-beb1-1649c52dba13,associatedDomain=orv
+ elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: 3cfde35a-98aa-4289-beb1-1649c52dba13
+accessControlList: 999 %wr demo@orvelte.nep
+
+# 5d6f9da0-6867-47c6-8b3e-d67a519eb31f, orvelte.nep, Reservoir, arpa2.net, Inte
+ rnetWide
+dn: resourceInstance=5d6f9da0-6867-47c6-8b3e-d67a519eb31f,associatedDomain=orv
+ elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: 5d6f9da0-6867-47c6-8b3e-d67a519eb31f
+accessControlList: 999 %wr demo@orvelte.nep
+
+# 7d9c75a4-6c6d-4f3b-8c53-f5c95dd0e6c4, orvelte.nep, Reservoir, arpa2.net, Inte
+ rnetWide
+dn: resourceInstance=7d9c75a4-6c6d-4f3b-8c53-f5c95dd0e6c4,associatedDomain=orv
+ elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: 7d9c75a4-6c6d-4f3b-8c53-f5c95dd0e6c4
+accessControlList: 999 %wr demo@orvelte.nep
+
+# c0743b9d-826d-43ac-83c2-ab915d974e60, orvelte.nep, Reservoir, arpa2.net, Inte
+ rnetWide
+dn: resourceInstance=c0743b9d-826d-43ac-83c2-ab915d974e60,associatedDomain=orv
+ elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: c0743b9d-826d-43ac-83c2-ab915d974e60
+accessControlList: 999 %wr demo@orvelte.nep
+
+# bcc718d8-a25f-4580-8259-2cdb7af20e92, orvelte.nep, Reservoir, arpa2.net, Inte
+ rnetWide
+dn: resourceInstance=bcc718d8-a25f-4580-8259-2cdb7af20e92,associatedDomain=orv
+ elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
+resourceInstance: bcc718d8-a25f-4580-8259-2cdb7af20e92
+accessControlList: 999 %wr demo@orvelte.nep
+accessControlList: %w smid@orvelte.nep %k @orvelte.nep
+accessControlList: 0 %w smid@orvelte.nep %k @orvelte.nep
+
+# search result
+search: 4
+result: 0 Success
+
+# numResponses: 10
+# numEntries: 9
+```
+
+Similar queries can be made in other languages.  The example given is for
+querying ACL instances, which in terms of Reservoir are Resource Collections
+as they define individual ACL setups.  If you were to program tooling to
+extract this information for management purposes covering all domains, you
+might want to be a bit more general, and say
+
+```
+shell$ ldapsearch -H ldapi://%2ftmp%2fldap-socket \
+	-Y gssapi \
+	-b ou=Reservoir,o=arpa2.net,ou=InternetWide \
+	'(&(objectClass=accessControlledObject)(objectClass=resourceInstanceObject))' \
+	resourceClass resourceInstance accessControlList
+```
+
+If you wanted to address ACL instances in general, you could use
+
+```
+shell$ ldapsearch -H ldapi://%2ftmp%2fldap-socket \
+	-Y gssapi \
+	-b ou=InternetWide \
+	'(&(objectClass=accessControlledObject)(objectClass=resourceInstanceObject))' \
+	resourceClass resourceInstance accessControlList
+```
+
+Similarly, for ACL classes covering many applications you could use
+
+```
+shell$ ldapsearch -H ldapi://%2ftmp%2fldap-socket \
+	-Y gssapi \
+	-b ou=InternetWide \
+	'(&(objectClass=accessControlledObject)(objectClass=resourceClassObject))' \
+	resourceClass accessControlList
+```
+
+And finally, Communication ACL entries would all be part of IdentityHub, and could
+be found using something like
+
+```
+shell$ ldapsearch -H ldapi://%2ftmp%2fldap-socket \
+	-Y gssapi \
+	-b ou=IdentityHub,o=arpa2.net,ou=InternetWide \
+	'(&(objectClass=accessControlledObject)(|(objectClass=identityHubUser)(objectClass=identityHubGroup)(objectClass=identityHubRole))' \
+	accessControlList uid uidAlias uidPseudonym uidGroup uidRole uidMember uidOccupant uidDecline
+```
+
 
 ## Image Updates
 
