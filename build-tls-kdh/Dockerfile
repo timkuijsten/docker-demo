@@ -37,7 +37,7 @@ RUN apt update && apt install -y \
 
 ## Install packages that we have to build ourselves 
 # libnettle
-RUN cd tmp \
+RUN cd /usr/local/src \
  && curl https://ftp.gnu.org/gnu/nettle/nettle-3.4.1.tar.gz | tar -zx \
  && cd nettle-3.4.1/ \
  && ./configure --disable-documentation \
@@ -46,7 +46,7 @@ RUN cd tmp \
  && make install
 
 # libidn2
-RUN cd tmp \
+RUN cd /usr/local/src \
  && curl https://ftp.gnu.org/gnu/libidn/libidn2-2.2.0.tar.lz | tar --lzip -xv \
  && cd libidn2-2.2.0/ \
  && ./configure \
@@ -55,13 +55,14 @@ RUN cd tmp \
  && make install
 
 ## Retrieve, build and install the latest stable tls-kdh source
-RUN cd tmp \
- && git clone --single-branch --branch tls-kdh12 https://gitlab.com/Vrancken/gnutls.git \
+RUN cd /usr/local/src \
+ && git clone --single-branch --branch tls-kdh https://gitlab.com/Vrancken/gnutls.git \
  && cd gnutls \
  && ./bootstrap \
  && ./configure --disable-doc --disable-guile \
  && make \
- && make install
+ && make install \
+ && ldconfig
 
 
 CMD ["bash"]
