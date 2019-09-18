@@ -1,9 +1,9 @@
 
 FROM arpa2/build-bin
 
-RUN apt-get -y install libssl-dev libunbound-dev python-setuptools python-dev
+RUN apt-get -y install libssl-dev libunbound-dev python3-setuptools python3-dev
 
-RUN easy_install six pyparsing asn1ate
+RUN python3 /usr/lib/python3/dist-packages/easy_install.py six pyparsing asn1ate
 
 ADD kip-initial.tar.gz /usr/local/src/
 
