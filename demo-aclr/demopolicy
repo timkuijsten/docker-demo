@@ -1,0 +1,5 @@
+example.com	@example.com	V	7a35d76d-a754-35a6-abe7-757c161f0263	/home/john
+example.com	john@example.com	CRWKOV	7a35d76d-a754-35a6-abe7-757c161f0263	/var/empty
+# a comment
+
+arpa2.org	foo@arpa2.org	CRWKO	7a35d76d-a754-35a6-abe7-757c161f0263

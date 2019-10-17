@@ -20,3 +20,5 @@ RUN mkdir ~/arpa2 && cd ~/arpa2 && \
 	make && \
 	make install && \
 	ldconfig
+
+COPY demopolicy /root/arpa2
