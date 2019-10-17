@@ -1,6 +1,6 @@
 # ARPA2 ACL demo
 
-This is a demonstration ACL resource
+This is a demonstration the resource acl library.
 
 ## Create the demo image
 ```sh
