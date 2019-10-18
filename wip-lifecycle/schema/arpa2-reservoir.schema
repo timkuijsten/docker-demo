@@ -1,0 +1,230 @@
+# Definitions of OBJECT CLASS and ATTRIBUTE TYPE for Reservoir
+# in the InternetWide Architecture, or more specifically, the
+# identity hosting node who provides object storage service.
+#
+# Currently allocated as
+# ARPA2-Experimental-LDAP-Reservoir
+# 1.3.6.1.4.1.44468.666.389.2
+# we add .1 for attribute types and .2 for object classes.
+
+
+##
+## RESERVOIR ATTRIBUTE TYPES AND OBJECT CLASSES
+##
+
+
+# The resource attribute identifies an attribute within the
+# ARPA2 Reservoir.  It is usually a UUID, but may differ for
+# other forms of storage than Riak KV.  In general, it uses
+# DirectoryString syntax, which supports UTF-8.
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.2.1.1
+	NAME 'resource'
+	DESC 'A key for use by Resources in the ARPA2 Reservoir.  Often a UUID in LDAP form, so lowercase text, but strictly free-form ASCII.'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+#DONT# # The collection attribute type is used as a key for complete
+#DONT# # Resource Collections.  This attribute specialises
+#DONT# # resourceInstanceKey, but is a more specific form and more
+#DONT# # readable in an RDN, where it is usually found.  It can
+#DONT# # still be used for retrieval of ACLs.
+#DONT# #
+#DONT# attributetype ( 1.3.6.1.4.1.44469.666.389.2.1.2
+#DONT# 	NAME 'collection'
+#DONT# 	DESC 'A key for use by Resource Collections in the ARPA2 Reservoir.  Usually the RDN for an object.  Only used form is a UUID in LDAP form, so lowercase text.'
+#DONT# 	SUP 1.3.6.1.4.1.44469.666.389.1.3.2 )
+
+
+# reservoir attributes are used to reference a Resource Collection
+# by UUID and, optionally, a space and human-friendly description.
+# The UUID is not usually shown to the user if it is not needed to
+# resolve ambiguity.  The form with just a UUID is never shown to
+# the user, but can be thought of as the default reference for the
+# LDAP object containing it.
+#
+# One object can hold as many reservoir attributes as it likes;
+# this can be used as a directory of named references to the
+# Resource Collections, with names assigned by the object owner.
+#
+# As a special note, a Resource Collection may also hold reservoir
+# attributes.  These help to define an apparent nesting between the
+# Resource Collections.  Lookup of entries in these attributes is
+# permitted by those with `@K@` access rights, or those who may
+# know that a Resource Collection exists (and in this case, the fact
+# that it references another Resource Collection).  It is possible
+# to pass through a Resource Collection without being able to read
+# it.
+#
+# The actual layout of the Resource Collections is flat, they are
+# all children of the same node and all Resources are direct children
+# of the Resource Collection that holds them.  Using the reservoir
+# references however, one may browse around.  Do note that there is
+# no constraint on how this is done.  There is no guarantee of
+# referential integratiy, not of subtrees never joining and nog even
+# on the avoidance of cycles.  What we do have is a unique, random
+# UUID for each Resource Collection, which serves well to detect any
+# cycles or rediscoveries of shared branches. Usually, tools should
+# not want to build such overviews though; the idea is that LDAP
+# already fulfils all the desired functions (of searching).
+#
+# This is a specialisation of commonName / cn.
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.2.1.3
+	NAME 'reservoirRef'
+	DESC 'UUID in lowercase text form, referencing a Resource Collection in the ARPA2 Reservoir, and optionally followed by a space and a name for human consumption.  ARPA2 applications constrain their search for this UUID to the same domain name, by interpreting one in the LDAP tree and setting that as a BASE for searches..'
+	SUP 2.5.4.3 )
+
+# The reservoirRemoteRef can be used to link to remote Resource Collections
+# and remote Resources.  The precise interpretation depends on the type of
+# link.  We specifically include sftp:// URIs, even though they are not
+# formally defined.  We follow the intepretation of OpenSSH as a kind of
+# industry standard because it is so widely adopted.
+#
+# The intention of reservoirRemoteRef is to allow seemless integration of
+# remote Resource Collections, perhaps for grousp that we may access, as
+# part of a locally managed Reservoir.
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.2.1.4
+	NAME 'reservoirRemoteRef'
+	DESC 'URI, referencing a remote location, and optionally followed by a space and a description for human consumption.  The interpretation of the ideas of a Resource Collection and Resources in it depends on the URI and the resource found at its location.'
+	SUP labeledURI )
+
+# Some objects can be locked by a user, as long as they insert the
+# SINGLE-VALUE attribute type "lockedBy" and set it reference them.
+# Only one may add this attribute and it is assumed that others
+# will not remove it.  An ACL on the attribute may even enforce this
+# but generally it may be assumed that software is well-behaved.
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.2.1.5
+	NAME 'lockedBy'
+	DESC 'Description of the user who locked this object.'
+	EQUALITY distinguishedNameMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+	SINGLE-VALUE )
+	SUP distinguishedName )
+
+
+### Following are descriptive attributes for Resources ###
+
+
+# The mediaType attribute holds a media type, as standardised
+# by the IETF and registered at IANA on
+# https://www.iana.org/assignments/media-types/media-types.xhtml
+#
+# Resource Collections can hold multiple mediaTypes and some
+# parts may be marked general by an asterisk, such as "text/*"
+# or even "*/*".  Note that LDAP search filters may need to
+# escape this character as \2a when these are to be matched,
+# as specified in Section 3 of RFC 4515.
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.2.1.10
+	NAME 'mediaType'
+	DESC 'Media Type as registered by IANA.'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+# The documentHash consists of two parts; one names the hash by
+# its official form, followed by a space and the outcome in
+# hexadecimal.
+#
+# One document may be hashed by more than one algorithm, in
+# which case multiple of these attributes can be specified.
+#
+attributetype ( 1.3.6.1.4.1.44469.666.389.2.1.11
+	NAME 'documentHash'
+	DESC 'A name of a hash algorithm, a space and the hexadecimal form of the hash computation outcome.'
+	EQUALITY caseIgnoreIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+#TBD# # The storageHint attribute holds at least one word, but possibly
+#TBD# # a space and an extra bit of information.  The initial word is
+#TBD# # an ASCII term used to indicate a form or place of storage, the
+#TBD# # optional extra indicates what/where/how in more detail.
+#TBD# #
+#TBD# #TODO# or make this a DN?
+#TBD# #
+#TBD# attributetype (
+#TBD# 	NAME 'storageHint'
+#TBD# 	SUP )
+
+
+
+# The reservoirResource is used for individual Resources that are
+# stored in the Reservoir.  Much of it is like a document object,
+# but there are precautions such as secure hashes that may benefit
+# integrity validation of the object as well as locating it in a
+# peer-to-peer network.  There is a hint to reveal the storage
+# location.
+#
+# Resources may be locked by a writer.
+#
+#TODO# simpler "blob" objects for resources?
+# +  includes hashing options
+# +  includes IPFS references?
+# +  includes IPNS locations? (as soon as they express it in URIs)
+# +  includes general URIs
+# +  includes short "blobKey" (resource=...)
+# -  includes version history / backrefs?
+# -  includes arbitrary kinds of documentation
+# +  includes Content-Type
+#
+objectclass ( 1.3.6.1.4.1.44469.666.389.2.2.1
+	NAME 'reservoirResource'
+	DESC 'One Resource as stored in the ARPA2 Reservoir.  This is the metadata part, the actual data is in an object store.'
+	STRUCTURAL SUP document
+	MUST ( resource )
+	MAY ( cn $ mediaType $ description $ documentHash $ labeledURI $ lockedBy ) )
+
+# The reservoirCollection is used to represent a Resource Collection.
+# Its identity is a UUID which should be used in the RDN, so as to
+# support quick identification of a Resource's container as a
+# resourceInstance to connect with.
+#
+# The resourceClassUUID is required, and must be set to the value
+# for Resource Collections, as per http://uuid.arpa2.org that is
+# fixed to 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9.
+#
+#TODO# make it STRUCTURAL SUP resourceInstance
+#
+objectclass ( 1.3.6.1.4.1.44469.666.389.2.2.2
+	NAME 'reservoirCollection'
+	DESC 'One Resource Collection as stored in the ARPA2 Reservoir.  Usually with a reservoirIndex attached to simulate trees of Resource Collections, with Resources at the leafs.'
+	STRUCTURAL SUP documentSeries
+	MUST ( resourceInstanceKey $ resourceClassUUID )
+	MAY ( cn $ description ) )
+
+# Reservoir Index Objects can be attached to other objects to make
+# them point into the Reservoir using UUIDs and optional names for
+# Resource Collections.
+#
+objectclass ( 1.3.6.1.4.1.44469.666.389.2.2.3
+	NAME 'reservoirIndex'
+	DESC 'Objects that may reference Resource Collections in the ARPA2 Reservoir with local names for global UUIDs.'
+	AUXILIARY
+	MAY ( reservoirRef $ reservoirRemoteRef ) )
+
+# The reservoirQueue is used to point to a queueing mechanism
+# to which objects may be sent.  TODO: Collection!
+#
+objectclass ( 1.3.6.1.4.1.44469.666.389.2.2.4
+	NAME 'reservoirQueue'
+	DESC 'Queues are a special form of Resource Collection in the ARPA2 Reservoir.  It is possible to send and receive items, depending on the queue implementation.  There may or may not be a representation of Resources underneath this Resource Collection.  The URI holds information for further processing in this queue.'
+	STRUCTURAL SUP reservoirCollection
+	MUST labeledURI )
+
+# Any object can be made into a lockableObject by adding this
+# AUXILIARY class.  Locking is based on atomic operations.
+# Locks are obtained by adding one's own DN in the SINGLE-VALUE
+# lockedBy attribute, and unlocking is done by removing it.
+#
+# The purpose of adding this class to an object is to indicate
+# that it does indeed allow locks to be made out against it.
+# TODO: Schema will also say "MAY lockedBy".  Apps already know.
+#
+objectclass ( 1.3.6.1.4.1.44469.666.389.2.2.9
+	NAME 'lockableObject'
+	DESC 'Objects that may be locked by atomically adding the lockedBy attribute to the DN of the lock holder, and by removing it atomically once done.'
+	AUXILIARY
+	MAY ( lockedBy ) )
+

@@ -1,0 +1,28 @@
+diff --git a/src/pulley/CMakeLists.txt b/src/pulley/CMakeLists.txt
+index a0ed092..b8965c9 100644
+--- a/src/pulley/CMakeLists.txt
++++ b/src/pulley/CMakeLists.txt
+@@ -42,16 +42,16 @@ set_target_properties(pulley PROPERTIES LINK_FLAGS -rdynamic)
+ # directory.
+ #
+ # add_definitions(-DNO_SECURITY=1)
+-add_executable(pulleyback_test pulleyback_test.cpp)
+-target_link_libraries(pulleyback_test 
+-  pspplib 
+-  pslib 
+-  swcommon
+-  )
++#TMPNOT# add_executable(pulleyback_test pulleyback_test.cpp)
++#TMPNOT# target_link_libraries(pulleyback_test 
++  #TMPNOT# pspplib 
++  #TMPNOT# pslib 
++  #TMPNOT# swcommon
++  #TMPNOT# )
+ # We need to link this executable such that the plugins can get
+ # at the write_logger() symbol from the executable -- otherwise
+ # the plugin can't produce logging output.
+-set_target_properties(pulleyback_test PROPERTIES LINK_FLAGS -rdynamic)
++#TMPNOT# set_target_properties(pulleyback_test PROPERTIES LINK_FLAGS -rdynamic)
+ 
+ install(TARGETS pulley
+   RUNTIME DESTINATION bin

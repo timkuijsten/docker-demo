@@ -1,0 +1,56 @@
+# SteamWorks Pulley script for Identity Inheritance.
+#
+# The InternetWide Architecture places great emphasis on
+# identity and personal control over it, in a desire to
+# allow everyday users good control over their online
+# presence.  As part of this design, there will be an
+# infrastructure of accounts and security mechanisms.
+#
+# As part of the flexible management of identities, a
+# number of kinds of identity have been identified, and
+# relationships are designed to allow the management of
+# these identities.  Not just pseudonyms and lighter
+# aliases, but even separate identities for group members
+# and role occupants, so users of those identities need
+# not be aware of the underlying basic identity.
+#
+# The implementation of Identity Inheritance requires
+# some investigation into the structures setup for it
+# in the IdentityHub, so in terms of LDAP objects.  With
+# SteamWorks Pulley, an application can subscribe to
+# this advanced model and have the result delivered to
+# it in the form of backend calls that can setup whatever
+# is desired to arrange things locally.
+#
+# We start from a node named "idhub" which is supposed
+# to be externally defined as an LDAP server to which
+# to subscribe for identity information with immediate
+# updates upon changes.  We retrieve all the domains in
+# this repository at once, in support of bulk service.
+#
+# For more information, see the "identity tag",
+# http://internetwide.org/tag/identity.html
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+# Bind to user/group/role names and domain for all the
+# users known to the IdentityHub to which we subscribe.
+#
+# Requires: idhub.
+# Provides: uid, domain.
+#
+Uid=uid,@user,AssociatedDomain=domain,Ou="IdentityHub",O="arpa2.net",Ou="InternetWide" <- idhub
+
+
+# Bind the login names that may precede a user, which is
+# then effectively a pseudonym.
+#
+# Requires: idhub, domain, uid.
+# Provides: login.
+#
+# TODO (this stuff is difficult!)
+#
+Uid=login,AssociatedDomain=domain,Ou="IdentityHub",O="arpa2.net",Ou="InternetWide" <- idhub
+UidPseudonym=uid,
+
