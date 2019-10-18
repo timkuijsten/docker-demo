@@ -1,6 +1,7 @@
-# ARPA2 ACL demo
+# ARPA2 Communication and Resource ACL demo
 #
-# In this container you can test a communication pair with an ACL policy file.
+# In this container you can test both the communication and the resource acl
+# with simple policy examples.
 
 FROM arpa2/base
 
@@ -13,11 +14,12 @@ RUN apt-get update && apt-get install -y \
 	tmux
 
 RUN mkdir ~/arpa2 && cd ~/arpa2 && \
-	git clone https://github.com/arpa2/libarpa2service.git && \
-	cd libarpa2service/build && \
+	git clone https://gitlab.com/arpa2/libarpa2common.git && \
+	cd libarpa2common && git checkout aclr && \
+	mkdir build && cd build && \
 	cmake .. && \
 	make && \
 	make install && \
 	ldconfig
 
-COPY demopolicy /root/arpa2
+COPY aclcpolicy aclrpolicy /root/arpa2/
