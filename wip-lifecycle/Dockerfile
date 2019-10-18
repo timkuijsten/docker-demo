@@ -50,6 +50,7 @@ RUN cd /usr/local/src && git clone https://gitlab.com/arpa2/arpa2cm arpa2cm.git 
 ADD steamworks-test-buildfailure.patch /tmp/steamworks-test-buildfailure.patch
 # RUN cd /usr/local/src && git clone https://gitlab.com/arpa2/steamworks steamworks.git && mkdir steamworks.git/build && cd steamworks.git/build && cmake .. && make && make install
 RUN cd /usr/local/src && git clone https://gitlab.com/arpa2/steamworks steamworks.git && cd steamworks.git && ( patch -p1 < /tmp/steamworks-test-buildfailure.patch ) && mkdir build && cd build && cmake .. && make && make install
+RUN cd /usr/local/src && git clone https://github.com/arpa2/pulleyback-lifecycle pulleyback-lifecycle.git && cd pulleyback-lifecycle.git && mkdir build && cd build && cmake .. && make && make install
 
 
 #
