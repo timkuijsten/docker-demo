@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN mkdir ~/arpa2 && cd ~/arpa2 && \
 	git clone https://gitlab.com/arpa2/libarpa2common.git && \
-	cd libarpa2common && git checkout aclr && \
+	cd libarpa2common && git checkout v0.7.0 && \
 	mkdir build && cd build && \
 	cmake .. && \
 	make && \

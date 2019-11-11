@@ -3,9 +3,10 @@
 This container contains two demos, one for the communication acl and one for the
 resource acl.
 
-### Create the demo image
+### Create the demo image and run a container
 ```sh
 docker build -t a2acl .
+docker run -it a2acl bash
 ```
 
 ## Communication ACL
@@ -15,8 +16,7 @@ other by using a policy defined in the file `aclcpolicy`.
 
 ### Run the demo in the container
 ```sh
-$ docker run -it a2acl bash
-$ cd /root/arpa2
+# cd /root/arpa2
 # a2aclc aclcpolicy order@ashop.example.com tim@dev.arpa2.org
 B
 # a2aclc aclcpolicy order@ashop.example.com tim+ashop@dev.arpa2.org
@@ -47,17 +47,21 @@ policy defined in the file `aclrpolicy`.
 
 ### Run the demo in the container
 ```sh
-$ docker run -it a2acl bash
 # cd /root/arpa2
-# a2aclr aclrpolicy example.com john@example.com 7a35d76d-a754-35a6-abe7-757c161f0263 /home/john
+# a2aclr -i aclrpolicy example.com john@example.com 7a35d76d-a754-35a6-abe7-757c161f0263 /home/john
+newly imported ACL rules 3
 V
-# a2aclr aclrpolicy example.com john@example.com 7a35d76d-a754-35a6-abe7-757c161f0263 /var/empty
+# a2aclr -i aclrpolicy example.com john@example.com 7a35d76d-a754-35a6-abe7-757c161f0263 /var/empty
+newly imported ACL rules 3
 CRWKOV
-# a2aclr aclrpolicy example.com @example.com 7a35d76d-a754-35a6-abe7-757c161f0263 /home/john
+# a2aclr -i aclrpolicy example.com @example.com 7a35d76d-a754-35a6-abe7-757c161f0263 /home/john
+newly imported ACL rules 3
 V
-# a2aclr aclrpolicy example.com @example.com 7a35d76d-a754-35a6-abe7-757c161f0263 /var/empty
+# a2aclr -i aclrpolicy example.com @example.com 7a35d76d-a754-35a6-abe7-757c161f0263 /var/empty
+newly imported ACL rules 3
 
-# a2aclr aclrpolicy arpa2.org  foo+opt@arpa2.org 7a35d76d-a754-35a6-abe7-757c161f0263
+# a2aclr -i aclrpolicy arpa2.org foo+opt@arpa2.org 7a35d76d-a754-35a6-abe7-757c161f0263
+newly imported ACL rules 3
 CRWKO
 ```
 
