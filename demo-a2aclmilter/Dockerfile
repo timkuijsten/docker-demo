@@ -11,9 +11,9 @@ COPY .bashrc /root
 RUN apt-get install -y liblmdb-dev
 
 RUN cd /usr/local/src && \
-	git clone https://github.com/arpa2/libarpa2service.git && \
-	cd libarpa2service && git checkout v0.5.0 && \
-	cd build && \
+	git clone https://gitlab.com/arpa2/libarpa2common.git && \
+	cd libarpa2common && git checkout v0.7.0 && \
+	mkdir build && cd build && \
 	cmake .. && \
 	make && \
 	make install && \
@@ -26,9 +26,10 @@ RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set
 	useradd tim
 
 RUN cd /usr/local/src && \
-	git clone https://github.com/arpa2/arpa2mail.git && \
-	mkdir arpa2mail/a2aclmilter/build && \
-	cd arpa2mail/a2aclmilter/build && \
+	git clone https://gitlab.com/arpa2/arpa2mail.git && \
+	cd arpa2mail && git checkout v0.6.0 && \
+	mkdir a2aclmilter/build && \
+	cd a2aclmilter/build && \
 	cmake .. && \
 	make && \
 	make install
