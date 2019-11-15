@@ -33,29 +33,32 @@ a2aclmilter /demopolicy 2498 /etc/opt inet:7000@127.0.0.1
 echo hi | msmtp -v --host 127.0.0.1 --port 25 --from \
     root@ashop.example.com tim+ashop@example.net
 # This should result in: 250 2.0.0 Ok: queued as XXXXXXXXXX
-# Show the appended X-ARPA2-ACL: Whitelisted header:
-postcat -hq XXXXXXXXXX
+# Watch the appended X-ARPA2-ACL: Whitelisted header in the last mail:
+cat /var/mail/tim
 
 # 2. Send a Greylisted mail
 echo hi | msmtp -v --host 127.0.0.1 --port 25 --from \
     root@ashop.example.com tim@example.net
 # This should result in: 250 2.0.0 Ok: queued as XXXXXXXXXX
-# Show the appended X-ARPA2-ACL: Greylisted header:
+# Watch the appended X-ARPA2-ACL: Greylisted header in the last mail:
+cat /var/mail/tim
+
 postcat -hq XXXXXXXXXX
 
 # 3. Send a Blacklisted mail
 echo hi | msmtp -v --host 127.0.0.1 --port 25 --from \
     root@milter.demo.arpa2.net tim@example.net
 # This should result in: 550 5.7.1 Command rejected
-# No message is queued.
+# No new message is queued and cat /var/mail/tim should only show the messsages
+# of the previous tests.
 
 # 4. Send an Abandoned mail
 echo hi | msmtp -v --host 127.0.0.1 --port 25 --from \
     root@someone.tk tim@example.net
 # This should result in: 250 2.0.0 Ok: queued as XXXXXXXXXX
-# Although it sais a message is queued, it is in fact discarded:
-postcat -hq XXXXXXXXXX
-postcat: fatal: open queue file XXXXXXXXXX: No such file or directory
+# Although it sais a message is queued, it is in fact discarded. Again, no new
+# message is queued and cat /var/mail/tim should only show the messsages of test
+# 1 and 2.
 ```
 
 ## a2aclmilter usage

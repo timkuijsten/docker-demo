@@ -12,16 +12,18 @@ RUN apt-get install -y liblmdb-dev
 
 RUN cd /usr/local/src && \
 	git clone https://github.com/arpa2/libarpa2service.git && \
-	cd libarpa2service/build && \
+	cd libarpa2service && git checkout v0.5.0 && \
+	cd build && \
 	cmake .. && \
 	make && \
 	make install && \
 	ldconfig
 
 RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections && \
-	echo "postfix postfix/mailname string milter.demo.arpa2.net" | debconf-set-selections && \
+	echo "postfix postfix/mailname string example.net" | debconf-set-selections && \
 	apt-get install -y libmilter-dev postfix msmtp && \
-	echo 'smtpd_milters = inet:127.0.0.1:7000' >> /etc/postfix/main.cf
+	echo 'smtpd_milters = inet:127.0.0.1:7000' >> /etc/postfix/main.cf && \
+	useradd tim
 
 RUN cd /usr/local/src && \
 	git clone https://github.com/arpa2/arpa2mail.git && \
