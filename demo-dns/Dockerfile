@@ -11,7 +11,7 @@ RUN pip install cmdparser
 
 FROM arpa2/base
 
-RUN apt-get install -y gnupg python-six python-enum34 apt-transport-https ca-certificates
+RUN apt-get install -y gnupg python-six python-enum34 apt-transport-https ca-certificates liburcu-dev libjemalloc-dev
 
 COPY knot.gpg /root/
 COPY knot.list /etc/apt/sources.list.d/
