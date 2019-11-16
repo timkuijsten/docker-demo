@@ -2,6 +2,7 @@
 cmake_minimum_required (VERSION 3.1 FATAL_ERROR)
 project ("docker-demo" C)
 
+set(SRC4LIST)
 macro(builddir DIR)
 	file(STRINGS "${DIR}/Dockerfile" LINES)
 	set(DEPS "")
@@ -33,9 +34,14 @@ macro(builddir DIR)
 		DEPENDS ${DIR})
 	foreach(EXTDEP IN LISTS EXTDEPS)
 		string (REGEX REPLACE "^([^/: ]+)[/:]([^/: ]+).*$" "\\1-\\2" SRC4 "${EXTDEP}")
-		#DEBUG# message("External dependency: ${EXTDEP} added as ${SRC4}")
-		add_custom_target(${SRC4}
-			COMMAND docker pull ${EXTDEP})
+		list(FIND SRC4LIST "${SRC4}" SRC4IDX)
+		#DEBUG# message("External dependency: ${EXTDEP} to be added as ${SRC4}")
+		if(${SRC4IDX} EQUAL -1)
+			list(APPEND SRC4LIST "${SRC4}")
+			#DEBUG# message("Added custom target for ${SRC4} to pull ${EXTDEP}")
+			add_custom_target(${SRC4}
+				COMMAND docker pull ${EXTDEP})
+		endif()
 	endforeach()
 endmacro(builddir)
 
