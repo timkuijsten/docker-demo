@@ -32,8 +32,8 @@ RUN apt-get install -y \
 	flex bison \
 	rsyslog strace gdb \
 	cmake cmake-curses-gui pkg-config \
-	libldap-dev libsasl2-dev libkrb5-dev \
-	runit
+	libldap-dev libsasl2-dev libkrb5-dev
+	#TODO# runit
 	#TODO#libgnutls-dev
 
 # Install ARPA2CM
