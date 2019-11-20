@@ -21,44 +21,46 @@ is abandoned.
 docker pull arpa2/demo-a2aclmilter
 docker run -ti arpa2/demo-a2aclmilter bash
 
-# Start logging and postfix
-service rsyslog start && service postfix start
+# Start logging, postfix and the milter.
+# The milter uses policy file /demopolicy, as user id 2498 and is chrooted into
+# /etc/opt. Postfix communicates with the milter via tcp://127.0.0.1:7000.
+service rsyslog start && service postfix start &&
+    a2aclmilter /demopolicy 2498 /etc/opt inet:7000@127.0.0.1
 
-# Start a2aclmilter with policy file /demopolicy, as user id 2498 and
-# chrooted to /etc/opt. Postfix communicates with the milter via
-# tcp://127.0.0.1:7000
-a2aclmilter /demopolicy 2498 /etc/opt inet:7000@127.0.0.1
-
-# 1. Send a Whitelisted mail
-echo hi | msmtp -v --host 127.0.0.1 --port 25 --from \
+# 1. Send a Whitelisted mail.
+# This should result in: 250 2.0.0 Ok: queued as XXXXXXXXXX
+echo test1white | msmtp -v --host 127.0.0.1 --port 25 --from \
     root@ashop.example.com tim+ashop@example.net
-# This should result in: 250 2.0.0 Ok: queued as XXXXXXXXXX
-# Watch the appended X-ARPA2-ACL: Whitelisted header in the last mail:
+
+# Watch the appended X-ARPA2-ACL: Whitelisted header in the last mail
 cat /var/mail/tim
 
-# 2. Send a Greylisted mail
-echo hi | msmtp -v --host 127.0.0.1 --port 25 --from \
+# 2. Send a Greylisted mail.
+# This should result in: 250 2.0.0 Ok: queued as XXXXXXXXXX
+echo test2grey | msmtp -v --host 127.0.0.1 --port 25 --from \
     root@ashop.example.com tim@example.net
-# This should result in: 250 2.0.0 Ok: queued as XXXXXXXXXX
-# Watch the appended X-ARPA2-ACL: Greylisted header in the last mail:
-cat /var/mail/tim
 
-postcat -hq XXXXXXXXXX
+# Watch the appended X-ARPA2-ACL: Greylisted header in the last mail
+cat /var/mail/tim
 
 # 3. Send a Blacklisted mail
-echo hi | msmtp -v --host 127.0.0.1 --port 25 --from \
-    root@milter.demo.arpa2.net tim@example.net
 # This should result in: 550 5.7.1 Command rejected
-# No new message is queued and cat /var/mail/tim should only show the messsages
-# of the previous tests.
+echo test3black | msmtp -v --host 127.0.0.1 --port 25 --from \
+    root@milter.demo.arpa2.net tim@example.net
 
-# 4. Send an Abandoned mail
-echo hi | msmtp -v --host 127.0.0.1 --port 25 --from \
-    root@someone.tk tim@example.net
+# No new message is queued and the spool should only contain the messsages from
+# the previous tests.
+cat /var/mail/tim
+
+# 4. Send an Abandoned mail.
 # This should result in: 250 2.0.0 Ok: queued as XXXXXXXXXX
-# Although it sais a message is queued, it is in fact discarded. Again, no new
-# message is queued and cat /var/mail/tim should only show the messsages of test
-# 1 and 2.
+echo test4abandon | msmtp -v --host 127.0.0.1 --port 25 --from \
+    root@someone.tk tim@example.net
+
+# Although the daemon says a message is queued, it is in fact discarded. Again,
+# no new message is queued and the spool should only contain the messsages from
+# the previous tests.
+cat /var/mail/tim
 ```
 
 ## a2aclmilter usage
