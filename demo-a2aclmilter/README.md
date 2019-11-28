@@ -16,11 +16,13 @@ is blacklisted.
 is abandoned.
 
 
-## Pull and run the demo image
+## Create the demo image and run a container
 ```sh
-docker pull arpa2/demo-a2aclmilter
-docker run -ti arpa2/demo-a2aclmilter bash
+docker build -t a2aclmilter .
+docker run -it a2aclmilter bash
+```
 
+```sh
 # Start logging, postfix and the milter.
 # The milter uses policy file /demopolicy, as user id 2498 and is chrooted into
 # /etc/opt. Postfix communicates with the milter via tcp://127.0.0.1:7000.
