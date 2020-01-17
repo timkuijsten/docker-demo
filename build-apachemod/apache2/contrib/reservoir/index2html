@@ -1,0 +1,62 @@
+#!/bin/bash
+#
+# index2html -- Given a $PATH_INFO envvar beyond the script, make an index
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+cd "$PATH_INFO"
+
+COLLUUID=$(basename "$PATH_INFO")
+DOMPATH=$(dirname "$PATH_INFO")
+DOMAIN=$(basename "$DOMPATH")
+
+SYMLINKS=()
+RESOURCES=()
+for FILE in *
+do
+	if [ -h "$FILE" ]
+	then
+		SYMLINKS+=( "$FILE" )
+	else
+		RESOURCES+=( "$FILE" )
+	fi
+done
+
+cat <<EOH
+<html>
+<head>
+<title>Domain $DOMAIN, Collection $COLLUUID</title>
+</head>
+<body>
+<h1>Domain $DOMAIN, Collection $COLLUUID</h1>
+
+<p>The following named links are available:</p>
+<ul>
+EOH
+
+for FILE in "${SYMLINKS[@]}"
+do
+	FILEUUID=$(readlink "$FILE")
+	echo '<li><a href="'"$FILEUUID"'">'$FILE'</a></li>'
+done
+
+cat <<EOM
+</ul>
+<p>The following resources are available:</p>
+<ul>
+EOM
+
+for FILE in "${RESOURCES[@]}"
+do
+	echo '<li><a href="'"$FILE"'">'$FILE'</a></li>'
+done
+
+
+cat <<EOT
+</ul>
+<p><hr><small>ARPA2 Reservoir was developed by InternetWide.org to benefit online user freedom</small></p>
+</body>
+</html>
+EOT
+
