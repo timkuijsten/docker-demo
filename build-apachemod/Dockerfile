@@ -11,14 +11,14 @@ FROM arpa2/build-tlspool AS apache
 
 # Install the source code, patch and compile.
 
-RUN apt-get install -y automake libtool-bin libpcre3-dev
+RUN apt-get install -y automake libtool-bin libpcre3-dev liblmdb-dev lmdb-utils
 # RUN cd /usr/local/src ; git clone -b trunk --single-branch https://github.com/hfmanson/httpd.git apache-httpd.git
 # RUN cd /usr/local/src/apache-httpd.git/srclib ; git clone -b trunk --single-branch https://github.com/hfmanson/apr apr
 RUN cd /usr/local/src ; git clone -b mod_arpa2_aclr --single-branch https://github.com/arpa2/apache-httpd.git apache-httpd.git
 RUN cd /usr/local/src/apache-httpd.git/srclib ; git clone -b mod_arpa2_tlspool --single-branch https://github.com/arpa2/apache-apr apr
 # libarpa2common
 RUN cd /usr/local/src ; git clone https://gitlab.com/arpa2/libarpa2common.git && \
-    cd libarpa2common && git checkout v0.7.1 && \
+    cd libarpa2common && git reset v0.7.1 && \
     mkdir build && cd build && \
     cmake .. && \
     make && \
