@@ -12,7 +12,7 @@ FROM arpa2/base
 RUN apt-get update && \
 	apt-get install -y firefox-esr openssh-server \
 		libsasl2-2 libsasl2-dev libsasl2-modules \
-		libsasl2-modules-gssapi-mit maven git openjdk-8-jdk openjfx
+		libsasl2-modules-gssapi-mit maven git openjdk-11-jdk
 
 RUN mkdir /var/run/sshd
 
