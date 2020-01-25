@@ -8,7 +8,6 @@ $ docker run --rm --name apache -p 8000:80 -it build-apachemod bash
 ```
 ## Inside docker ##
 ```
-root@9b0050a13502:/# export PATH=$PATH:/usr/local/apache2/bin
 root@9b0050a13502:/# apachectl start
 ```
 

@@ -31,17 +31,19 @@ RUN cd /usr/local/src ; git clone https://gitlab.com/arpa2/libarpa2common.git &&
 RUN cd /usr/local/src/apache-httpd.git ; ./buildconf ; ./configure --prefix=/usr/local/apache2 --enable-tlspool
 RUN cd /usr/local/src/apache-httpd.git ; make all test install
 
+COPY bashrc /root/.bashrc
+
 #TODO# Setup script to run
 RUN sed -i 's/^#\(LoadModule tlspool_module\)/\1/' /usr/local/apache2/conf/httpd.conf
 
 # Create a user or two (we force them into ARPA2 Reservoir, evil but it works)
-#TOOMUCH# RUN useradd -m john && su -c 'mkdir ~/public_html' john
-#TOOMUCH# RUN useradd -m mary && su -c 'mkdir ~/public_html' mary
-#TOOMUCH# COPY john.index.html /home/john/public_html/index.html
-#TOOMUCH# COPY mary.index.html /home/mary/public_html/index.html
+RUN useradd -m john && su -c 'mkdir ~/public_html' john
+RUN useradd -m mary && su -c 'mkdir ~/public_html' mary
+COPY john.index.html /home/john/public_html/index.html
+COPY mary.index.html /home/mary/public_html/index.html
 COPY --from=reservoir /var/arpa2/reservoir /var/arpa2/reservoir
-COPY john.index.html /var/arpa2/reservoir/arpa2.org/uid=john/index.html
-COPY mary.index.html /var/arpa2/reservoir/arpa2.org/uid=mary/index.html
+#TOOCRUDE# COPY john.index.html /var/arpa2/reservoir/arpa2.org/uid=john/index.html
+#TOOCRUDE# COPY mary.index.html /var/arpa2/reservoir/arpa2.org/uid=mary/index.html
 
 # Provide for something to read
 COPY README.MD /ApacheHTTPD.MD
