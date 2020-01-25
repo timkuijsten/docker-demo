@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# symlink2colluuid -- map a symbolic link's filename to a Collection UUID
+#
+#TODO# There appears to be a problem with uid= form on ZFS.
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+while read LINKNAME
+do
+	if [ ! -h "$LINKNAME" ]
+	then
+		echo 'NULL'
+	else
+		COLLUUID=$(basename $(readlink "$LINKNAME"))
+		echo "$COLLUUID"
+	fi
+done
