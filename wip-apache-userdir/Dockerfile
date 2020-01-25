@@ -5,6 +5,9 @@
 # From: Henri Manson <hfmanson@gmail.com>
 
 
+# ARPA2 Reservoir demonstration files
+FROM arpa2/files-reservoir AS reservoir
+
 # ARPA2 base image is build-tlspool
 FROM arpa2/build-tlspool AS apache
 
@@ -31,11 +34,13 @@ RUN cd /usr/local/src/apache-httpd.git ; make all test install
 #TODO# Setup script to run
 RUN sed -i 's/^#\(LoadModule tlspool_module\)/\1/' /usr/local/apache2/conf/httpd.conf
 
-# Create a user
+# Create a user or two
 RUN useradd -m john && su -c 'mkdir ~/public_html' john
 RUN useradd -m mary && su -c 'mkdir ~/public_html' mary
 COPY john.index.html /home/john/public_html/index.html
 COPY mary.index.html /home/mary/public_html/index.html
+RUN mkdir -p /var/arpa2/reservoir
+COPY --from=reservoir /var/arpa2/reservoir /var/arpa2/reservoir
 
 # Provide for something to read
 COPY README.MD /ApacheHTTPD.MD
