@@ -45,8 +45,9 @@ $ curl -L -H 'User: mary' http://localhost:8000
 </html>
 ```
 
-**Note:**
-A variant is also available.  Edit `/usr/local/apache2/conf/extra/httpd-userdir.conf` and switch to the `UserDir "/var/arpa2/reservoir/uid=*"` line.  This allows retrieval with the following sequence:
+The demo is a bit crude, in that it forced John and Mary into a structure
+that is in fact a bit different, the ARPA2 Reservoir.  More appropriate ways
+of viewing that are:
 
 ```
 curl -L -H 'User: rick' http://localhost:8000
@@ -57,6 +58,11 @@ curl -L -H 'User: rick' -o /tmp/sonata.mp3 http://localhost:8000/Negrin%20-%20Wh
 ```
 
 You can now play the file, `/tmp/sonata.mp3`, with your favourite music player.  Creative Commons!
+
+**Note:** If you use a client without support for the `User:` header,
+you can still get away with the hackish form of prefixing `/~rick` to
+the path in the URI.
+
 
 ## Inside docker ##
 ```
