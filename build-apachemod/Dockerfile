@@ -9,14 +9,12 @@
 FROM arpa2/build-tlspool AS apache
 
 
-# Install the source code, patch and compile.
+# Install the Apache tool chain and compile
 
-RUN apt-get install -y automake libtool-bin libpcre3-dev liblmdb-dev lmdb-utils
-# RUN cd /usr/local/src ; git clone -b trunk --single-branch https://github.com/hfmanson/httpd.git apache-httpd.git
-# RUN cd /usr/local/src/apache-httpd.git/srclib ; git clone -b trunk --single-branch https://github.com/hfmanson/apr apr
-RUN cd /usr/local/src ; git clone -b mod_arpa2_aclr --single-branch https://github.com/arpa2/apache-httpd.git apache-httpd.git
-RUN cd /usr/local/src/apache-httpd.git/srclib ; git clone -b mod_arpa2_tlspool --single-branch https://github.com/arpa2/apache-apr apr
-# libarpa2common
+RUN apt-get install -y automake libtool-bin libpcre3-dev liblmdb-dev lmdb-utils apache2-dev apache2-utils apache2
+
+# Install libarpa2common
+
 RUN cd /usr/local/src ; git clone https://gitlab.com/arpa2/libarpa2common.git && \
     cd libarpa2common && git reset v0.7.1 && \
     mkdir build && cd build && \
@@ -25,24 +23,16 @@ RUN cd /usr/local/src ; git clone https://gitlab.com/arpa2/libarpa2common.git &&
     make install && \
     ldconfig
 
-RUN cd /usr/local/src/apache-httpd.git ; ./buildconf ; ./configure --prefix=/usr/local/apache2 --enable-tlspool
-RUN cd /usr/local/src/apache-httpd.git ; make all test install
+# Build Apache modules
+COPY mod_arpa2_tlspool	/usr/local/src/mod_arpa2_tlspool
+COPY mod_arpa2_aclr 	/usr/local/src/mod_arpa2_aclr
+COPY mod_arpa2_userdir	/usr/local/src/mod_arpa2_userdir
 
-#TODO# Setup script to run
-RUN sed -i 's/^#\(LoadModule tlspool_module\)/\1/' /usr/local/apache2/conf/httpd.conf
-
-# Provide for something to read
-COPY README.MD /ApacheHTTPD.MD
-COPY apache2 /usr/local/apache2
+RUN cd /usr/local/src/mod_arpa2_userdir	&& apxs -i -a -c mod_arpa2_userdir.c
+RUN cd /usr/local/src/mod_arpa2_aclr	&& apxs -i -a -c mod_arpa2_aclr.c \
+                                    	        -larpa2aclr
+RUN cd /usr/local/src/mod_arpa2_tlspool	&& apxs -i -a -c mod_arpa2_tlspool.c \
+                                    	        -ltlspool
 
 # Define default command
 CMD ["/bin/bash"]
-
-
-### FUTURE: EXTRACT FROM THIS IMAGE
-#
-# FROM arpa2/base
-# COPY --from=apache /usr/local/apache2 /usr/local/apache2
-# COPY --from=apache /usr/local/lib/libtlspool.so /usr/local/lib/
-# COPY README.MD /ApacheHTTPD.MD
-# CMD ["/bin/bash"]
