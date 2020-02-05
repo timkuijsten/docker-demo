@@ -105,7 +105,8 @@
 #
 
 
-FROM arpa2/base
+#EASY_INSTALL_LDAP# FROM arpa2/base
+FROM arpa2/build-bin
 
 
 # Install Riak KV from .deb (moved from option 2 above)
@@ -117,9 +118,10 @@ FROM arpa2/base
 
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get install --no-install-recommends -y \
-	openssl logrotate sudo libncurses5 libtinfo5
+	openssl logrotate sudo libncurses5 libtinfo5 \
+	python3-dev
 
-RUN python3 /usr/lib/python3/dist-packages/easy_install.py python3-ldap riak six #TODO:AWAIT:PY3#web2ldap
+RUN python3 -m easy_install python3-ldap riak six web2ldap
 
 #TODO:BUILD# RUN cd /usr/local/src ; git clone https://github.com/arpa2/arpa2shell-cmdparser cmdparser.git
 #TODO:BUILD# RUN cd /usr/local/src/cmdparser.git/cmdparser ; python setup.py install
