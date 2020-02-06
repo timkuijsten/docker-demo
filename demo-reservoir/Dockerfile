@@ -54,7 +54,7 @@ RUN DEBIAN_FRONTEND=noninteractive SLAPD_PASSWORD=sekreet \
 
 COPY initial.ldif /root/initial.ldif
 # COPY index.ldif   /root/index.ldif
-COPY webdav-reservoir/schema/* /etc/ldap/schema/
+COPY schema/* /etc/ldap/schema/
 RUN rm -rf /etc/ldap/slapd.d
 COPY slapd.conf /etc/ldap/slapd.conf
 COPY ldap.conf /etc/ldap/ldap.conf

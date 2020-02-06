@@ -300,152 +300,91 @@ may suggest otherwise.
 shell# arpa2acl 
 Edit Access Control Lists as saved in LDAP.
 
-arpa2acl> acl_dn resourceInstance={UUID_Zwaarden},associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
-#EXAMPLE# acl_dn resourceInstance=bcc718d8-a25f-4580-8259-2cdb7af20e92,associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+arpa2acl> acl_dn resins=0878c424-e544-43cd-b1c4-71f8c7f76237,associatedDomain=arpa2.org,ou=Reservoir,o=arpa2.net,ou=InternetWide
+
 resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
-resourceInstance: bcc718d8-a25f-4580-8259-2cdb7af20e92
-cn: Zwaarden
+resourceInstance: 0878c424-e544-43cd-b1c4-71f8c7f76237
+cn: Negrin
+reservoirRef: 9673fd11-6d10-48a1-905b-8f8599a0584f Whispering
+accessControlList: 999 %wr demo@arpa2.org
 
-arpa2acl> acl_add %k @orvelte.nep
-('Adding rights', '%k', 'to selector', '@orvelte.nep')
+arpa2acl> acl_add %r bakker@orvelte.nep
 
-arpa2acl> acl_add %w smid@orvelte.nep
-('Adding rights', '%w', 'to selector', 'smid@orvelte.nep')
+arpa2acl> acl_del demo@arpa2.org
+Removing rights %wr from selector demo@arpa2.org
 
 arpa2acl> acl_save
-('OLD =', [])
-('NEW =', ['0', '%w', 'smid@orvelte.nep', '%k', '@orvelte.nep'])
-('MOD =', [(0, 'accessControlList', '0 %w smid@orvelte.nep %k @orvelte.nep')])
-```
 
-After this action, `slapcat` would reveal something like this for the `Zwaarden`
-object:
+arpa2acl> acl_dn resins=0878c424-e544-43cd-b1c4-71f8c7f76237,associatedDomain=arpa2.org,ou=Reservoir,o=arpa2.net,ou=InternetWide
 
-```
-dn: resourceInstance=bcc718d8-a25f-4580-8259-2cdb7af20e92,associatedDomain=o
- rvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
-objectClass: reservoirCollection
-objectClass: resourceInstanceObject
-objectClass: accessControlledObject
-objectClass: reservoirIndex
 resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
-resourceInstance: bcc718d8-a25f-4580-8259-2cdb7af20e92
-cn: Zwaarden
-accessControlList: 999 %wr demo@arpa2.net
-accessControlList: 0 %w smid@orvelte.nep %k @orvelte.nep
-structuralObjectClass: reservoirCollection
-entryUUID: 74b5a61c-6da8-1039-9f07-67b874f43b45
-creatorsName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.net
- ,ou=internetwide
-createTimestamp: 20190917150622Z
-entryCSN: 20190917153219.162745Z#000000#000#000000
-modifiersName: uid=demo,associatedDomain=arpa2.net,ou=identityhub,o=arpa2.ne
- t,ou=internetwide
-modifyTimestamp: 20190917153219Z
+resourceInstance: 0878c424-e544-43cd-b1c4-71f8c7f76237
+cn: Negrin
+reservoirRef: 9673fd11-6d10-48a1-905b-8f8599a0584f Whispering
+accessControlList: %r bakker@orvelte.nep
+
 ```
 
-Much better would of course be to query using LDAP, for instance assuming that
-you have a Kerberos login,
+Instead of this other `acl_dn` call, you could also try with `slapcat`
+what has changed.  Or you could of course query LDAP, for instance
+assuming that you have a Kerberos login after `arpa2kinit` succeeded,
 
 ```
 shell$ ldapsearch -H ldapi://%2ftmp%2fldap-socket \
 	-Y gssapi \
-	-b associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide \
+	-b associatedDomain=arpa2.org,ou=Reservoir,o=arpa2.net,ou=InternetWide \
 	'(&(objectClass=accessControlledObject)(objectClass=resourceInstanceObject))' \
 	resourceClass resourceInstance accessControlList
 ```
 
-which could yield something like
+which would yield the ACL definitions underneath this domain's Reservoir:
 
 ```
+SASL/GSSAPI authentication started
+SASL username: demo@ARPA2.NET
+SASL SSF: 256
+SASL data security layer installed.
 # extended LDIF
 #
 # LDAPv3
-# base <associatedDomain=orvelte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide> with scope subtree
+# base <associatedDomain=arpa2.org,ou=Reservoir,o=arpa2.net,ou=InternetWide> with scope subtree
 # filter: (&(objectClass=accessControlledObject)(objectClass=resourceInstanceObject))
 # requesting: resourceClass resourceInstance accessControlList 
 #
 
-# cad30662-6d31-479e-810c-022af25e04db, orvelte.nep, Reservoir, arpa2.net, Inte
- rnetWide
-dn: resourceInstance=cad30662-6d31-479e-810c-022af25e04db,associatedDomain=orv
- elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+# 0878c424-e544-43cd-b1c4-71f8c7f76237, arpa2.org, Reservoir, arpa2.net, Intern
+ etWide
+dn: resourceInstance=0878c424-e544-43cd-b1c4-71f8c7f76237,associatedDomain=arp
+ a2.org,ou=Reservoir,o=arpa2.net,ou=InternetWide
 resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
-resourceInstance: cad30662-6d31-479e-810c-022af25e04db
-accessControlList: 999 %wr demo@arpa2.net
+resourceInstance: 0878c424-e544-43cd-b1c4-71f8c7f76237
+accessControlList: %r bakker@orvelte.nep
 
-# 58113855-5c25-4472-a37b-c62768e8ed9d, orvelte.nep, Reservoir, arpa2.net, Inte
- rnetWide
-dn: resourceInstance=58113855-5c25-4472-a37b-c62768e8ed9d,associatedDomain=orv
- elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
+# 9673fd11-6d10-48a1-905b-8f8599a0584f, arpa2.org, Reservoir, arpa2.net, Intern
+ etWide
+dn: resourceInstance=9673fd11-6d10-48a1-905b-8f8599a0584f,associatedDomain=arp
+ a2.org,ou=Reservoir,o=arpa2.net,ou=InternetWide
 resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
-resourceInstance: 58113855-5c25-4472-a37b-c62768e8ed9d
-accessControlList: 999 %wr demo@arpa2.net
-
-# 7c63433e-c603-4e62-b309-b89c008495b1, orvelte.nep, Reservoir, arpa2.net, Inte
- rnetWide
-dn: resourceInstance=7c63433e-c603-4e62-b309-b89c008495b1,associatedDomain=orv
- elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
-resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
-resourceInstance: 7c63433e-c603-4e62-b309-b89c008495b1
-accessControlList: 999 %wr demo@arpa2.net
-
-# cdc98770-b09e-41c7-972c-eea34dada600, orvelte.nep, Reservoir, arpa2.net, Inte
- rnetWide
-dn: resourceInstance=cdc98770-b09e-41c7-972c-eea34dada600,associatedDomain=orv
- elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
-resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
-resourceInstance: cdc98770-b09e-41c7-972c-eea34dada600
-accessControlList: 999 %wr demo@arpa2.net
-
-# 3cfde35a-98aa-4289-beb1-1649c52dba13, orvelte.nep, Reservoir, arpa2.net, Inte
- rnetWide
-dn: resourceInstance=3cfde35a-98aa-4289-beb1-1649c52dba13,associatedDomain=orv
- elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
-resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
-resourceInstance: 3cfde35a-98aa-4289-beb1-1649c52dba13
-accessControlList: 999 %wr demo@arpa2.net
-
-# 5d6f9da0-6867-47c6-8b3e-d67a519eb31f, orvelte.nep, Reservoir, arpa2.net, Inte
- rnetWide
-dn: resourceInstance=5d6f9da0-6867-47c6-8b3e-d67a519eb31f,associatedDomain=orv
- elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
-resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
-resourceInstance: 5d6f9da0-6867-47c6-8b3e-d67a519eb31f
-accessControlList: 999 %wr demo@arpa2.net
-
-# 7d9c75a4-6c6d-4f3b-8c53-f5c95dd0e6c4, orvelte.nep, Reservoir, arpa2.net, Inte
- rnetWide
-dn: resourceInstance=7d9c75a4-6c6d-4f3b-8c53-f5c95dd0e6c4,associatedDomain=orv
- elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
-resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
-resourceInstance: 7d9c75a4-6c6d-4f3b-8c53-f5c95dd0e6c4
-accessControlList: 999 %wr demo@arpa2.net
-
-# c0743b9d-826d-43ac-83c2-ab915d974e60, orvelte.nep, Reservoir, arpa2.net, Inte
- rnetWide
-dn: resourceInstance=c0743b9d-826d-43ac-83c2-ab915d974e60,associatedDomain=orv
- elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
-resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
-resourceInstance: c0743b9d-826d-43ac-83c2-ab915d974e60
-accessControlList: 999 %wr demo@arpa2.net
-
-# bcc718d8-a25f-4580-8259-2cdb7af20e92, orvelte.nep, Reservoir, arpa2.net, Inte
- rnetWide
-dn: resourceInstance=bcc718d8-a25f-4580-8259-2cdb7af20e92,associatedDomain=orv
- elte.nep,ou=Reservoir,o=arpa2.net,ou=InternetWide
-resourceClass: 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9
-resourceInstance: bcc718d8-a25f-4580-8259-2cdb7af20e92
-accessControlList: 999 %wr demo@arpa2.net
-accessControlList: 0 %w smid@orvelte.nep %k @orvelte.nep
+resourceInstance: 9673fd11-6d10-48a1-905b-8f8599a0584f
+accessControlList: 999 %wr demo@arpa2.org
 
 # search result
 search: 4
 result: 0 Success
 
-# numResponses: 10
-# numEntries: 9
+# numResponses: 3
+# numEntries: 2
 ```
+
+A similar query, albeit not domain-specific, is done by the software that
+downloads access rigths for checking at the sites where they are needed.
+The difference is that this is not a `search` operation, but a synchronising
+variant, that continues to receive updates to the original search result.
+This is done fast, so the synchronised listeners (which we implement with
+SteamWorks Pulley) continually receive additions and removals that they can
+disperse to their backends for (virtually) immediate changes to access control
+in the nooks and crannies of the InternetWide Architecture.  Such fast updates
+are helpful when permissions must be retracted as fast as possible.
 
 Similar queries can be made in other languages.  The example given is for
 querying ACL instances, which in terms of Reservoir are Resource Collections
