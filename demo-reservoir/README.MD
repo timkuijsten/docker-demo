@@ -284,15 +284,20 @@ first/lowest RDN in the path may give away details to identify
 the ACL object; an attribute (possibly inherited) of `uid`
 for a Communication ACL object, or a `rescls` or `resins` for
 a resource class and resource instance, respectively.  For
-instance in the Reservoir, we have a nesting `resins=, rescls=, ...`
-that can be helpful.
+instance in the Reservoir, we have a nesting
+`resource=, resins=, ..., ou=Reservoir,o=arpa2.net,ou=InternetWide`
+that can be helpful.  Although `rescls` is not shown in the
+DN, the `ou=Reservoir,o=arpa2.net,ou=InternetWide` says the
+same thing, it marks the boundaries of the application, which
+in turn specifies the `resourceClass`, which is also part of
+the `resins=` LDAP objects.
 
 Finally, resources are specific to a domain name, which serves
 as a realm.  This can be found in the `dn` as the user domain.
 For Reservoir, one would have `associatedDomain=orvelte.nep,
 ou=Reservoir, o=arpa2.net, ou=InternetWide` if `orvelte.nep`
-is the user domain.  Directly underneath would be `resins=,
-rescls=` levels.  Note that there is no more nesting than
+is the user domain.  Directly underneath would be `resource=,
+resins=` levels.  Note that there is no more nesting than
 this, even when the cross-references between `rescls` objects
 may suggest otherwise.
 

@@ -35,7 +35,7 @@ FROM arpa2/build-bin
 
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get install --no-install-recommends -y \
-	openssl logrotate sudo libncurses5 libtinfo5 \
+	logrotate libncurses5 libtinfo5 \
 	python3-dev
 
 RUN python3 -m easy_install python3-ldap six web2ldap
