@@ -12,10 +12,7 @@ sed -e '$,$s/^\([^ \t]*\)[ \t]/\1 reservoir.arpa2 /' < /etc/hosts > /etc/hosts2 
 echo Configuring OpenLDAP
 echo
 slapadd -c -f /etc/ldap/slapd.conf -l /root/initial.ldif
-
-echo Start Riak KV
-echo
-riak start
+slapadd -c -f /etc/ldap/slapd.conf -l /var/arpa2/reservoir/index.ldif
 
 #NOTHERE# echo 'Starting web2ldap (only over IPv4) on port 1761...'
 #NOTHERE# echo

@@ -1,4 +1,4 @@
-# README for Docker Image arpa2/reservoir
+# README for Docker Image arpa2/demo-reservoir
 
 > *This is a simple, initial version of the ARPA2 Reservoir
 > as designed in the InternetWide.org project, and implemented
@@ -122,6 +122,34 @@ of the tree, to help with situations where not all
 domains have the same service, where subdomains have
 additional service, where customers take out only one
 but not both the services, and so on.
+
+## Use the prepared Reservoir Domain
+
+The music collection from the `arpa2/files-reservoir` Docker Demo are loaded
+in `/var/arpa2/reservoir` and the shell `arpa2reservoir` uses those as
+file store, with metadata in LDAP.  The additional links and a few
+descriptive files from the demo are ignored.
+
+The following commands can now be tried to start at the
+default collection for domain `arpa2.org`, then follow
+index links, first `Negrin` then `Whispering`, and list
+resources.
+
+```
+index domain arpa2.org
+index path Negrin Whispering
+resource list
+resource get efd7a299-2b35-457d-83af-25fd54697e99
+```
+
+The latter dumps a file on standard output, which we should
+improve on, but in this case it is a simple text file, so no
+harm done.  Negrin has a habit of using Creative Commons
+licenses, yet deliver interesting guitar music with classical
+inspirational links.  Enjoy!
+
+
+## Setup your own Reservoir Domain
 
 Once on an `arpa2reservoir` shell, you can do things like
 adding domains, Resource Collections underneath domains,
