@@ -7,6 +7,7 @@
 + construct an image arpa2/buildphase-pip FROM debian:stable with "just" pip
 + use it to RUN pip install cmdparser python-ldap riak
 + COPY --from /usr/*/lib/python2.7/dist-utils/ /usr/*/lib/python2.7/dist-utils
-- Somehow get riak to create bucket types with or without crypto:md5 facility
+X Somehow get riak to create bucket types with or without crypto:md5 facility
 + Drop user_pasw.py from Dockerfile [also in the arpa2/identityhub target]
-
++ Make arpa2reservoir work; riak->files, str.strip, imports
+- Expand arpa2acl with libarpa2common wrapper

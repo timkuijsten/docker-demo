@@ -71,18 +71,16 @@ RUN chmod go+r /etc/krb5.keytab
 COPY --from=reservoir /var/arpa2/reservoir /var/arpa2/reservoir
 
 
-# Install operator's shells to play around with the Reservoir
+# Install utitilities commonly used in the demo environments
 #
-
-COPY arpa2reservoir.py /usr/local/lib/python2.7/dist-packages/arpa2reservoir.py
-#PY3# COPY arpa2reservoir.py /usr/local/lib/python3/dist-packages/arpa2reservoir.py
-RUN ln -s /usr/local/lib/python2.7/dist-packages/arpa2reservoir.py /usr/bin/arpa2reservoir
-#PY3# RUN ln -s /usr/local/lib/python3/dist-packages/arpa2reservoir.py /usr/bin/arpa2reservoir
-COPY arpa2acl.py /usr/local/lib/python2.7/dist-packages/arpa2acl.py
-RUN ln -s /usr/local/lib/python2.7/dist-packages/arpa2acl.py /usr/bin/arpa2acl
-RUN chmod ugo+x /usr/bin/arpa2reservoir /usr/bin/arpa2acl
 COPY arpa2gnu /usr/bin/arpa2gnu
 COPY arpa2kinit /usr/bin/arpa2kinit
+
+
+# Install the arpa2shell utilities from Git
+#
+RUN git clone https://github.com/arpa2/arpa2shell /usr/local/src/arpa2shell.git
+RUN python /usr/local/src/arpa2shell.git/setup.py install
 
 
 # Install the main script for the Reservoir service
