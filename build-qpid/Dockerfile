@@ -8,7 +8,7 @@
 
 # Start with the binary + python build environment
 #
-FROM arpa2/build-pip
+FROM arpa2/build-pip AS src2export
 
 # Include the README.MD in the root
 #
@@ -51,9 +51,20 @@ RUN cd /usr/local/src/qpid-dispatch.git ; mkdir build ; cd build ; cmake .. ; ma
 # Prepare export directories for each product in DESTDIR=/export/qpid/<product>
 #
 RUN mkdir -p /export/qpid/proton /export/qpid/broker /export/qpid/dispatch
-RUN cd /usr/local/src/qpid-proton.git/build && make DESTDIR=/export/qpid/proton install && cd /export/qpid/proton && tar -czf ../proton.tgz * && cd .. && rm -rf proton
-#BROKEN:QPID-8413# RUN cd /usr/local/src/qpid-cpp-broker.git/build && make DESTDIR=/export/qpid/broker install && cd /export/qpid/broker && tar -czf ../broker.tgz * && cd .. && rm -rf broker
-RUN cd /usr/local/src/qpid-dispatch.git/build && make DESTDIR=/export/qpid/dispatch install && cd /export/qpid/dispatch && tar -czf ../dispatch.tgz * && cd .. && rm -rf dispatch
+RUN cd /usr/local/src/qpid-proton.git/build && make DESTDIR=/export/qpid/proton install #NOMORE# && cd /export/qpid/proton && tar -czf ../proton.tgz * && cd .. && rm -rf proton
+#BROKEN:QPID-8413# RUN cd /usr/local/src/qpid-cpp-broker.git/build && make DESTDIR=/export/qpid/broker install #NOMORE# && cd /export/qpid/broker && tar -czf ../broker.tgz * && cd .. && rm -rf broker
+RUN cd /usr/local/src/qpid-dispatch.git/build && make DESTDIR=/export/qpid/dispatch install #NOMORE# && cd /export/qpid/dispatch && tar -czf ../dispatch.tgz * && cd .. && rm -rf dispatch
+
+
+#
+# Start setting up the actual output
+#
+
+FROM arpa2/base
+
+RUN apt-get install libpython3.7
+
+COPY --from=src2export /export/qpid/proton/ /export/qpid/dispatch/ /export/qpid/broker/ /
 
 
 # Baseline command is bash
