@@ -33,10 +33,10 @@ RUN cd /usr/local/src/qpid-proton.git ; mkdir build ; cd build ; cmake .. ; make
 #
 # Old INSTALL: https://raw.githubusercontent.com/apache/qpid-cpp/master/INSTALL.txt
 #
-RUN cd /usr/local/src ; git clone -b master --single-branch \
-		https://git-wip-us.apache.org/repos/asf/qpid-cpp.git qpid-cpp-broker.git
-#FAILING TEST# RUN cd /usr/local/src/qpid-cpp-broker.git ; mkdir build ; cd build ; cmake .. ; make all test install
-RUN cd /usr/local/src/qpid-cpp-broker.git ; mkdir build ; cd build ; cmake .. ; make all install
+#BROKEN:QPID-8413# RUN cd /usr/local/src ; git clone -b master --single-branch \
+#BROKEN:QPID-8413# 		https://git-wip-us.apache.org/repos/asf/qpid-cpp.git qpid-cpp-broker.git
+#FAILING TEST# RUN cd /usr/local/src/qpid-cpp-broker.git ; mkdir build ; cd build ; cmake .. ; make all test #EXPORT:BELOW# install
+#BROKEN:QPID-8413# RUN cd /usr/local/src/qpid-cpp-broker.git ; mkdir build ; cd build ; cmake .. ; make all #EXPORT:BELOW# install
 
 # Install Qpid Dispatch
 #
@@ -45,16 +45,15 @@ RUN cd /usr/local/src/qpid-cpp-broker.git ; mkdir build ; cd build ; cmake .. ; 
 #
 RUN cd /usr/local/src ; git clone -b master --single-branch \
 		https://git-wip-us.apache.org/repos/asf/qpid-dispatch.git qpid-dispatch.git
-#FAILING TESTS# RUN cd /usr/local/src/qpid-dispatch.git ; mkdir build ; cd build ; cmake .. ; make all test install
-RUN cd /usr/local/src/qpid-dispatch.git ; mkdir build ; cd build ; cmake .. ; make all install
+#FAILING TESTS# RUN cd /usr/local/src/qpid-dispatch.git ; mkdir build ; cd build ; cmake .. ; make all test #EXPORT:BELOW# install
+RUN cd /usr/local/src/qpid-dispatch.git ; mkdir build ; cd build ; cmake .. ; make all #EXPORT:BELOW# install
 
 # Prepare export directories for each product in DESTDIR=/export/qpid/<product>
 #
-RUN mkdir -p /export/qpid/{proton,broker,dispatch}
-RUN cd /usr/local/src/qpid-proton.git/build DESTDIR=/export/qpid/proton make install
-RUN cd /usr/local/src/qpid-cpp-broker.git/build DESTDIR=/export/qpid/broker make install
-RUN cd /usr/local/src/qpid-dispatch.git/build DESTDIR=/export/qpid/dispatch make install
-RUN for PROD in proton broker dispatch ; do cd /export/qpid/$PROD ; tar -czvf -C /export/qpid/$PROD /export/qpid/$PROD.tgz * ; rm -rf /export/qpid/$PROD ; done
+RUN mkdir -p /export/qpid/proton /export/qpid/broker /export/qpid/dispatch
+RUN cd /usr/local/src/qpid-proton.git/build && make DESTDIR=/export/qpid/proton install && cd /export/qpid/proton && tar -czf ../proton.tgz * && cd .. && rm -rf proton
+#BROKEN:QPID-8413# RUN cd /usr/local/src/qpid-cpp-broker.git/build && make DESTDIR=/export/qpid/broker install && cd /export/qpid/broker && tar -czf ../broker.tgz * && cd .. && rm -rf broker
+RUN cd /usr/local/src/qpid-dispatch.git/build && make DESTDIR=/export/qpid/dispatch install && cd /export/qpid/dispatch && tar -czf ../dispatch.tgz * && cd .. && rm -rf dispatch
 
 
 # Baseline command is bash
