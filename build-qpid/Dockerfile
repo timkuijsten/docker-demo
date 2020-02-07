@@ -17,8 +17,8 @@ COPY README.MD /Qpid.md
 # Prepare by adding Ruby (for C++ Broker)
 #TODO# should libboost-dev be included in build-bin?
 #
-RUN apt-get install -y ruby-dev libboost-program-options1.62 libboost-system1.62 uuid-dev \
-	libcunit1-dev doxygen valgrind swig python-unittest2
+RUN apt-get update && apt-get -y upgrade && apt-get install -y ruby-dev libboost-program-options1.62 libboost-system1.62 uuid-dev \
+	libcunit1-dev doxygen valgrind swig python3-unittest2
 
 # Install Qpid Proton
 #
@@ -47,6 +47,14 @@ RUN cd /usr/local/src ; git clone -b master --single-branch \
 		https://git-wip-us.apache.org/repos/asf/qpid-dispatch.git qpid-dispatch.git
 #FAILING TESTS# RUN cd /usr/local/src/qpid-dispatch.git ; mkdir build ; cd build ; cmake .. ; make all test install
 RUN cd /usr/local/src/qpid-dispatch.git ; mkdir build ; cd build ; cmake .. ; make all install
+
+# Prepare export directories for each product in DESTDIR=/export/qpid/<product>
+#
+RUN mkdir -p /export/qpid/{proton,broker,dispatch}
+RUN cd /usr/local/src/qpid-proton.git/build DESTDIR=/export/qpid/proton make install
+RUN cd /usr/local/src/qpid-cpp-broker.git/build DESTDIR=/export/qpid/broker make install
+RUN cd /usr/local/src/qpid-dispatch.git/build DESTDIR=/export/qpid/dispatch make install
+RUN for PROD in proton broker dispatch ; do cd /export/qpid/$PROD ; tar -czvf -C /export/qpid/$PROD /export/qpid/$PROD.tgz * ; rm -rf /export/qpid/$PROD ; done
 
 
 # Baseline command is bash
