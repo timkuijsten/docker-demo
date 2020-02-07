@@ -23,6 +23,10 @@
 FROM arpa2/files-reservoir AS reservoir
 
 
+### Prepare: Qpid Runtime code
+
+FROM arpa2/build-qpid AS qpid
+
 
 ### Setup: OpenLDAP
 #
@@ -33,10 +37,14 @@ FROM arpa2/files-reservoir AS reservoir
 FROM arpa2/build-bin
 
 
+# First install Qpid Dispatch Router
+COPY --from=qpid /usr/local/ /usr/local/
+
+
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get install --no-install-recommends -y \
 	logrotate libncurses5 libtinfo5 \
-	python3-dev
+	python3-dev python3-gssapi python3-qpid-proton
 
 RUN python3 -m easy_install python3-ldap six web2ldap
 
