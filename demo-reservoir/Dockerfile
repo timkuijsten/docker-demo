@@ -43,6 +43,7 @@ COPY --from=qpid /usr/local/ /usr/local/
 
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get install --no-install-recommends -y \
+	openssh-server \
 	logrotate libncurses5 libtinfo5 \
 	python3-dev python3-gssapi python3-qpid-proton
 
@@ -67,8 +68,17 @@ RUN rm -rf /etc/ldap/slapd.d
 COPY slapd.conf /etc/ldap/slapd.conf
 COPY ldap.conf /etc/ldap/ldap.conf
 COPY reservoir.keytab /etc/krb5.keytab
+COPY arpa2api.keytab /etc/arpa2/arpa2api.keytab
 # RUN chmod go-rwx /etc/krb5.keytab
 RUN chmod go+r /etc/krb5.keytab
+
+RUN echo >>/etc/ssh/sshd_config PermitRootLogin yes
+RUN echo >>/etc/ssh/sshd_config Subsystem arpa2shell \
+                           /usr/local/bin/arpa2shell
+RUN echo >>/etc/ssh/sshd_config Subsystem arpa2client \
+                           /usr/local/bin/arpa2client
+RUN echo >>/etc/ssh/sshd_config Subsystem arpa2reservoir \
+                           /usr/local/bin/arpa2reservoir
 
 #RATHER #COPY slapd.keytab	/etc/ldap/slapd.keytab
 #RATHER #RUN chown opldap:openldap /etc/ldap/slapd.keytab
@@ -87,7 +97,8 @@ COPY arpa2kinit /usr/bin/arpa2kinit
 
 # Install the arpa2shell utilities from Git
 #
-RUN git clone https://github.com/arpa2/arpa2shell /usr/local/src/arpa2shell.git
+#TMP#DEV# RUN git clone https://github.com/arpa2/arpa2shell /usr/local/src/arpa2shell.git
+RUN git clone -b amqp-improvements-py3 https://github.com/arpa2/arpa2shell /usr/local/src/arpa2shell.git
 RUN python /usr/local/src/arpa2shell.git/setup.py install
 
 

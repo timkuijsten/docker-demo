@@ -49,7 +49,7 @@ The `slapd` is on the main terminal, outputing tons of debugging
 information; you can avoid seeing it with the `--detach` option:
 
 ```
-docker run --detach --network host --hostname reservoir.arpa2 -p 1388:1388 -p 1761:1761 --name rv0 rv
+docker run --detach --network host --hostname reservoir.arpa2 -p 1388:1388 -p 1761:1761 -p 5672:5672 -p 2020:22 --name rv0 rv
 ```
 
 You can stop and start it at any time using
@@ -73,6 +73,13 @@ Shells for poking around can be started as desired:
 docker exec -ti rv0 arpa2shell
 ```
 
+Or, you could use SSH from your host and request to start
+the appropriate subsystem:
+
+```
+ssh -p 2020 -s localhost arpa2shell
+```
+
 This is a special shell for doing ARPA2 manipulations.
 In fact, it is a meta-shell that can drop in on various
 ARPA2 sub-shells and allows switching between them.
@@ -80,6 +87,12 @@ This is more powerful than just opening a single shell,
 
 ```
 docker exec -ti rv0 arpa2reservoir
+```
+
+or,
+
+```
+ssh -p 2020 -s localhost arpa2reservoir
 ```
 
 You can get a normal shell with
@@ -102,14 +115,30 @@ you could use `demo@ARPA2.NET` with password `sekreet`:
 arpa2kinit
 ```
 
-To drop Kerberos, instead run
+Alternatively, if you use SSH from your host with Kerberos
+access (UNTESTED), you might use your existing single-signon
+account or the same one as above:
+
+```
+kinit
+#or#
+kinit demo@ARPA2.NET
+```
+
+To drop Kerberos in the container, instead run
 
 ```
 arpa2kinit @
 ```
 
+on the host system, you would instead use
 
-On the shell, you could also run the shells,
+```
+kdestroy
+```
+
+
+On the commandline of the container, you could also run the shells,
 
 ```
 arpa2reservoir
@@ -122,6 +151,42 @@ of the tree, to help with situations where not all
 domains have the same service, where subdomains have
 additional service, where customers take out only one
 but not both the services, and so on.
+
+
+## Use from JSON
+
+There is (EARLY) support for standardised
+[JSON messaging with the shells](https://github.com/arpa2/arpa2shell/blob/master/PROTOCOL.MD)
+for which we start an `arpa2api.d` in the
+background.  If you run `arpa2api` as a command, or
+ask SSH for that subsystem, you will have an input/output
+system for exchanging JSON packages.  These will look
+slightly different from the commandline format presented
+in the examples below, as explained at the link above.
+
+In addition, there is an AMQP interface to the
+`arpa2apid` which runs the
+[complete stack](https://github.com/arpa2/arpa2shell/blob/master/PROTOCOL.MD#authenticated-json-between-microservices)
+in service of microservices.  Those microservices
+could run their own `arpa2api`, either as a
+standalong or through 
+
+FUTURE versions will use your credentials from the environment
+that invokes the `arpa2api`, so your host when you call
+it yourself or otherwise the SSH session to the container.
+These credentials are passed on via the stack to the
+`arpa2apid`, which passes them on to the shells.  The
+shells finally use the credentials for access control decisions.
+
+FUTURE versions will export these services, both over SSH and
+AMQP, to anyone who wants to have them.  Whether they get
+anything done will be completely up to access control.  This
+[backbone innovation](http://www.internetwide.org/blog/2018/11/22/backbone-innovations.html)
+allows us to accept requests from microservices hosted by
+others, which we will need in the upcoming
+[ServiceHub phase](http://internetwide.org/blog/2016/06/24/iwo-phases.html)
+of the project.
+
 
 ## Use the prepared Reservoir Domain
 

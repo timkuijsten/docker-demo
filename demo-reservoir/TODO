@@ -1,6 +1,14 @@
 + (arpa2id) look into ldap.conf instead of ARPA2_DOMAIN and ARPA2_LDAPURI
 + (arpa2id) use GSSAPI login when the BINDDN matches
 - (arpa2id) inherit from cmd.Cmd instead of parsing "manually"
+- (arpa2dns) stop from crashing when no libknotV.so found (or only different V)
+- (arpa2dns) find a way to link the Python support to OS packages
+- TODO:TMP: sshd_config += "PermitRootLogin yes"
++ sshd_config += "subsystem arpa2reservoir /usr/local/bin/arpa2reservoir"
++ sshd_config += "subsystem arpa2shell     /usr/local/bin/arpa2shell"
++ sshd_config += "subsystem arpa2client    /usr/local/bin/arpa2client"
++ initial krb5 tickets for arpa2client (NO, PLAIN LOGIN) and arpa2server
+- make arpa2api usable as a library arpa2shell.amqp.client as a Container==App
 + setup Kerberos5 server ticket ldap/reservoir.arpa2@ARPA2.NET
 + a2reservoir -> arpa2reservoir
 + yet another round of Python installation blues (BUT THIS TIME IT'S RESOLVED!!!!)
@@ -11,3 +19,4 @@ X Somehow get riak to create bucket types with or without crypto:md5 facility
 + Drop user_pasw.py from Dockerfile [also in the arpa2/identityhub target]
 + Make arpa2reservoir work; riak->files, str.strip, imports
 - Expand arpa2acl with libarpa2common wrapper
+- Expand arpa2reservoir with libarpa2common wrapper
