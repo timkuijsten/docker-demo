@@ -66,7 +66,8 @@ ADD pulley/ /export/steamworks/root/pulley
 #
 FROM arpa2/base
 
-RUN apt-get install libpython3.7
+RUN apt-get update && \
+	apt-get install -y liblog4cpp5v5 libsqlite3-0 libfcgi-bin libfl2
 
 COPY --from=src2export /export/steamworks /
 
