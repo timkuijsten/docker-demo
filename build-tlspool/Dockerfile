@@ -56,8 +56,8 @@ RUN useradd tlspool
 ADD https://github.com/arpa2/tlspool/archive/0.9.3.tar.gz /root/tlspool-0.9.3.tar.gz
 COPY gnutls-abruptly-dropped-pgp.patch /tmp/
 RUN cd /usr/local/src && tar -xzvf /root/tlspool-0.9.3.tar.gz && cd tlspool-0.9.3 && patch -p1 < /tmp/gnutls-abruptly-dropped-pgp.patch
-#ALT# RUN git clone -b master https://github.com/arpa2/tlspool/ /usr/local/src/tlspool-0.9.3
-# run cd /usr/local/src && git clone https://github.com/arpa2/tlspool tlspool-0.9.3
+#ALT# RUN git clone -b master https://gitlab.com/arpa2/tlspool/ /usr/local/src/tlspool-0.9.3
+# run cd /usr/local/src && git clone https://gitlab.com/arpa2/tlspool tlspool-0.9.3
 RUN cd /usr/local/src/tlspool-0.9.3 && make -C lib/python clean && mkdir build && cd build && cmake -D TEST_UNDER_TLSPOOL:BOOL=ON -D CMAKE_INSTALL_PREFIX:PATH=/ .. && make all install
 #OVERRULED_BELOW# RUN cp /usr/local/src/tlspool-0.9.3/etc/tlspool.conf /etc/tlspool.conf
 RUN cp /usr/local/src/tlspool-0.9.3/etc/root.key /etc/dnsroot-tlspool

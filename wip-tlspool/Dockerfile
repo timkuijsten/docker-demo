@@ -32,6 +32,7 @@ RUN apt-get install -y libdb5.3-dev softhsm2 libgnutls28-dev gnutls-bin libldns-
 
 # Install Quick DER
 COPY --from=quickder /usr/local/include/quick-der /usr/local/include/quick-der
+COPY --from=quickder /usr/local/include/arpa2 /usr/local/include/arpa2
 COPY --from=quickder /usr/local/lib/pkgconfig/Quick-DER.pc /usr/local/lib/pkgconfig/Quick-DER.pc
 COPY --from=quickder /usr/local/lib/libquickder.so /usr/local/lib/libquickder.so
 COPY --from=quickder /usr/local/lib/libquickder.a /usr/local/lib/libquickder.a
@@ -48,9 +49,9 @@ COPY --from=quickder /usr/local/share/doc/quick-der/ /usr/local/share/doc/quick-
 
 # Install TLS Pool
 RUN useradd tlspool
-#SEEBELOW# ADD https://github.com/arpa2/tlspool/archive/0.20-beta9.tar.gz /root/tlspool-0.20-beta9.tar.gz
+#SEEBELOW# ADD https://gitlab.com/arpa2/tlspool/archive/0.20-beta9.tar.gz /root/tlspool-0.20-beta9.tar.gz
 #SEEBELOW# RUN cd /usr/local/src && tar -xzvf /root/tlspool-0.20-beta9.tar.gz
-RUN cd /usr/local/src && git clone https://github.com/arpa2/tlspool tlspool.git
+RUN git clone https://gitlab.com/arpa2/tlspool.git /usr/local/src/tlspool.git
 #SEEBELOW# RUN cd /usr/local/src/tlspool-0.20-beta9 && make -C lib/python clean && mkdir build && cd build && cmake .. && make all test install
 RUN cd /usr/local/src/tlspool.git && make -C lib/python clean && mkdir build && cd build && cmake .. && make all test install
 #SEEBELOW# RUN cp /usr/local/src/tlspool-0.20-beta9/etc/tlspool.conf /etc/tlspool.conf
