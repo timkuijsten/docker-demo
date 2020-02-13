@@ -56,6 +56,10 @@ RUN sed -i 's+a2lc_+/usr/local/share/steamworks/pulleyscript/a2lc_+g' /export/st
 RUN mkdir -p /var/db/pulley && cp /usr/local/src/steamworks.git/src/pulley/examples/pulley.properties /
 RUN mkdir -p /export/steamworks/var/db/pulley && cp /usr/local/src/steamworks.git/src/pulley/examples/pulley.properties /export/steamworks
 
+# The test program, for now the Ultimate Experience on Pulling Back
+RUN mkdir -p /export/steamworks/usr/local/sbin
+RUN cp /usr/local/src/steamworks.git/build/src/pulley/pulleyback_test /export/steamworks/usr/local/sbin
+
 # Add a few Pulley Scripts
 ADD pulley/ /root/pulley
 ADD pulley/ /export/steamworks/root/pulley
