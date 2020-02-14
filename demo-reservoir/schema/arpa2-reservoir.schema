@@ -185,14 +185,12 @@ objectclass ( 1.3.6.1.4.1.44469.666.389.2.2.1
 # for Resource Collections, as per http://uuid.arpa2.org that is
 # fixed to 904dfdb5-6b34-3818-b580-b9a0b4f7e7a9.
 #
-#TODO# make it STRUCTURAL SUP resourceInstance
-#
 objectclass ( 1.3.6.1.4.1.44469.666.389.2.2.2
 	NAME 'reservoirCollection'
 	DESC 'One Resource Collection as stored in the ARPA2 Reservoir.  Usually with a reservoirIndex attached to simulate trees of Resource Collections, with Resources at the leafs.'
 	STRUCTURAL SUP documentSeries
 	MUST ( resourceInstanceKey $ resourceClassUUID )
-	MAY ( cn $ description ) )
+	MAY ( cn $ description $ mediaType $ labeledURI $ seeAlso $ associatedDomain $ uid $ mail ) )
 
 # Reservoir Index Objects can be attached to other objects to make
 # them point into the Reservoir using UUIDs and optional names for

@@ -1,7 +1,11 @@
++ Rename arpa2shell to arpa2.shell
++ Migrate LDAP logic into arpa2.reservoir default loaded api.py
++ Extend arpa2.reservoir with the shell using the API
++ Migrate arpa2shell.arpa2reservoir to arpa2.reservoir.shell
 + (arpa2id) look into ldap.conf instead of ARPA2_DOMAIN and ARPA2_LDAPURI
 + (arpa2id) use GSSAPI login when the BINDDN matches
 - (arpa2id) inherit from cmd.Cmd instead of parsing "manually"
-- (arpa2dns) stop from crashing when no libknotV.so found (or only different V)
++ (arpa2dns) stop from crashing when no libknotV.so found (or only different V)
 - (arpa2dns) find a way to link the Python support to OS packages
 - TODO:TMP: sshd_config += "PermitRootLogin yes"
 + sshd_config += "subsystem arpa2reservoir /usr/local/bin/arpa2reservoir"
