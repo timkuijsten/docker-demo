@@ -98,7 +98,7 @@ COPY arpa2kinit /usr/bin/arpa2kinit
 # Install the arpa2shell utilities from Git
 #
 #TMP#DEV# RUN git clone https://gitlab.com/arpa2/shell /usr/local/src/arpa2shell.git
-RUN git clone -b rename-arpa2-dot-shell https://gitlab.com/arpa2/shell.git /usr/local/src/arpa2shell.git
+RUN git clone https://gitlab.com/arpa2/shell.git /usr/local/src/arpa2shell.git
 RUN python /usr/local/src/arpa2shell.git/setup.py install
 
 # Install the arpa2.reservoir core logic
