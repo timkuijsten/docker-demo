@@ -1,0 +1,3 @@
+#!/bin/bash
+
+tee /tmp/sftp.stdin | /usr/lib/openssh/sftp-server | tee /tmp/sftp.stdout
