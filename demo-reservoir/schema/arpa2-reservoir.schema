@@ -164,17 +164,31 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.2.1.11
 # +  includes IPFS references?
 # +  includes IPNS locations? (as soon as they express it in URIs)
 # +  includes general URIs
-# +  includes short "blobKey" (resource=...)
+# +  includes short "blobKey" (resource=...)  -->  or "blobId" or "Content-Id"
 # -  includes version history / backrefs?
 # -  includes arbitrary kinds of documentation
 # +  includes Content-Type
 #
+# Also useful ideas: making it a KIP-Document /or/ KIP-Collection
+#  - kipDocument --> attrs kipLocation, kipCollection, kipRootCollection,
+#                          kipAuthor, kipContact, kipACL, kipProtections
+# Most document descriptors exist, so KIP-Document adds little to LDAP,
+# some things may however make sense.  The kipAuthor and kipACL can help to
+# decide if communication makes any sense.  The kipProtections give the
+# parameters that could be added to "data:message/kip;base64;...," and the
+# kipLocation can hold KIP-Object-Reference values.  The kipCollection and
+# kipRootCollection hold the KIP-Collection-ID (which may be a UUID) that
+# allows a lookup; possibly as a Collection UUID in Reservoir!
+#
+# 20200220 - Dropped SUP document (forced globally unique documentIdentifier)
+#          - Added MUST uniqueIdentifier (we'll say unique in Collection)
+#
 objectclass ( 1.3.6.1.4.1.44469.666.389.2.2.1
 	NAME 'reservoirResource'
 	DESC 'One Resource as stored in the ARPA2 Reservoir.  This is the metadata part, the actual data is in an object store.'
-	STRUCTURAL SUP document
-	MUST ( resource )
-	MAY ( cn $ mediaType $ description $ documentHash $ labeledURI $ lockedBy ) )
+	STRUCTURAL SUP top
+	MUST ( resource $ mediaType $ uniqueIdentifier )
+	MAY ( cn $ description $ documentIdentifier $ documentTitle $ documentVersion $ documentAuthor $ documentPublisher $ documentLocation $ documentHash $ labeledURI $ lockedBy ) )
 
 # The reservoirCollection is used to represent a Resource Collection.
 # Its identity is a UUID which should be used in the RDN, so as to

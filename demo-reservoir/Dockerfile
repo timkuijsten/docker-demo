@@ -45,7 +45,7 @@ RUN apt-get update && apt-get -y upgrade
 RUN apt-get install --no-install-recommends -y \
 	openssh-server \
 	logrotate libncurses5 libtinfo5 \
-	python3-dev python3-gssapi python3-qpid-proton
+	python3-dev python3-gssapi python3-qpid-proton python3-twisted
 
 RUN python3 -m easy_install python3-ldap six web2ldap
 
@@ -106,6 +106,9 @@ RUN python /usr/local/src/arpa2shell.git/setup.py install
 RUN git clone https://gitlab.com/arpa2/reservoir.git /usr/local/src/arpa2reservoir.git
 RUN python /usr/local/src/arpa2reservoir.git/setup.py install
 
+# Install Henri's cute little web demo
+#
+COPY MusicLister.py MusicLister.xml /usr/local/src/
 
 # Install the main script for the Reservoir service
 #

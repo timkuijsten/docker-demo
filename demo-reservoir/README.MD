@@ -16,6 +16,7 @@ This container currently holds:
 
 There are several ARPA2 idea that could be added:
 
+  * MusicLister op port 8811 is Henri's minimal-yet-functional Python Twisted webinterface to music
   * WebDAV on port 1761 through [wsgidav](http://wsgidav.readthedocs.io)
   * AMQP 1.0 upload interface for external users
   * SFTP access? for `user@domain.name@host` to a simulated tree
@@ -49,7 +50,7 @@ The `slapd` is on the main terminal, outputing tons of debugging
 information; you can avoid seeing it with the `--detach` option:
 
 ```
-docker run --detach --network host --hostname reservoir.arpa2 -p 1388:1388 -p 1761:1761 -p 5672:5672 -p 2020:22 --name rv0 rv
+docker run --detach --hostname reservoir.arpa2 -p 1388:1388 -p 1761:1761 -p 5672:5672 -p 8811:8811 -p 2020:22 --name rv0 rv
 ```
 
 You can stop and start it at any time using
