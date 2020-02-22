@@ -13,6 +13,10 @@ echo 'Starting OpenSSH server...'
 echo
 /etc/init.d/ssh start
 
+echo 'Starting Mosquitto server...'
+echo
+/etc/init.d/mosquitto start
+
 echo 'Starting Qpid Dispatch Router on port 5672...'
 echo
 /usr/local/sbin/qdrouterd &

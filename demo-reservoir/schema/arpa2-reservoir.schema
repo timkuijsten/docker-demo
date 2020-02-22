@@ -183,6 +183,8 @@ attributetype ( 1.3.6.1.4.1.44469.666.389.2.1.11
 # 20200220 - Dropped SUP document (forced globally unique documentIdentifier)
 #          - Added MUST uniqueIdentifier (we'll say unique in Collection)
 #
+#TODO# Consider renaming to reservoirObject (clash with ACL Resource is terrible)
+#
 objectclass ( 1.3.6.1.4.1.44469.666.389.2.2.1
 	NAME 'reservoirResource'
 	DESC 'One Resource as stored in the ARPA2 Reservoir.  This is the metadata part, the actual data is in an object store.'

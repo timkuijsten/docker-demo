@@ -154,6 +154,37 @@ additional service, where customers take out only one
 but not both the services, and so on.
 
 
+## Listen for Changes with MQTT
+
+The demo runs Mosquitto as an MQTT Broker in the background.
+The Reservoir API, which is used in pretty much everything
+described here, will send notifications whenever a Resource
+is added, deleted or has changed.  The message content for
+these events is `ADD`, `DEL` and `CHG`, respectively.
+
+The topics used are formed like `/reservoiruuid/domain/colluuid/resuuid`,
+where `reservoiruuid` is the fixed value that we use across
+protocols, `904dfdb5-6b34-3818-b580-b9a0b4f7e7a9` and the
+`colluuid` and `resuuid` are Collection and Resource UUID
+values.
+
+When the ACL is enforced, the required access right for
+listening for changes will be `K`, for Knowing-About,
+and it will be bound to `/reservoiruuid/colluuid` and
+thus inform the client about any resource changes in the
+indicated Collection.  Until this is in place, you can:
+
+```
+mosquitto_sub -t /904dfdb5-6b34-3818-b580-b9a0b4f7e7a9/arpa2.org
+```
+
+We have a few ideas for extensions in the future:
+
+  * Inform about Index name additions and removals
+  * Allow users to form an (authoritative) path
+  * Allow the `user@domain` form instead of just `domain`
+
+
 ## Use from JSON
 
 There is (EARLY) support for standardised
