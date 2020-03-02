@@ -50,7 +50,7 @@ The `slapd` is on the main terminal, outputing tons of debugging
 information; you can avoid seeing it with the `--detach` option:
 
 ```
-docker run --detach --hostname reservoir.arpa2 -p 1388:1388 -p 1761:1761 -p 5672:5672 -p 8811:8811 -p 2020:22 --name rv0 rv
+docker run --detach --hostname reservoir.arpa2 -p 1388:1388 -p 1761:1761 -p 5672:5672 -p 8811:8811 -p 1883:1883 -p 2020:22 --name rv0 rv
 ```
 
 You can stop and start it at any time using
