@@ -28,6 +28,11 @@ FROM arpa2/files-reservoir AS reservoir
 FROM arpa2/build-qpid AS qpid
 
 
+### Prepare: SteamWorks
+
+FROM arpa2/build-steamworks AS steamworks
+
+
 ### Setup: OpenLDAP
 #
 #
@@ -43,11 +48,12 @@ COPY --from=qpid /usr/local/ /usr/local/
 
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get install --no-install-recommends -y \
-	openssh-server \
+	openssh-server mosquitto mosquitto-clients \
 	logrotate libncurses5 libtinfo5 \
-	python3-dev python3-gssapi python3-qpid-proton
+	python3-dev python3-gssapi python3-qpid-proton python3-twisted \
+	liblog4cpp5v5 libsqlite3-0 libfcgi-bin libfl2
 
-RUN python3 -m easy_install python3-ldap six web2ldap
+RUN python3 -m easy_install python3-ldap six web2ldap paho-mqtt cheroot
 
 #TODO:BUILD# RUN cd /usr/local/src ; git clone https://github.com/arpa2/arpa2shell-cmdparser cmdparser.git
 #TODO:BUILD# RUN cd /usr/local/src/cmdparser.git/cmdparser ; python setup.py install
@@ -88,6 +94,14 @@ RUN echo >>/etc/ssh/sshd_config Subsystem arpa2reservoir \
 #
 COPY --from=reservoir /var/arpa2/reservoir /var/arpa2/reservoir
 
+# Install SteamWorks, so we can use Pulley on the delivery lifecycleState
+#
+COPY --from=steamworks /usr/local/share         /usr/local/share
+COPY --from=steamworks /usr/local/bin           /usr/local/bin
+COPY --from=steamworks /usr/local/sbin          /usr/local/sbin
+COPY --from=steamworks /usr/local/include       /usr/local/include
+COPY --from=steamworks /usr/local/lib/pkgconfig /usr/local/lib/pkgconfig
+
 
 # Install utitilities commonly used in the demo environments
 #
@@ -103,9 +117,19 @@ RUN python /usr/local/src/arpa2shell.git/setup.py install
 
 # Install the arpa2.reservoir core logic
 #
-RUN git clone https://gitlab.com/arpa2/reservoir.git /usr/local/src/arpa2reservoir.git
+RUN git clone -b initial https://gitlab.com/arpa2/reservoir.git /usr/local/src/arpa2reservoir.git
+RUN cp /usr/local/src/arpa2reservoir.git/extra/reservoir.conf.demo /etc/arpa2/reservoir.conf
+RUN cd /usr/local/src/arpa2reservoir.git checkout feature-amqp
 RUN python /usr/local/src/arpa2reservoir.git/setup.py install
 
+# Install the wsgidev service
+#
+RUN git clone -b arpa2reservoir https://github.com/arpa2/wsgidav /usr/local/src/wsgidav.git
+RUN python /usr/local/src/wsgidav.git/setup.py install
+
+# Install Henri's cute little web demo
+#
+COPY MusicLister.py MusicLister.xml /usr/local/src/
 
 # Install the main script for the Reservoir service
 #

@@ -1,3 +1,7 @@
+- Decide on apphints: use as ?apphint=; implicit creation; default/unnamed
+- Decide on domain [user?] objects with labeledURI; noname=auto, named=usrlink
+- Decide on labeledURI; probably prefix to paths like /colluuid[/resuuid]
+- Decide on User: header requirement to adress a user (related to URI or not)
 + Rename arpa2shell to arpa2.shell
 + Migrate LDAP logic into arpa2.reservoir default loaded api.py
 + Extend arpa2.reservoir with the shell using the API

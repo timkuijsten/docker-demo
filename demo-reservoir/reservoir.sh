@@ -9,9 +9,16 @@ echo
 #LOCKOUT# sed -i -e '$,$s/^\([^ \t]*\)[ \t]/\1 reservoir.arpa2 /' /etc/hosts
 sed -e '$,$s/^\([^ \t]*\)[ \t]/\1 reservoir.arpa2 /' < /etc/hosts > /etc/hosts2 && cp /etc/hosts2 /etc/hosts
 
+echo 'Starting syslog...'
+/etc/init.d/rsyslog start
+
 echo 'Starting OpenSSH server...'
 echo
 /etc/init.d/ssh start
+
+echo 'Starting Mosquitto server...'
+echo
+/etc/init.d/mosquitto start
 
 echo 'Starting Qpid Dispatch Router on port 5672...'
 echo

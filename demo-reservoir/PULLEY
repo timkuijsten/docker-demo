@@ -1,0 +1,27 @@
+
+1.
+Starting /usr/bin/reservoir.sh in one shell
+
+2.
+Running Pulley in another
+cd /usr/local/src/arpa2reservoir.git
+git checkout feature-amqp
+git pull
+python3 setup.py build install
+pulleyback_test -r ldapi://%2ftmp%2fldap-socket -b ou=Reservoir,o=arpa2.net,ou=InternetWide -s extra/reservoir-sender.ply
+
+3.
+Adding an enty to the "send queue" in LDAP via arpa2reservoir
+index domain arpa2.org
+# index collection c46a6a03-fec5-4fb1-87e2-069045fc5899
+# index path Negrin Whispering
+index collection 9673fd11-6d10-48a1-905b-8f8599a0584f
+resource send 20bac206-0acc-4386-9b48-bbfdb8e4d4bd pino@sesamstraat.nep
+
+4.
+List current entries in the "send queue" in LDAP
+slapcat | grep ^lifecycleState
+lifecycleState: sender init@1583165640 from=tommy@sesamstraat.nep to=rick@va
+lifecycleState: sender init@1583165640 from=tommy@sesamstraat.nep to=elmo@se
+lifecycleState: sender init@1583166247 from=tommy@sesamstraat.nep to=pino@se
+
