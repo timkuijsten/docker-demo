@@ -18,7 +18,7 @@ RUN apt-get install -y automake libtool-bin libpcre3-dev liblmdb-dev lmdb-utils 
 RUN cd /usr/local/src ; git clone https://gitlab.com/arpa2/libarpa2common.git && \
     cd libarpa2common && git reset v0.7.1 && \
     mkdir build && cd build && \
-    cmake .. && \
+    cmake .. -D_have_lmdb:INTERNAL=0 && \
     make && \
     make install && \
     ldconfig
@@ -28,11 +28,17 @@ COPY mod_arpa2_tlspool	/usr/local/src/mod_arpa2_tlspool
 COPY mod_arpa2_aclr 	/usr/local/src/mod_arpa2_aclr
 COPY mod_arpa2_userdir	/usr/local/src/mod_arpa2_userdir
 
-RUN cd /usr/local/src/mod_arpa2_userdir	&& apxs -i -a -c mod_arpa2_userdir.c
-RUN cd /usr/local/src/mod_arpa2_aclr	&& apxs -i -a -c mod_arpa2_aclr.c \
-                                    	        -larpa2aclr
-RUN cd /usr/local/src/mod_arpa2_tlspool	&& apxs -i -a -c mod_arpa2_tlspool.c \
-                                    	        -ltlspool
+# Copy apache resources
+# HTML files
+COPY /var/www/html /var/www/html
+# configuration files
+COPY /etc/apache2 /etc/apache2
+
+RUN cd /usr/local/src/mod_arpa2_userdir && apxs -i -a -c mod_arpa2_userdir.c
+RUN cd /usr/local/src/mod_arpa2_aclr    && apxs -i -a -c mod_arpa2_aclr.c \
+                                                -larpa2aclr
+RUN cd /usr/local/src/mod_arpa2_tlspool && apxs -i -a -c mod_arpa2_tlspool.c \
+                                                -ltlspool
 
 # Define default command
 CMD ["/bin/bash"]
