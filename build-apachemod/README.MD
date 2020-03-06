@@ -119,7 +119,6 @@ manson@manson-Satellite-L300:~/docker/docker-demo$ curl --cacert build-apachemod
 manson@manson-Satellite-L300:~/docker/docker-demo$
 ```
 
-```
 ## Inside docker ##
 ```
 root@9b0050a13502:/# tail -n 5 /usr/local/apache2/logs/error_log 
