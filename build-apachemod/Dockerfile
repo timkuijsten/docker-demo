@@ -11,7 +11,7 @@ FROM arpa2/build-tlspool AS apache
 
 # Install the Apache tool chain and compile
 
-RUN apt-get install -y automake libtool-bin libpcre3-dev liblmdb-dev lmdb-utils apache2-dev apache2-utils apache2
+RUN apt-get install -y automake libtool-bin libpcre3-dev liblmdb-dev lmdb-utils apache2-dev apache2-utils apache2 sasl2-bin
 
 # Install libarpa2common
 
@@ -24,9 +24,10 @@ RUN cd /usr/local/src ; git clone https://gitlab.com/arpa2/libarpa2common.git &&
     ldconfig
 
 # Build Apache modules
-COPY mod_arpa2_tlspool	/usr/local/src/mod_arpa2_tlspool
-COPY mod_arpa2_aclr 	/usr/local/src/mod_arpa2_aclr
-COPY mod_arpa2_userdir	/usr/local/src/mod_arpa2_userdir
+COPY mod_arpa2_tlspool  /usr/local/src/mod_arpa2_tlspool
+COPY mod_arpa2_aclr     /usr/local/src/mod_arpa2_aclr
+COPY mod_arpa2_userdir  /usr/local/src/mod_arpa2_userdir
+COPY mod_arpa2_sasl     /usr/local/src/mod_arpa2_sasl
 
 # Copy apache resources
 # HTML files
@@ -39,6 +40,8 @@ RUN cd /usr/local/src/mod_arpa2_aclr    && apxs -i -a -c mod_arpa2_aclr.c \
                                                 -larpa2aclr
 RUN cd /usr/local/src/mod_arpa2_tlspool && apxs -i -a -c mod_arpa2_tlspool.c \
                                                 -ltlspool
+RUN cd /usr/local/src/mod_arpa2_sasl && apxs -i -a -c mod_arpa2_sasl.c \
+                                                -lsasl2 -lpcre
 
 # Define default command
 CMD ["/bin/bash"]
