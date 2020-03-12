@@ -5,14 +5,14 @@ RUN apt-get -y install libssl-dev libunbound-dev python3-setuptools python3-dev
 
 RUN python3 /usr/lib/python3/dist-packages/easy_install.py six pyparsing asn1ate
 
-ADD kip-initial.tar.gz /usr/local/src/
-
 RUN git clone https://github.com/vanrein/quick-der /usr/local/src/quick-der.git
 RUN mkdir /usr/local/src/quick-der.git/build ; cd /usr/local/src/quick-der.git/build ; cmake -DDEBUG:BOOL=OFF ..
 RUN make -C /usr/local/src/quick-der.git/build all install
 RUN python /usr/local/src/quick-der.git/setup.py install
 
-RUN git clone -b initial https://gitlab.com/arpa2/kip /usr/local/src/kip.git
+RUN python -m easy_install arpa2.quickder_tools
+RUN python -m easy_install arpa2.quickder
+RUN git clone -b master https://gitlab.com/arpa2/kip /usr/local/src/kip.git
 RUN mkdir /usr/local/src/kip.git/build ; cd /usr/local/src/kip.git/build ; cmake ..
 RUN make -C /usr/local/src/kip.git/build
 RUN mkdir /etc/unbound ; cp /usr/local/src/kip.git/test/bin/root.key /etc/unbound/root.key
