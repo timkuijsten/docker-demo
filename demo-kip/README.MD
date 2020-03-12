@@ -87,7 +87,7 @@ PING 193d5e2c77b1 (172.17.0.93) 56(84) bytes of data.
 To run this demo, first start the KIP Service but **replace the IP address**:
 
 ```
-kipd 172.17.0.93 9876 /usr/local/src/kip-initial/test/bin/unicorn.keytab $KIP_REALM 1 &
+kipd 172.17.0.93 9876 /usr/local/src/kip.git/test/bin/unicorn.keytab 1 &
 ```
 
 
