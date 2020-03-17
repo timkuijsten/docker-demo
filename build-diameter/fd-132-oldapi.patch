@@ -1,0 +1,13 @@
+Only in freeDiameter-1.3.2-new/: build
+diff -ur freeDiameter-1.3.2/libfdcore/sctp.c freeDiameter-1.3.2-new/libfdcore/sctp.c
+--- freeDiameter-1.3.2/libfdcore/sctp.c	2019-06-02 14:41:21.000000000 +0000
++++ freeDiameter-1.3.2-new/libfdcore/sctp.c	2020-03-17 10:25:58.116179000 +0000
+@@ -48,7 +48,7 @@
+ /* #define OLD_SCTP_SOCKET_API */
+ 
+ /* Automatically fallback to old API if some of the new symbols are not defined */
+-#if (!defined(SCTP_CONNECTX_4_ARGS) || (!defined(SCTP_RECVRCVINFO)) || (!defined(SCTP_SNDINFO))) 
++#if (!defined(SCTP_CONNECTX_4_ARGS) || (!defined(SCTP_RECVRCVINFO)) || (!defined(SCTP_SNDINFO))  || (!defined(SCTP_SEND_FAILED_EVENT)))
+ # define OLD_SCTP_SOCKET_API
+ #endif
+ 
