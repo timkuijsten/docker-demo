@@ -11,17 +11,33 @@
 FROM arpa2/build-bin
 
 RUN apt-get update && \
-    apt-get install -y libgnutls28-dev gnutls-bin libidn11-dev libsctp-dev lksctp-tools libgcrypt20-dev # mercurial
+    apt-get install -y libssl-dev libunbound-dev python3-setuptools python3-dev freediameter libfreediameter-dev
+RUN python3 /usr/lib/python3/dist-packages/easy_install.py six pyparsing asn1ate
 
-ADD http://www.freediameter.net/hg/freeDiameter/archive/1.3.2.tar.gz /root/freediameter-1.3.2.tar.gz
-ADD fd-132-oldapi.patch /root/fd-132-oldapi.patch
+RUN git clone https://github.com/vanrein/quick-der /usr/local/src/quick-der.git
+RUN mkdir /usr/local/src/quick-der.git/build ; cd /usr/local/src/quick-der.git/build ; cmake -DDEBUG:BOOL=OFF ..
+RUN make -C /usr/local/src/quick-der.git/build all install
+RUN python /usr/local/src/quick-der.git/setup.py install
 
-RUN cd /usr/local/src && tar -xzvf /root/freediameter-1.3.2.tar.gz && cd freeDiameter-1.3.2 && patch -p1 < /root/fd-132-oldapi.patch
-RUN cd /usr/local/src/freeDiameter-1.3.2 ; mkdir build ; cd build ; cmake -Wno-dev ..
-#TEST_FAILS_ON_SCTP_IN_DOCKER# RUN cd /usr/local/src/freeDiameter-1.3.2/build ; make all test install ; ldconfig
-RUN cd /usr/local/src/freeDiameter-1.3.2/build ; make all install ; ldconfig
+RUN python -m easy_install arpa2.quickder_tools
+RUN python -m easy_install arpa2.quickder
+RUN git clone -b sxover-diameter https://gitlab.com/arpa2/kip /usr/local/src/kip.git
+RUN mkdir /usr/local/src/kip.git/build ; cd /usr/local/src/kip.git/build ; cmake ..
+RUN make -C /usr/local/src/kip.git/build
+RUN mkdir /etc/unbound ; cp /usr/local/src/kip.git/test/bin/root.key /etc/unbound/root.key
+#RUN cd /usr/local/src/kip.git/build ; ctest
 
-RUN python3 -m easy_install pyDiameter
+RUN cp /usr/local/src/kip.git/build/src/kip  /usr/local/bin/kip
+RUN cp /usr/local/src/kip.git/build/src/kipd /usr/local/bin/kipd
 
+ADD README.MD /KIP.MD
+ADD kip-up-and-down.c   /tmp/kip-up-and-down.c
+ADD kip-up-and-down.kip /tmp/kip-up-and-down.kip
+#NOTYET# RUN cp /usr/local/src/kip.git/src/cmdline.c /tmp/kip-up-and-down.c
+#NOTYET# RUN /usr/local/bin/kip up /tmp/kip-up-and-down.c /tmp/kip-up-and-down.kip
+
+ENV KIP_REALM=unicorn.demo.arpa2.org
+
+COPY conf /root/test-run
 
 CMD ["bash"]
