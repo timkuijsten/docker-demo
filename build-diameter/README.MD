@@ -38,3 +38,29 @@ in C, not C++ or Erlang.
     and [server soruce](http://www.freediameter.net/trac/browser/freeDiameter/extensions/test_app/ta_serv.c)
     and [app context](http://www.freediameter.net/trac/browser/freeDiameter/extensions/test_app).  Looks doable to make a SASL variation.
 
+**Quick start**
+
+Terminal 1
+```
+docker run --rm --name diameter -it build-diameter
+```
+
+Terminal 2
+```
+docker exec -it diameter bash
+cd ~/test-run
+sh make_certs.sh
+freeDiameterd -c freeDiameter-1.conf
+```
+
+Terminal 3
+```
+docker exec -it diameter bash
+cd ~/test-run
+freeDiameterd -c freeDiameter-2.conf
+```
+
+Terminal 1
+```
+kill -USR1 <pid-of freeDiameterd instance>
+```
