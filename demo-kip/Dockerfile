@@ -12,11 +12,11 @@ RUN python /usr/local/src/quick-der.git/setup.py install
 
 RUN python -m easy_install arpa2.quickder_tools
 RUN python -m easy_install arpa2.quickder
-RUN git clone -b master https://gitlab.com/arpa2/kip /usr/local/src/kip.git
+RUN git clone -b cyrus-sxover https://gitlab.com/arpa2/kip /usr/local/src/kip.git
 RUN mkdir /usr/local/src/kip.git/build ; cd /usr/local/src/kip.git/build ; cmake ..
 RUN make -C /usr/local/src/kip.git/build
 RUN mkdir /etc/unbound ; cp /usr/local/src/kip.git/test/bin/root.key /etc/unbound/root.key
-RUN cd /usr/local/src/kip.git/build ; ctest
+#RUN cd /usr/local/src/kip.git/build ; ctest
 
 RUN cp /usr/local/src/kip.git/build/src/kip  /usr/local/bin/kip
 RUN cp /usr/local/src/kip.git/build/src/kipd /usr/local/bin/kipd
