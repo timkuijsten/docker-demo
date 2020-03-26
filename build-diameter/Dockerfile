@@ -38,6 +38,4 @@ ADD kip-up-and-down.kip /tmp/kip-up-and-down.kip
 
 ENV KIP_REALM=unicorn.demo.arpa2.org
 
-COPY conf /root/test-run
-
 CMD ["bash"]

@@ -43,24 +43,12 @@ in C, not C++ or Erlang.
 Terminal 1
 ```
 docker run --rm --name diameter -it build-diameter
+freeDiameterd -dd -c /usr/local/src/kip.git/build/test/bin/fdserver.conf
 ```
 
 Terminal 2
 ```
 docker exec -it diameter bash
-cd ~/test-run
-sh make_certs.sh
-freeDiameterd -c freeDiameter-1.conf
-```
-
-Terminal 3
-```
-docker exec -it diameter bash
-cd ~/test-run
-freeDiameterd -c freeDiameter-2.conf
-```
-
-Terminal 1
-```
-kill -USR1 <pid-of freeDiameterd instance>
+/usr/local/src/kip.git/build/src/fdclient -dd -c /usr/local/src/kip.git/build/test/bin/fdclient.conf
+/usr/local/src/kip.git/build/src/fdclient -dd -c /usr/local/src/kip.git/build/test/bin/fdclient.conf -v 6666
 ```
