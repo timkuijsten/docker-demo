@@ -31,11 +31,11 @@ RUN cp /usr/local/src/kip.git/build/src/kip  /usr/local/bin/kip
 RUN cp /usr/local/src/kip.git/build/src/kipd /usr/local/bin/kipd
 
 ADD README.MD /KIP.MD
-ADD kip-up-and-down.c   /tmp/kip-up-and-down.c
-ADD kip-up-and-down.kip /tmp/kip-up-and-down.kip
+#ADD kip-up-and-down.c   /tmp/kip-up-and-down.c
+#ADD kip-up-and-down.kip /tmp/kip-up-and-down.kip
 #NOTYET# RUN cp /usr/local/src/kip.git/src/cmdline.c /tmp/kip-up-and-down.c
 #NOTYET# RUN /usr/local/bin/kip up /tmp/kip-up-and-down.c /tmp/kip-up-and-down.kip
 
 ENV KIP_REALM=unicorn.demo.arpa2.org
-
+RUN cp /etc/hosts /tmp/hosts ; sed -i "\${s/\$/a kipsvc.unicorn.demo.arpa2.lab/}" /tmp/hosts ; echo 'cp /tmp/hosts /etc/hosts' >> /root/.bashrc
 CMD ["bash"]
