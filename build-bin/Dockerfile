@@ -41,6 +41,9 @@ ADD https://github.com/arpa2/arpa2cm/archive/version-0.5.tar.gz /root/arpa2cm-ve
 RUN cd /usr/local/src && tar -xzvf /root/arpa2cm-version-0.5.tar.gz
 RUN cd /usr/local/src/arpa2cm-version-0.5 && mkdir build && cd build && cmake .. && make all install
 
+# Install "mkhere" structures
+RUN cd / && git clone https://github.com/arpa2/mkhere
+
 #RUNIT## Install runit-docker (base already holds runit but not activated)
 #RUNIT# RUN git clone https://github.com/arpa2/runit-docker /usr/local/src/runit-docker.git
 #RUNIT# RUN make -C /usr/local/src/runit-docker.git install
